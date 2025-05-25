@@ -1,0 +1,69 @@
+---
+import HeaderLink from './HeaderLink.astro';
+---
+
+<aside class="sidebar" id="sidebar">
+    <nav class="sidebar-nav">
+        <HeaderLink href="/">Home</HeaderLink>
+        <HeaderLink href="/blog">Posts</HeaderLink> {/* Assuming /blog is your posts page */}
+        <HeaderLink href="/books">Books</HeaderLink>
+        <HeaderLink href="/about">About</HeaderLink>
+        {/* Add other links as needed */}
+    </nav>
+</aside>
+
+<style>
+    .sidebar {
+        position: fixed;
+        top: var(--header-height) - 1em; /* Position below the header */
+        left: -250px; /* Initially off-screen */
+        width: 250px;
+        height: calc(100% - var(--header-height)); /* Fill remaining height below header */
+        background-color: #fff4ec; /* Or your preferred background */
+        transition: left 0.3s ease-in-out;
+        z-index: 100; /* Ensure it's above other content */
+        overflow-y: auto; /* Add scroll if content overflows */
+    }
+
+    .sidebar.open {
+        left: 0; /* Slide in */
+    }
+
+    .sidebar-nav {
+        display: flex;
+        flex-direction: column;
+        padding: 1em;
+    }
+
+    .sidebar-nav a {
+        padding: 0.8em 1em;
+        color: rgb(var(--black));
+        text-decoration: none;
+        border-bottom: 1px solid var(--gray-light); /* Optional separator */
+        transition: background-color 0.2s ease;
+    }
+
+    .sidebar-nav a:last-child {
+        border-bottom: none;
+    }
+
+    .sidebar-nav a:hover {
+        background-color: rgba(var(--gray-light), 0.5);
+    }
+
+    /* Optional: Overlay to dim content when sidebar is open */
+    .overlay {
+        position: fixed;
+        top: var(--header-height); /* Position below the header */
+        left: 0;
+        width: 100%;
+        height: calc(100% - var(--header-height)); /* Fill remaining height below header */
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 99;
+        display: none; /* Hidden by default */
+    }
+
+    .overlay.visible {
+        display: block;
+    }
+</style> 

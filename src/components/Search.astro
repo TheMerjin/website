@@ -1,0 +1,57 @@
+<form class="search-form">
+  <input type="text" placeholder="Search..." class="search-input" />
+  <button type="button" class="search-icon" id="searchIcon">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+  </button>
+</form>
+
+<style>
+  .search-form {
+    display: flex;
+    align-items: center;
+    /* Initially hide the input */
+  }
+
+  .search-input {
+    all: unset;
+    display: none; /* Hide by default */
+    margin-right: 0.5em;
+    padding: 0.5em;
+    
+    font-size: 1em;
+    transition: width 0.3s ease-in-out;
+    width: 0; /* Start with zero width */
+    opacity: 1; /* Start with zero opacity */
+  }
+
+  .search-input.active {
+    display: block; /* Show when active */
+    width: 150px; /* Expand width */
+    opacity: 1; /* Fade in */
+  }
+
+  .search-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgb(var(--black)); /* Use a color variable */
+  }
+
+  .search-icon:hover {
+    color: var(--accent); /* Hover effect */
+  }
+</style>
+
+<script is:inline>
+  document.getElementById('searchIcon').addEventListener('click', function() {
+    const searchInput = this.parentElement.querySelector('.search-input');
+    searchInput.classList.toggle('active');
+    if (searchInput.classList.contains('active')) {
+      searchInput.focus();
+    }
+  });
+</script>
