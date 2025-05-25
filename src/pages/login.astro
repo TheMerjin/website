@@ -37,25 +37,56 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
   align-items: flex-end; /* aligns everything to the right */
   gap: 0.5em;
 }
-    .login-title {
-        text-align: center;
-        font-size: 20px;
-        font-weight: bold;
-        margin-top: 20px;
-    }
-    .login-form {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100vh;
-    }
-    .auth-links {
-        display: flex;
-        width: 100%;
-        justify-content: space-between;
-        margin-top: 0.2em;
-        }
+    /* Keep other styles as they are */
+
+.login-title {
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: 20px;
+}
+
+.page-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5em;
+  margin-top: 2rem;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75em;
+}
+
+.login-input {
+  width: 200px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.auth-links {
+  display: flex;
+  /* justify-content: space-between; /* REMOVE this line */
+  justify-content: center; /* ADD this line - centers the flex items */
+  gap: 1em; /* ADD this line - creates space between the links (adjust as needed) */
+  width: 200px; /* You can keep this if you want the links container to align with the input width */
+              /* Or remove it if you want the links to define their own width and be centered by .page-content */
+  margin-top: 1rem;
+}
+
+.auth-links a {
+  text-decoration: none;
+  color: #0077cc;
+  font-size: 14px;
+}
+
+.auth-links a:hover {
+  text-decoration: underline;
+}
     .login-input {
         width: 200px;
         padding: 10px;
