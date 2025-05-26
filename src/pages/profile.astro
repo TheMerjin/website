@@ -1,0 +1,100 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Profile</title>
+</Header>
+  <style>
+    .profile-header {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      border-bottom: 1px solid #ccc;
+    }
+    .user-info {
+      margin-left: 1rem;
+    }
+    .user-stats span {
+      display: inline-flex;
+      align-items: center;
+      margin-right: 1rem;
+      font-size: 0.9rem;
+      color: #555;
+    }
+    .user-stats svg {
+      width: 1em;
+      height: 1em;
+      margin-right: 0.25em;
+      fill: currentColor;
+    }
+    .header-nav {
+      margin-top: 0.5rem;
+    }
+    .header-nav a {
+      text-decoration: none;
+      margin: 0 0.5rem;
+      color: #007bff;
+    }
+    .header-nav span {
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+  <div class="profile-header">
+    <div class="user-info">
+      <h1 id="username">Loading...</h1>
+      <div class="user-stats" id="user-stats">
+        <!-- Stats will be injected -->
+      </div>
+      <div class="header-nav">
+        <a href="#">My Posts</a><span>&bull;</span>
+        <a href="#">Favorites</a><span>&bull;</span>
+        <a href="#">Settings</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Mock Auth object
+    const Auth = {
+      username: "Sreek",
+      stats: {
+        stars: 42,
+        posts: 17,
+        comments: 85
+      }
+    };
+
+    // Icon SVGs
+    const IconStar = `
+      <svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3L22 9.3l-5 4.9L18.2 22 12 18.3 5.8 22 7 14.2 2 9.3l6.9-1L12 2z"/></svg>
+    `;
+
+    const IconDocumentStats = `
+      <svg viewBox="0 0 24 24"><path d="M6 2h9l5 5v15a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm8 1.5V8h4.5L14 3.5zM8 13h8v-2H8v2zm0 4h8v-2H8v2z"/></svg>
+    `;
+
+    const IconCommentStats = `
+      <svg viewBox="0 0 24 24"><path d="M21 6h-2v9H7l-4 4V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2z"/></svg>
+    `;
+
+    // Inject data
+    document.getElementById("username").textContent = Auth.username;
+
+    document.getElementById("user-stats").innerHTML = `
+      <span>${IconStar}${Auth.stats.stars}</span>
+      <span>${IconDocumentStats}${Auth.stats.posts}</span>
+      <span>${IconCommentStats}${Auth.stats.comments}</span>
+    `;
+  </script>
+</body>
+</html>
