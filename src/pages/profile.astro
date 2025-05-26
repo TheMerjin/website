@@ -22,7 +22,7 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
             <!-- Stats will be injected -->
         </div>
         <div class="header-nav">
-            <a href="#">My Posts</a><span>&bull;</span>
+            <a href="#posts">My Posts</a><span>&bull;</span>
             <a href="#">Favorites</a><span>&bull;</span>
             <a href="#">Settings</a>
             <span class = "spacer"></span>
@@ -41,8 +41,16 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
       <h2> Bio</h2>
       <h5 id="Bio"> I am a traveler of many lands</h5>
     </div>
+    <section class = "post-section" id = "posts">
+      <h2> Posts</h2>
+      <h5 id="Bio"> yap</h5>
+    </section>
     </div>
     <style>
+      .post-section{
+        margin: 0rem;
+        padding: 1rem 0rem;
+      }
       .new-post-button-and-text{
         display: contents;
         margin: 0;
@@ -69,17 +77,28 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
         max-width: 900px;
         margin-left: 8rem;
         margin-right: auto;
+        outline: none;        /* removes the focus outline */
+        border: none;         /* removes the button border */
+        background: none;
         }
         new-post:hover {
           background-color: transparent
+          outline: none;        /* removes the focus outline */
+          border: none;         /* removes the button border */
+          background: none;
         }
       
         .logout-button {
-        padding: 1rem 1rem;
+        display: flex;
+        align-items: center;
+        padding: 0.8rem 1.6rem;
         border-bottom: 0px solid #fff4ec;
         max-width: 900px;
-        margin-left: 8rem;
+        max-height: 900px;
+        margin-left: 2rem;
         margin-right: auto;
+        gap : 1rem;
+        
         }
         .profile-header {
         padding: 1rem 5rem;
@@ -116,7 +135,11 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
         }
 
         .header-nav {
-        font-size: 1.5rem;
+          display: flex;
+          align-items: center; /* Vertically centers all direct children */
+          flex-wrap: nowrap;
+          font-size: 1.5rem;
+          margin-left: -0.5rem;
         }
 
         .header-nav a {
