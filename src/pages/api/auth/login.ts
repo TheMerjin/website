@@ -39,5 +39,5 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
     maxAge: 60 * 60 * 24 * 30, // 30 days
   });
 
-  return redirect("/dashboard");
+  return redirect("http://localhost:4321/index?msg=LoggedInThankyou");
 };
