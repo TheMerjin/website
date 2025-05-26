@@ -17,6 +17,11 @@ export const POST: APIRoute = async ({ request }) => {
   const { error: signUpError } = await supabase.auth.signUp({
     email,
     password,
+    options: {
+      data: {
+        username: username
+      }
+    }
   });
 
   if (signUpError) {

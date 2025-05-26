@@ -28,7 +28,11 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
             <button class="logout-button">Logout</button>
         </div>
         </div>
+      <div>
         
+      </div>
+      <h2> Bio</h2>
+      <h5 id="Bio"> I am a traveler of many lands</h5>
     </div>
 
     <style>
@@ -89,28 +93,61 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
         }
     </style>
 
-    <script>
-        const res = 0;
+<script>
+    async function load_user_name() {
+      try {
+        const response = await fetch('/api/auth/user-data', {
+          method: "GET",
+          credentials: "include"
+        });
+  
+        if (!response.ok) {
+          throw new Error("Failed to fetch user");
+        }
+  
+        const data = await response.json();
+        const user = data.user;
+  
+        
+  
+        // Display username
+        document.getElementById("username").textContent =
+        user.user_metadata.username
+  
+        // Display stats (replace with real values later if available)
+        
+  
+      } catch (error) {
+        console.error(error);
+        alert("Error loading user data.");
+      }
+    }
+    async function load_bio() {
+      try {
+        const response = await fetch('/api/auth/user-data', {
+          method: "GET",
+          credentials: "include"
+        });
+  
+        if (!response.ok) {
+          throw new Error("Failed to fetch user");
+        }
+  
+        
+        
+  
+        // Display stats (replace with real values later if available)
+        
+  
+      } catch (error) {
+        console.error(error);
+        alert("Error loading user data.");
+      }
+    }
 
-        const IconStar = `
-        <svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3L22 9.3l-5 4.9L18.2 22 12 18.3 5.8 22 7 14.2 2 9.3l6.9-1L12 2z"/></svg>
-        `;
-
-        const IconDocumentStats = `
-        <svg viewBox="0 0 24 24"><path d="M6 2h9l5 5v15a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm8 1.5V8h4.5L14 3.5zM8 13h8v-2H8v2zm0 4h8v-2H8v2z"/></svg>
-        `;
-
-        const IconCommentStats = `
-        <svg viewBox="0 0 24 24"><path d="M21 6h-2v9H7l-4 4V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2z"/></svg>
-        `;
-
-        document.getElementById("username").textContent = Auth.username;
-
-        document.getElementById("user-stats").innerHTML = `
-        <span>${IconStar}${Auth.stats.stars}</span>
-        <span>${IconDocumentStats}${Auth.stats.posts}</span>
-        <span>${IconCommentStats}${Auth.stats.comments}</span>
-        `;
-    </script>
+  
+    load_user_name();
+  </script>
+  
 </body>
 </html>
