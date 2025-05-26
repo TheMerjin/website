@@ -132,7 +132,7 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
         if (!response.ok) {
           throw new Error("Failed to fetch user");
         }
-  
+        console.log(response)
         
         
   
@@ -147,6 +147,7 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 
   
     load_user_name();
+    load_bio();
   </script>
   
 </body>
