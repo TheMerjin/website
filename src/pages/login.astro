@@ -38,6 +38,13 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
         </div>
       </form>
     </div>
+    <script>
+      const urlParams = new URLSearchParams(window.location.search);
+      const msg = urlParams.get('msg');
+      if (msg) {
+        alert(msg); // or render message nicely on the page
+      }
+    </script>
 
     <Footer />
   </body>
