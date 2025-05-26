@@ -171,6 +171,7 @@ import { supabase } from "../lib/supabase";
     const newElement = document.createElement('img');  // Create an <img> element
     newElement.src = "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F3819%2F3819284.png&f=1&nofb=1&ipt=3aefd150eccca53e2aee6a06e408482a9263f721a2c1846ba270efbafd6c3e49";
     newElement.alt = "Profile Icon";
+	newElement.style = "width: 50px; height: auto;
     newElement.style.cursor = "pointer";
     newElement.onclick = () => {
       window.location.href = "/profile";
