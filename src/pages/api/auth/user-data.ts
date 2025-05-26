@@ -1,15 +1,31 @@
-export const prerender = false;
-
 import type { APIRoute } from "astro";
 import { supabase } from '../../../lib/supabase.js';
-
+export const prerender = false;
 export const GET: APIRoute = async ({ request }) => {
-  const { data: { user } } = await supabase.auth.getUser()
-  
+  const cookie = request.headers.get("cookie") || "";
+  const token = cookie
+    .split(";")
+    .find((c) => c.trim().startsWith("sb-access-token="))
+    ?.split("=")[1];
+
+  if (!token) {
+    return new Response(JSON.stringify({ error: "No access token found" }), {
+      status: 401,
+    });
+  }
+
+  const { data: { user }, error } = await supabase.auth.getUser(token);
+
+  if (error || !user) {
+    return new Response(JSON.stringify({ error: error?.message || "User not found" }), {
+      status: 500,
+    });
+  }
+
   return new Response(JSON.stringify({ user }), {
     status: 200,
     headers: {
       'Content-Type': 'application/json',
     },
   });
-}
+};

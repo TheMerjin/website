@@ -25,20 +25,58 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
             <a href="#">My Posts</a><span>&bull;</span>
             <a href="#">Favorites</a><span>&bull;</span>
             <a href="#">Settings</a>
+            <span class = "spacer"></span>
+            <div class = "new-post-button-and-text">
+            <button id = "new-post" onclick="myFunction()">
+              <img src="/assets_task_01jw742a8nfz48tp2bhjht7wav_1748290863_img_3.jpg" style="width:35px;height:35px;" alt="New post">
+            </button>
+            <h20> New post</h20>
+            </div>
             <button class="logout-button">Logout</button>
         </div>
         </div>
       <div>
         
-      </div>
+    <div>
       <h2> Bio</h2>
       <h5 id="Bio"> I am a traveler of many lands</h5>
     </div>
-
+    </div>
     <style>
+      .new-post-button-and-text{
+        display: contents;
+        margin: 0;
+        padding: 0;
+        border: none; /* or border: 0; */
+        background: none; /* or background-color: transparent; */
+        font-size: 1rem; /* Ensures it doesn't change font size */
+        color: inherit;     /* Ensures it doesn't change text color */
+        line-height: inherit;
+
+
+      }
+        .spacer {
+          margin-left: 100px
+        }
+        .new-post {
+          
+        background-color: transparent; 
+        border: none;
+        padding: 0; /* If you only want the image to be clickable */
+        cursor: pointer;
+        padding: 0rem 0rem;
+        border-bottom: 0px solid #fff4ec;
+        max-width: 900px;
+        margin-left: 8rem;
+        margin-right: auto;
+        }
+        new-post:hover {
+          background-color: transparent
+        }
+      
         .logout-button {
         padding: 1rem 1rem;
-        border-bottom: 1px solid #fff4ec;
+        border-bottom: 0px solid #fff4ec;
         max-width: 900px;
         margin-left: 8rem;
         margin-right: auto;
@@ -78,7 +116,7 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
         }
 
         .header-nav {
-        font-size: 0.95rem;
+        font-size: 1.5rem;
         }
 
         .header-nav a {
@@ -113,6 +151,8 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
         // Display username
         document.getElementById("username").textContent =
         user.user_metadata.username
+        document.getElementById("user-stats").textContent = "Joined: " +
+        user.created_at.slice(0,10)
   
         // Display stats (replace with real values later if available)
         
@@ -122,18 +162,23 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
         alert("Error loading user data.");
       }
     }
+
     async function load_bio() {
       try {
-        const response = await fetch('/api/auth/user-data', {
+        const response = await fetch('/api/auth/get_bio', {
           method: "GET",
           credentials: "include"
         });
+        
   
         if (!response.ok) {
-          throw new Error("Failed to fetch user");
+          const err = await response.json();
+          throw new Error(err.error || "Failed to fetch user");
         }
+        const data = await response.json();
+        const user = data.user;
         console.log(response)
-        
+        document.getElementById("Bio").textContent = data.profile.bio;
         
   
         // Display stats (replace with real values later if available)
@@ -148,6 +193,7 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
   
     load_user_name();
     load_bio();
+
   </script>
   
 </body>
