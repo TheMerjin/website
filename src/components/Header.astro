@@ -3,6 +3,7 @@ import HeaderLink from './HeaderLink.astro';
 import { SITE_TITLE } from '../consts';
 import Search from './Search.astro';
 import Sidebar from './Sidebar.astro';
+import { supabase } from "../lib/supabase";
 ---
 
 <header>
@@ -13,10 +14,15 @@ import Sidebar from './Sidebar.astro';
 			</button>
 			<a href="/" class="site-title">{SITE_TITLE}</a>
 		</div>
-		<div class="nav-right">
-			<Search />
-			<a href="/login" class="login-button">Login</a>
-		</div>
+		<div class="nav-right-group">
+			<div class="nav-right">
+				<Search />
+				
+			</div>
+			<div id = "login">
+				<a href="/login" class="login-button">Login</a>
+			</div>
+	</div>
 	</nav>
 </header>
 
@@ -101,6 +107,12 @@ import Sidebar from './Sidebar.astro';
 	.nav-middle {
 		display: none;
 	}
+	.nav-right-group {
+	display: flex;
+	align-items: center;
+	gap: 1em;
+	margin-left: auto; /* Pushes it all the way to the right in the nav */
+}
 
 	/* Adjust main content when sidebar is open (optional, requires JS) */
 	/* body.sidebar-open main {
@@ -145,4 +157,28 @@ import Sidebar from './Sidebar.astro';
 			toggleSidebar();
 		}
 	});
+</script>
+<script>
+(async () => {
+    const res = await fetch("/api/auth/logged-in");
+
+    if (res.ok) {
+      replaceElement()
+    }
+  })();
+
+  function replaceElement() {
+    const newElement = document.createElement('img');  // Create an <img> element
+    newElement.src = "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F3819%2F3819284.png&f=1&nofb=1&ipt=3aefd150eccca53e2aee6a06e408482a9263f721a2c1846ba270efbafd6c3e49";
+    newElement.alt = "Profile Icon";
+    newElement.style.cursor = "pointer";
+    newElement.onclick = () => {
+      window.location.href = "/profile";
+    }
+
+    const loginElement = document.getElementById("login");
+    if (loginElement) {
+      loginElement.replaceWith(newElement);
+    }
+  }
 </script>
