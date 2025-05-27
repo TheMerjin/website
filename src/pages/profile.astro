@@ -1,9 +1,8 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
+
 import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
-import SessionProvider from '../layouts/SessionProvider.jsx';
+import {supabase} from '../lib/client-supabase.js'
+
 ---
 
 <!DOCTYPE html>
@@ -27,7 +26,7 @@ import SessionProvider from '../layouts/SessionProvider.jsx';
             <a href="#">Favorites</a><span>&bull;</span>
             <a href="#">Settings</a>
             <span class = "spacer"></span>
-            <div class = "new-post-button-and-text">
+            <div id = "new-post-button-and-text">
             <button id = "new-post" onclick="myFunction()">
               <img src="/assets_task_01jw742a8nfz48tp2bhjht7wav_1748290863_img_3.jpg" style="width:35px;height:35px;" alt="New post">
             </button>
@@ -159,9 +158,46 @@ import SessionProvider from '../layouts/SessionProvider.jsx';
       window.location.assign("http://localhost:4321/post-editor");
       
   }
+  
+
+
+    
+
+  
+
 
   </script>
 <script>
+import { supabase } from "../lib/client-supabase";
+
+  const logoutButton = document.querySelector('.logout-button');
+if (logoutButton) {
+  logoutButton.addEventListener('click', async () => {
+    console.log("Running");
+    await supabase.auth.signOut();
+    // your sign out logic
+  
+
+
+    // Optionally call backend API to sign out server-side (e.g., clear cookies)
+    try {
+      const res = await fetch('/api/auth/signout', {
+  method: 'POST',
+  credentials: 'include',    // ← send cookies so server can clear them
+});
+      if (!res.ok) {
+        console.error('Backend sign out failed');
+      } else {
+        console.log('Backend sign out successful');
+      }
+    } catch (err) {
+      console.error('Error calling backend sign out:', err);
+    }
+
+    // Redirect user after sign out
+    window.location.assign("http://localhost:4321");
+    }
+  )}
   
     async function load_user_name() {
       try {

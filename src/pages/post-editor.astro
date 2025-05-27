@@ -1,17 +1,45 @@
+---
+import Header from "../components/Header.astro";
+---
 
 <html lang="en">
 <head>
   <title>Post Editor</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
 </head>
-<body class="bg-gray-50 p-10">
-  <h1 class="text-2xl font-bold mb-6">Create a New Post</h1>
-  <form id="postForm" class="max-w-xl space-y-4 bg-white p-6 rounded shadow">
-    <input type="text" name="title" placeholder="Title" required class="w-full border p-2 rounded" />
-    <textarea name="content" placeholder="Content" rows="6" required class="w-full border p-2 rounded"></textarea>
-    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save Post</button>
-  </form>
-  <p id="status" class="mt-4 text-sm"></p>
+<body style="background-color: #fff4ec;" class="bg-gray-50 p-10 min-h-screen">
+  <Header />
+
+  <main class="max-w-xl mx-auto">
+    <h1 class="text-3xl font-semibold mb-8 text-gray-800">Create a New Post</h1>
+
+    <form id="postForm" class="space-y-6">
+      <input
+        type="text"
+        name="title"
+        placeholder="Title"
+        required
+        class="w-full border-b-2 border-gray-300 focus:border-blue-600 outline-none text-lg pb-2 placeholder-gray-400 transition"
+      />
+
+      <textarea
+        name="content"
+        placeholder="Content"
+        rows="6"
+        required
+        class="w-full border-b-2 border-gray-300 focus:border-blue-600 outline-none text-base pb-2 placeholder-gray-400 resize-y transition"
+      ></textarea>
+
+      <button
+        type="submit"
+        class="text-white bg-blue-600 hover:bg-blue-700 rounded px-5 py-2 font-semibold transition"
+      >
+        Save Post
+      </button>
+    </form>
+
+    <p id="status" class="mt-4 text-sm text-gray-600"></p>
+  </main>
 
   <script type="module">
     const form = document.getElementById('postForm');
@@ -36,7 +64,7 @@
         title: formData.get('title'),
         content: formData.get('content'),
         userId: user.id,
-        username : user.user_metadata.username,
+        username: user.user_metadata.username,
       };
 
       status.textContent = 'Saving post...';
@@ -47,7 +75,6 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(post),
       });
-      console.log("here")
 
       if (saveRes.ok) {
         status.textContent = 'Post saved!';

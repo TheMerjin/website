@@ -1,19 +1,25 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
+import Postcard from '../components/PostCard.astro';
 import Header from '../components/Header.astro';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+
+
+const res = await fetch("http://localhost:4321/api/auth/get_posts");
+const { posts } = await res.json();
+
 ---
-
-<!doctype html>
-<html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-	</head>
-	<body>
-		<Header />
-
+<html>
+	<body style = "background-color: #fff4ec;">
 		
-
-		
-	</body>
+<Header/>
+<main id="posts-container">
+	<script is ="in-line">
+		console.log(posts)
+	</script>
+  {posts.length === 0 ? (
+    <p>No posts yet!</p>
+  ) : (
+    posts.map(post => <Postcard post={post} key={post.id} />)
+  )}
+</main>
+</body>
 </html>
