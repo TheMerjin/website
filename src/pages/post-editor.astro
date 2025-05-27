@@ -1,0 +1,21 @@
+---
+import PostEditor from '../components/post-editor.jsx';
+import Header from '../components/Header.astro';
+---
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Post Editor</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  </head>
+  <body style="background-color: #fff4ec;" class="min-h-screen">
+    <Header />
+    <main
+      class="py-10"
+      style="margin-left: 200px; max-width: calc(100% - 250px);"
+    >
+      <PostEditor client:load />
+    </main>
+  </body>
+</html>

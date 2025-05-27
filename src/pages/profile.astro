@@ -30,7 +30,7 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
             <button id = "new-post" onclick="myFunction()">
               <img src="/assets_task_01jw742a8nfz48tp2bhjht7wav_1748290863_img_3.jpg" style="width:35px;height:35px;" alt="New post">
             </button>
-            <h20> New post</h20>
+            <h6> New post</h6>
             </div>
             <button class="logout-button">Logout</button>
         </div>
@@ -66,7 +66,7 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
         .spacer {
           margin-left: 100px
         }
-        .new-post {
+        #new-post {
           
         background-color: transparent; 
         border: none;
@@ -81,7 +81,7 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
         border: none;         /* removes the button border */
         background: none;
         }
-        new-post:hover {
+        #new-post:hover {
           background-color: transparent
           outline: none;        /* removes the focus outline */
           border: none;         /* removes the button border */
@@ -153,8 +153,11 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
         color: #999;
         }
     </style>
-
 <script>
+  function myFunction(){
+    window.location.assign("http://localhost:4321/post-editor");
+    
+  }
     async function load_user_name() {
       try {
         const response = await fetch('/api/auth/user-data', {
@@ -211,6 +214,12 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
         console.error(error);
         alert("Error loading user data.");
       }
+    }
+    const newPostButton = document.getElementById('new-post-button-and-text');
+    if (newPostButton) {
+      newPostButton.addEventListener('click', myFunction); // Now the linter sees this usage
+    } else {
+      console.error("Button with ID 'new-post' not found for event listener.");
     }
 
   
