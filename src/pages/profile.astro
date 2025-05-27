@@ -3,6 +3,7 @@ import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import SessionProvider from '../layouts/SessionProvider.jsx';
 ---
 
 <!DOCTYPE html>
@@ -153,11 +154,15 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
         color: #999;
         }
     </style>
-<script>
+<script is:inline>
   function myFunction(){
-    window.location.assign("http://localhost:4321/post-editor");
-    
+      window.location.assign("http://localhost:4321/post-editor");
+      
   }
+
+  </script>
+<script>
+  
     async function load_user_name() {
       try {
         const response = await fetch('/api/auth/user-data', {
