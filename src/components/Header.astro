@@ -157,48 +157,48 @@ import Sidebar from './Sidebar.astro';
 	});
 </script>
 <script>
-(async () => {
-    const res = await fetch("/api/auth/logged-in");
-	console.log(res);
-
-    if (res.ok) {
-      replaceElement()
-    } else {
-		re_replaceElement()
-	}
-  })();
-
-  function replaceElement() {
-    const newElement = document.createElement('img');  // Create an <img> element
-    newElement.src = "/assets_task_01jw77ts1xfxa9cbxf8r57zr1g_1748294820_img_2.jpg";
-    newElement.alt = "Profile Icon";
-	newElement.style = "width: 60px; height: 60px; border-radius: 50%; object-fit: cover;display: block;object-position: center top;"
-    newElement.style.cursor = "pointer";
-    newElement.onclick = () => {
-      window.location.href = "/profile";
-    }
+	(async () => {
+		const res = await fetch(`${import.meta.env.PUBLIC_API_URL}/api/auth/logged-in`);
+		console.log(res);
 	
-
-    const loginElement = document.getElementById("login");
-    if (loginElement) {
-      loginElement.replaceWith(newElement);
-    }
-  }
-  function re_replaceElement() {
-    // 1. Create a new <a> element
-    const newElement = document.createElement('a');
-    
-    // 2. Set its attributes
-    newElement.href = '/login';
-    newElement.className = 'login-button';
-    
-    // 3. Set its text
-    newElement.textContent = 'Login';
-    
-    // 4. Find the old “login” placeholder and replace it
-    const loginElement = document.getElementById('login');
-    if (loginElement) {
-      loginElement.replaceWith(newElement);
-    }
-  }
-</script>
+		if (res.ok) {
+		  replaceElement();
+		} else {
+		  re_replaceElement();
+		}
+	})();
+	
+	function replaceElement() {
+	  const newElement = document.createElement('img');  // Create an <img> element
+	  newElement.src = "/assets_task_01jw77ts1xfxa9cbxf8r57zr1g_1748294820_img_2.jpg";
+	  newElement.alt = "Profile Icon";
+	  newElement.style = "width: 60px; height: 60px; border-radius: 50%; object-fit: cover;display: block;object-position: center top;";
+	  newElement.style.cursor = "pointer";
+	  newElement.onclick = () => {
+		window.location.href = "/profile";
+	  }
+	
+	  const loginElement = document.getElementById("login");
+	  if (loginElement) {
+		loginElement.replaceWith(newElement);
+	  }
+	}
+	
+	function re_replaceElement() {
+	  // 1. Create a new <a> element
+	  const newElement = document.createElement('a');
+	  
+	  // 2. Set its attributes
+	  newElement.href = '/login';
+	  newElement.className = 'login-button';
+	  
+	  // 3. Set its text
+	  newElement.textContent = 'Login';
+	  
+	  // 4. Find the old “login” placeholder and replace it
+	  const loginElement = document.getElementById('login');
+	  if (loginElement) {
+		loginElement.replaceWith(newElement);
+	  }
+	}
+	</script>
