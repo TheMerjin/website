@@ -1,7 +1,11 @@
 ---
 
 import Header from '../components/Header.astro';
-import {supabase} from '../lib/client-supabase.js'
+import {supabase} from '../lib/client-supabase.js';
+import ProfilePostCard from '../components/ProfilePostCard.astro';
+const res = await fetch("http://localhost:4321/api/auth/get_posts");
+const { posts } = await res.json();
+const profile_posts = posts.slice(0,3)
 
 ---
 
@@ -43,7 +47,13 @@ import {supabase} from '../lib/client-supabase.js'
     </div>
     <section class = "post-section" id = "posts">
       <h2> Posts</h2>
-      <h5 id="Bio"> yap</h5>
+      <section id = "posts">
+        {posts.length === 0 ? (
+          <p>No posts yet!</p>
+        ) : (
+          profile_posts.map(post => <ProfilePostCard post={post} key={post.id} />)
+        )}
+      </section>
     </section>
     </div>
     <style>
@@ -51,7 +61,8 @@ import {supabase} from '../lib/client-supabase.js'
         margin: 0rem;
         padding: 1rem 0rem;
       }
-      .new-post-button-and-text{
+      #new-post-button-and-text{
+
         display: contents;
         margin: 0;
         padding: 0;

@@ -1,0 +1,90 @@
+---
+import Header from "../../components/Header.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { marked } from "marked";
+import createDOMPurify from "dompurify";
+import { JSDOM } from "jsdom";
+export const prerender = false// Adjust path if needed
+const { slug } = Astro.params;
+const res = await fetch("http://localhost:4321/api/auth/get_posts");
+const { posts } = await res.json();
+let correctPost = null;
+for (const post of posts) {
+  if (post.id == slug){
+    correctPost = post;
+  } // do something with each post
+}
+
+
+// Setup DOMPurify with JSDOM (since Astro runs on server)
+const window = new JSDOM("").window;
+const DOMPurify = createDOMPurify(window);
+
+// Convert markdown to HTML
+const rawHtml = marked.parse(correctPost.content);
+
+// Sanitize HTML output
+const safeHtml = DOMPurify.sanitize(rawHtml);
+
+// Format date nicely
+const date = new Date(correctPost.created_at).toLocaleDateString(undefined, {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
+---
+<html>
+  <body style = "background-color: #fff4ec;">
+    <Header/>
+<BaseLayout>
+  <article class="post">
+    <h1 class="title">{correctPost.title}</h1>
+    <div class="byline">By {correctPost.username} on {date}</div>
+    <div class="content" set:html={safeHtml}></div>
+  </article>
+</BaseLayout>
+</body>
+</html>
+
+<style>
+  .post {
+    max-width: 700px;
+    margin: 4rem auto;
+    padding: 0 1rem;
+    font-family: 'Georgia', serif;
+    line-height: 1.7;
+  }
+
+  .title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+
+  .byline {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 2rem;
+  }
+
+  /* Markdown content styles */
+  .content pre {
+    background: #f6f6f6;
+    padding: 1rem;
+    overflow-x: auto;
+    border-radius: 6px;
+    margin: 1.5rem 0;
+  }
+
+  .content code {
+    font-family: 'Fira Code', monospace;
+  }
+
+  .content h2, .content h3 {
+    margin-top: 2rem;
+  }
+
+  .content p {
+    margin: 1rem 0;
+  }
+</style>

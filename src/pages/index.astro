@@ -5,12 +5,10 @@ import Header from '../components/Header.astro';
 
 const res = await fetch("http://localhost:4321/api/auth/get_posts");
 const { posts } = await res.json();
-
 ---
 <html>
 	<body style = "background-color: #fff4ec;">
-		
-<Header/>
+		<Header/>
 <main id="posts-container">
 	<script is ="in-line">
 		console.log(posts)
@@ -21,5 +19,6 @@ const { posts } = await res.json();
     posts.map(post => <Postcard post={post} key={post.id} />)
   )}
 </main>
+
 </body>
 </html>

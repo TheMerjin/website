@@ -1,0 +1,81 @@
+---
+const { post } = Astro.props;
+---
+
+<article class="lw-post-card">
+  <header class="lw-post-header">
+    <a href={`/${post.id}`} class="lw-post-title">
+      {post.title}
+    </a>
+    <div class="lw-post-meta">
+      <span class="lw-post-author">{post.username}</span>
+      <time datetime={post.created_at} class="lw-post-date">
+        {new Date(post.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+      </time>
+    </div>
+  </header>
+
+  <section class="lw-post-excerpt">
+    {post.content.length > 100 
+      ? post.content.slice(0, 100) + '…' 
+      : post.content}
+  </section>
+</article>
+
+<style>
+  /* Container: thin vertical spacing */
+  .lw-post-card {
+    max-width: 720px;
+    max-height: 200px;;
+    margin: 0rem 0rem;
+    border-top: 1px solid #ddd;
+    padding-top: 1rem;
+  }
+
+  /* Header: title left, meta right */
+  .lw-post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .lw-post-title {
+    font-family: 'Georgia', serif;
+    font-size: 1.5rem;
+    line-height: 1.2;
+    color: #111;
+    text-decoration: none;
+  }
+
+  .lw-post-title:hover {
+    text-decoration: underline;
+  }
+
+  .lw-post-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-family: 'Helvetica Neue', sans-serif;
+    font-size: 0.8rem;
+    color: #666;
+  }
+
+  .lw-post-author {
+    font-weight: 500;
+  }
+
+  .lw-post-date {
+    font-style: normal;
+  }
+
+  /* Excerpt: very thin spacing */
+  .lw-post-excerpt {
+    font-family: 'Georgia', serif;
+    font-size: 1rem;
+    line-height: 1.4;
+    color: #222;
+    margin: 0;
+    overflow: hidden;
+  }
+</style>
