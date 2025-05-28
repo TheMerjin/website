@@ -2,6 +2,7 @@
 import { SITE_TITLE } from '../consts';
 import Search from './Search.astro';
 import Sidebar from './Sidebar.astro';
+import BaseHead from './BaseHead.astro';
 ---
 
 <header style = "background-color : #fff4ec;">
@@ -158,7 +159,7 @@ import Sidebar from './Sidebar.astro';
 </script>
 <script>
 	(async () => {
-		const res = await fetch(`https://website-six-zeta-53.vercel.app/api/auth/logged-in`);
+		const res = await fetch(`${import.meta.env.PUBLIC_API_URL}api/auth/logged-in`);
 		console.log(res);
 	
 		if (res.ok) {
@@ -195,7 +196,7 @@ import Sidebar from './Sidebar.astro';
 	  // 3. Set its text
 	  newElement.textContent = 'Login';
 	  
-	  // 4. Find the old “login” placeholder and replace it
+	  // 4. Find the old "login" placeholder and replace it
 	  const loginElement = document.getElementById('login');
 	  if (loginElement) {
 		loginElement.replaceWith(newElement);
