@@ -1,6 +1,6 @@
 ---
+import WebsiteLayout from '../layouts/WebsiteLayout.astro';
 import BaseHead from '../components/BaseHead.astro';
-import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 
@@ -8,56 +8,39 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 
 ---
 
-<html lang="en">
-  <head>
-    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-  </head>
-  <body>
-    <Header />
-
-    <h3 class="register-title">Greetings traveler. Register here</h3>
-
-    <div class="page-content">
-      <form action="/api/auth/register" method="post">
-        <input
-          type="text"
-          class="email-input"
-          id = "email"
-          name="email"
-          placeholder="Wizard@gmail.com"
-          required
-        />
-        <input
-          type="text"
-          class="register-input"
-          id = "username"
-          name="username"
-          placeholder="Username"
-          required
-        />
-        <input
-          type="password"
-          id = "password"
-          class="register-input"
-          name="password"
-          placeholder="Password"
-          required
-        />
-        <button id = "button" type="submit">Register</button>
-
-      </form>
-    </div>
-    
-            
-
-
-
-            
-  
-
-    <Footer />
-  </body>
-</html>
+<WebsiteLayout>
+  <h3 class="register-title">Greetings traveler. Register here</h3>
+  <div class="page-content">
+    <form action="/api/auth/register" method="post">
+      <input
+        type="text"
+        class="email-input"
+        id = "email"
+        name="email"
+        placeholder="Wizard@gmail.com"
+        required
+      />
+      <input
+        type="text"
+        class="register-input"
+        id = "username"
+        name="username"
+        placeholder="Username"
+        required
+      />
+      <input
+        type="password"
+        id = "password"
+        class="register-input"
+        name="password"
+        placeholder="Password"
+        required
+      />
+      <button id = "button" type="submit">Register</button>
+    </form>
+  </div>
+  <Footer />
+</WebsiteLayout>
 
 <style>
   .register-title {

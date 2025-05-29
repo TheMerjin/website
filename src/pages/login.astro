@@ -1,55 +1,45 @@
 ---
-import Header from '../components/Header.astro';
+import WebsiteLayout from '../layouts/WebsiteLayout.astro';
 import Footer from '../components/Footer.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 import BaseHead from '../components/BaseHead.astro';
 
 ---
 
-<html lang="en">
-  <head>
-    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-  </head>
-  <body>
-    <Header />
-
-    <h3 class="login-title">Welcome to Agora! Login or Register here traveler</h3>
-
-    <div class="page-content">
-      <form action="/api/auth/login" method="post" id="login-form" class="login-form">
-        <input
-          type="text"
-          class="login-input"
-          name="email"
-          placeholder="Sauron@DolGoldur.com"
-          required
-        />
-        <input
-          type="password"
-          class="login-input"
-          name="password"
-          placeholder="Password"
-          required
-        />
-        <button type="submit">Login</button>
-
-        <div class="auth-links">
-          <a href="/register" class="register-link">Register</a>
-          <a href="/reset-password" class="reset-link">Reset Password</a>
-        </div>
-      </form>
-    </div>
-    <script>
-      const urlParams = new URLSearchParams(window.location.search);
-      const msg = urlParams.get('msg');
-      if (msg) {
-        alert(msg); // or render message nicely on the page
-      }
-    </script>
-
-    <Footer />
-  </body>
-</html>
+<WebsiteLayout>
+  <h3 class="login-title">Welcome to Agora! Login or Register here traveler</h3>
+  <div class="page-content">
+    <form action="/api/auth/login" method="post" id="login-form" class="login-form">
+      <input
+        type="text"
+        class="login-input"
+        name="email"
+        placeholder="Sauron@DolGoldur.com"
+        required
+      />
+      <input
+        type="password"
+        class="login-input"
+        name="password"
+        placeholder="Password"
+        required
+      />
+      <button type="submit">Login</button>
+      <div class="auth-links">
+        <a href="/register" class="register-link">Register</a>
+        <a href="/reset-password" class="reset-link">Reset Password</a>
+      </div>
+    </form>
+  </div>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const msg = urlParams.get('msg');
+    if (msg) {
+      alert(msg); // or render message nicely on the page
+    }
+  </script>
+  <Footer />
+</WebsiteLayout>
 
 <style>
   .login-title {

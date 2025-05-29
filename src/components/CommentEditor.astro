@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Comment Box</title>
+  <style>
+    textarea:focus, input:focus{
+    outline: none;
+}
+    .comment-box-container {
+      max-width: 835px;
+      width: 100%;
+      margin-left: 0rem;
+      margin: -1rem auto;    
+      padding: 0rem;
+
+    }
+
+    #commentBox {
+      width: 100%;
+      resize: none;
+      overflow: hidden;
+      padding: 0.75rem;
+      font-size: 1rem;
+      box-sizing: border-box;
+      border: 1px solid #ffe0c0;
+      border-radius: 0;
+      background-color: #fff8f4;
+    }
+
+    .button-wrapper {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: -2.25rem; /* Pull button upward */
+      margin-right: 0.5rem;
+    }
+
+    .custom-button {
+      padding: 0.4rem 1rem;
+      background-color: #fff8f4;
+      border: 0px solid #ffe0c0;
+      border-radius: 0;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .custom-button:hover {
+      background-color: #ffe0c0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="comment-box-container">
+    <textarea id="commentBox" rows="6" placeholder="Type your comment here..."></textarea>
+    <div class="button-wrapper">
+      <button type="submit" class="custom-button">Post</button>
+    </div>
+  </div>
+
+  <script>
+    const textarea = document.getElementById("commentBox");
+    textarea.addEventListener('input', () => {
+      const lines = textarea.value.split('\n').length;
+      textarea.rows = Math.max(lines + 2, 6);
+    });
+  </script>
+
+</body>
+</html>
