@@ -31,7 +31,7 @@ const profile_posts = posts.slice(0,3)
             <a href="#">Settings</a>
             <span class = "spacer"></span>
             <div id = "new-post-button-and-text">
-            <button id = "new-post" onclick="myFunction()">
+            <button id = "new-post" >
               <img src="/assets_task_01jw742a8nfz48tp2bhjht7wav_1748290863_img_3.jpg" style="width:35px;height:35px;" alt="New post">
             </button>
             <h6> New post</h6>
@@ -164,21 +164,12 @@ const profile_posts = posts.slice(0,3)
         color: #999;
         }
     </style>
-<script is:inline>
-  function myFunction(){
+
+<script>
+function myFunction(){
       window.location.assign(`${import.meta.env.PUBLIC_API_URL}/post-editor` );
       
   }
-  
-
-
-    
-
-  
-
-
-  </script>
-<script>
 import { supabase } from "../lib/client-supabase";
 
   const logoutButton = document.querySelector('.logout-button');
