@@ -38,8 +38,9 @@ const { post } = Astro.props;
     display: flex;
     justify-content: space-between; /* Distribute header and stats */
     align-items: center; /* Vertically align items */
-    max-width: 800px; /* Slightly wider card */
-    margin: 0rem 0rem auto 0rem; /* Center the card horizontally, add vertical spacing */
+    max-width: 900px; /* Slightly wider card */
+    margin: 0rem 3rem 0rem 0rem;
+    margin-left: 0rem; /* Center the card horizontally, add vertical spacing */
     padding: 0.75rem 1.5rem; /* More padding for a spacious feel */
     border-bottom: 1px solid #eee; /* Light bottom border for separation */
     background-color: #fff; /* White background */
@@ -62,7 +63,7 @@ const { post } = Astro.props;
 
   .lw-post-title {
     font-family: 'Inter', sans-serif; /* Modern sans-serif font */
-    font-size: 1.125rem; /* Slightly larger title */
+    font-size: 1.0rem; /* Slightly larger title */
     line-height: 1.4;
     color: #333; /* Darker text for better readability */
     text-decoration: none;
@@ -97,7 +98,7 @@ const { post } = Astro.props;
     align-items: center;
     gap: 1rem; /* Space between votes and comments */
     font-family: 'Inter', sans-serif;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     color: #555;
   }
 
@@ -123,7 +124,8 @@ const { post } = Astro.props;
       flex-direction: column; /* Stack header and stats on smaller screens */
       align-items: flex-start; /* Align items to the start */
       padding: 1rem;
-      margin: 1rem auto; /* Center with some margin */
+      margin: 1rem auto;
+      margin-left: 250px; /* Center with some margin */
     }
 
     .lw-post-header {
@@ -141,7 +143,7 @@ const { post } = Astro.props;
 
   @media (max-width: 480px) {
     .lw-post-title {
-      font-size: 1rem; /* Smaller title on very small screens */
+      font-size: 2rem; /* Smaller title on very small screens */
     }
 
     .lw-post-meta {
