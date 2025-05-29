@@ -8,7 +8,7 @@ export const POST: APIRoute = async ({ request }) => {
   const email = formData.get('email') as string;
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${import.meta.env.PUBLIC_API_URL}/update-password?msg=User%20already%20registered`, 
+    redirectTo: `${import.meta.env.PUBLIC_API_URL}/update-passwordaw`, 
   });
 
   if (error) {
