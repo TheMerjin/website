@@ -3,7 +3,7 @@
 import Header from '../components/Header.astro';
 import {supabase} from '../lib/client-supabase.js';
 import ProfilePostCard from '../components/ProfilePostCard.astro';
-const res = await fetch("http://localhost:4321/api/auth/get_posts");
+const res = await fetch(`${import.meta.env.PUBLIC_API_URL}/update-password/api/auth/get_posts`);
 const { posts } = await res.json();
 const profile_posts = posts.slice(0,3)
 
@@ -166,7 +166,7 @@ const profile_posts = posts.slice(0,3)
     </style>
 <script is:inline>
   function myFunction(){
-      window.location.assign("http://localhost:4321/post-editor");
+      window.location.assign(`${import.meta.env.PUBLIC_API_URL}/post-editor` );
       
   }
   
@@ -206,7 +206,7 @@ if (logoutButton) {
     }
 
     // Redirect user after sign out
-    window.location.assign("http://localhost:4321");
+    window.location.assign(`${import.meta.env.PUBLIC_API_URL}`);
     }
   )}
   
