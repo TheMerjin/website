@@ -2,7 +2,7 @@
 
 import Header from '../components/Header.astro';
 import ProfilePostCard from '../components/ProfilePostCard.astro';
-const res = await fetch(`${import.meta.env.PUBLIC_API_URL}/api/auth/get_posts`);
+const res = await fetch(`${import.meta.env.PUBLIC_API_URL}api/auth/get_posts`);
 const { posts } = await res.json();
 const profile_posts = posts.slice(0,3)
 
