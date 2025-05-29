@@ -28,7 +28,7 @@ export const POST: APIRoute = async ({ request }) => {
     if (signUpError.message === "User already registered") {
       // Redirect to login with a message
       return Response.redirect(
-        "http://localhost:4321/login?msg=User%20already%20registered",
+        `${import.meta.env.PUBLIC_API_URL}/login?msg=User%20already%20registered`,
         303
       );
     }
