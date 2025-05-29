@@ -10,6 +10,7 @@ export const POST: APIRoute = async ({ request }) => {
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${import.meta.env.PUBLIC_API_URL}/update-password`, 
   });
+  console.log('Redirect URL:', import.meta.env.PUBLIC_API_URL);
 
   if (error) {
     return new Response(JSON.stringify({ error: error.message }), {
