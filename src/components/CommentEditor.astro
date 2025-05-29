@@ -44,10 +44,40 @@
       font-weight: 600;
       cursor: pointer;
       transition: background-color 0.2s ease;
+      font-size: 1rem;
     }
 
     .custom-button:hover {
       background-color: #ffe0c0;
+    }
+
+    @media (max-width: 800px) {
+      .comment-box-container {
+        max-width: 100vw;
+        padding: 0 0.5rem;
+      }
+      #commentBox {
+        font-size: 0.95rem;
+        padding: 0.5rem;
+      }
+      .custom-button {
+        font-size: 0.95rem;
+        padding: 0.3rem 0.8rem;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .comment-box-container {
+        padding: 0 0.25rem;
+      }
+      #commentBox {
+        font-size: 0.9rem;
+        padding: 0.3rem;
+      }
+      .custom-button {
+        font-size: 0.9rem;
+        padding: 0.2rem 0.6rem;
+      }
     }
   </style>
 </head>
@@ -62,10 +92,13 @@
 
   <script>
     const textarea = document.getElementById("commentBox");
-    textarea.addEventListener('input', () => {
-      const lines = textarea.value.split('\n').length;
-      textarea.rows = Math.max(lines + 2, 6);
-    });
+    if (textarea) {
+      textarea.addEventListener('input', () => {
+        const ta = textarea as HTMLTextAreaElement;
+        const lines = ta.value.split('\n').length;
+        ta.rows = Math.max(lines + 2, 6);
+      });
+    }
   </script>
 
 </body>
