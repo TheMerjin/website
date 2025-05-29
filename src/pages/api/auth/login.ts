@@ -50,5 +50,6 @@ if (error) {
     maxAge: 60 * 60 * 24 * 30, // 30 days
   });
 
-  return redirect("http://localhost:4321?msg=LoggedInThankyou");
+  return redirect(`${import.meta.env.PUBLIC_API_URL}?msg=LoggedInThankyou`);
+
 };
