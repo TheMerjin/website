@@ -58,6 +58,6 @@ export const POST: APIRoute = async ({ request }) => {
   console.log("Profile created:", data);
 
   // Redirect to login page with success message
-  return Response.redirect("http://localhost:4321/login?msg=Registration%20successful", 303);
+  return Response.redirect(`${import.meta.env.PUBLIC_API_URL}/login?msg=Registration%20successful`, 303);
 };
 

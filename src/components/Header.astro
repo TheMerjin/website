@@ -186,21 +186,16 @@ import BaseHead from './BaseHead.astro';
 	}
 	
 	function re_replaceElement() {
-	  // 1. Create a new <a> element
-	  const newElement = document.createElement('a');
-	  
-	  // 2. Set its attributes
-	  newElement.href = '/login';
-	  newElement.className = 'login-button';
-	  
-	  
-	  // 3. Set its text
-	  newElement.textContent = 'Login';
-	  
-	  // 4. Find the old "login" placeholder and replace it
-	  const loginElement = document.getElementById('login');
-	  if (loginElement) {
-		loginElement.replaceWith(newElement);
-	  }
-	}
+  const loginElement = document.getElementById('login');
+  if (loginElement) {
+    loginElement.innerHTML = ''; // Clear it
+
+    const newElement = document.createElement('a');
+    newElement.href = '/login';
+    newElement.className = 'login-button';
+    newElement.textContent = 'Login';
+
+    loginElement.appendChild(newElement);
+  }
+}
 	</script>
