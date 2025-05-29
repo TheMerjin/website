@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 
 export const supabase = createClient(
   import.meta.env.PUBLIC_SUPABASE_URL,
-  import.meta.env.PRIVATE_SUPABASE_ROLE_KEY,
+  import.meta.env.SUPABASE_ROLE_KEY,
   {
     auth: {
       persistSession: true,     // <--- This enables session persistence
