@@ -14,58 +14,143 @@ const { post } = Astro.props;
       </time>
     </div>
   </header>
-
-  
+  <div class="lw-post-stats">
+    <span class="lw-post-votes">
+      {/* You might want to replace 'post.votes' with the actual property for votes if it's different */}
+      {post.votes || '0'}
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
+      </svg>
+    </span>
+    <span class="lw-post-comments">
+      {/* You might want to replace 'post.comments' with the actual property for comments if it's different */}
+      {post.comments || '0'}
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+      </svg>
+    </span>
+  </div>
 </article>
 
 <style>
-  /* Container: thin vertical spacing */
+  /* Base styles for the card */
   .lw-post-card {
-    max-width: 800px;              /* Narrower card */
-  margin: 2rem 0 0rem 15rem;      /* Align left, reduce right margin */
-  border-top: 1px solid #ddd;
-  padding-top: 1rem;
-}
+    display: flex;
+    justify-content: space-between; /* Distribute header and stats */
+    align-items: center; /* Vertically align items */
+    max-width: 800px; /* Slightly wider card */
+    margin: 0rem auto auto 15rem; /* Center the card horizontally, add vertical spacing */
+    padding: 0.75rem 1.5rem; /* More padding for a spacious feel */
+    border-bottom: 1px solid #eee; /* Light bottom border for separation */
+    background-color: #fff; /* White background */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* Subtle shadow for depth */
+    transition: all 0.2s ease-in-out; /* Smooth transition for hover effects */
+  }
 
-/* Header: title left, meta right */
-.lw-post-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;         /* Align bottom of title and meta */
-  margin-bottom: 0.25rem;        /* Less vertical space */
-}
+  .lw-post-card:hover {
+    background-color: #f9f9f9; /* Light background on hover */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* More pronounced shadow on hover */
+  }
 
-.lw-post-title {
-  font-family: 'Georgia', serif;
-  font-size: 1.25rem;            /* Slightly smaller title */
-  line-height: 1.1;
-  color: #111;
-  text-decoration: none;
-}
+  /* Header: title left, meta right within its own flex container */
+  .lw-post-header {
+    display: flex;
+    flex-direction: column; /* Stack title and meta */
+    flex-grow: 1; /* Allow header to grow */
+    margin-right: 1.5rem; /* Space between header and stats */
+  }
 
-.lw-post-title:hover {
-  text-decoration: underline;
-}
+  .lw-post-title {
+    font-family: 'Inter', sans-serif; /* Modern sans-serif font */
+    font-size: 1.125rem; /* Slightly larger title */
+    line-height: 1.4;
+    color: #333; /* Darker text for better readability */
+    text-decoration: none;
+    font-weight: 600; /* Bolder title */
+    margin-bottom: 0.25rem; /* Space between title and meta */
+  }
 
-.lw-post-meta {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  font-family: 'Helvetica Neue', sans-serif;
-  font-size: 0.75rem;
-  color: #666;
-}
+  .lw-post-title:hover {
+    text-decoration: underline;
+    color: #007bff; /* Blue on hover for a link feel */
+  }
 
-.lw-post-author {
-  font-weight: 500;
-}
+  .lw-post-meta {
+    display: flex;
+    align-items: center; /* Align author and date horizontally */
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem; /* Smaller meta info */
+    color: #777; /* Lighter color for meta */
+  }
 
-.lw-post-date {
-  font-style: normal;
-}
+  .lw-post-author {
+    font-weight: 500;
+    margin-right: 0.5rem; /* Space between author and date */
+  }
 
-/* Optional: remove unused class */
-.lw-post-excerpt {
-  display: none;
-}
+  .lw-post-date {
+    font-style: normal;
+  }
+
+  /* New styles for the stats section (votes and comments) */
+  .lw-post-stats {
+    display: flex;
+    align-items: center;
+    gap: 1rem; /* Space between votes and comments */
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    color: #555;
+  }
+
+  .lw-post-votes,
+  .lw-post-comments {
+    display: flex;
+    align-items: center;
+    background-color: #f0f0f0; /* Light background for stats */
+    padding: 0.3rem 0.6rem;
+    border-radius: 9999px; /* Pill shape */
+    font-weight: 500;
+    color: #444;
+  }
+
+  .lw-post-votes svg,
+  .lw-post-comments svg {
+    color: #888; /* Icon color */
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .lw-post-card {
+      flex-direction: column; /* Stack header and stats on smaller screens */
+      align-items: flex-start; /* Align items to the start */
+      padding: 1rem;
+      margin: 1rem auto; /* Center with some margin */
+    }
+
+    .lw-post-header {
+      margin-right: 0;
+      margin-bottom: 0.75rem; /* Add space below header when stacked */
+      width: 100%; /* Full width for header */
+    }
+
+    .lw-post-stats {
+      width: 100%; /* Full width for stats */
+      justify-content: flex-end; /* Align stats to the right */
+      gap: 0.75rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .lw-post-title {
+      font-size: 1rem; /* Smaller title on very small screens */
+    }
+
+    .lw-post-meta {
+      font-size: 0.7rem; /* Smaller meta info */
+    }
+
+    .lw-post-stats {
+      font-size: 0.8rem; /* Smaller stats */
+    }
+  }
 </style>
