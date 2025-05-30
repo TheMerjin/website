@@ -120,39 +120,70 @@ const { post } = Astro.props;
   }
 
   /* Responsive adjustments */
-  @media (max-width: 768px) {
+  @media (max-width: 800px) {
     .lw-post-card {
-      flex-direction: column; /* Stack header and stats on smaller screens */
-      align-items: flex-start; /* Align items to the start */
-      padding: 1rem;
+      flex-direction: column;
+      align-items: stretch;
+      max-width: 98vw;
+      padding: 0.7rem 0.3rem;
       margin: 1rem auto;
-      margin-left: 250px; /* Center with some margin */
     }
-
     .lw-post-header {
+      flex-direction: column;
+      align-items: flex-start;
       margin-right: 0;
-      margin-bottom: 0.75rem; /* Add space below header when stacked */
-      width: 100%; /* Full width for header */
+      margin-bottom: 0.5rem;
+      width: 100%;
     }
-
+    .lw-post-title {
+      font-size: 1.05rem;
+      text-align: left;
+      margin-bottom: 0.2rem;
+    }
+    .lw-post-meta {
+      font-size: 0.8rem;
+      margin-top: 0.2rem;
+      flex-wrap: wrap;
+    }
     .lw-post-stats {
-      width: 100%; /* Full width for stats */
-      justify-content: flex-end; /* Align stats to the right */
-      gap: 0.75rem;
+      width: 100%;
+      justify-content: flex-start;
+      font-size: 0.85rem;
+      gap: 0.5rem;
+      margin-top: 0.3rem;
+    }
+    .lw-post-votes,
+    .lw-post-comments {
+      padding: 0.18rem 0.4rem;
+      font-size: 0.85rem;
     }
   }
-
-  @media (max-width: 480px) {
+  @media (max-width: 500px) {
+    .lw-post-card {
+      max-width: 100vw;
+      padding: 0.5rem 0.1rem;
+      margin: 0.5rem 0;
+      border-radius: 0.5em;
+    }
+    .lw-post-header {
+      margin-bottom: 0.2rem;
+    }
     .lw-post-title {
-      font-size: 2rem; /* Smaller title on very small screens */
+      font-size: 0.92rem;
+      padding-right: 0.2rem;
     }
-
     .lw-post-meta {
-      font-size: 0.7rem; /* Smaller meta info */
+      font-size: 0.7rem;
+      margin-top: 0.1rem;
     }
-
     .lw-post-stats {
-      font-size: 0.8rem; /* Smaller stats */
+      font-size: 0.75rem;
+      gap: 0.3rem;
+    }
+    .lw-post-votes,
+    .lw-post-comments {
+      padding: 0.12rem 0.25rem;
+      font-size: 0.75rem;
     }
   }
 </style>
