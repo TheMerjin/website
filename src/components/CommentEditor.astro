@@ -91,7 +91,7 @@
   <div class="comment-box-container">
     <textarea id="commentBox" rows="6" placeholder="Type your comment here..."></textarea>
     <div class="button-wrapper">
-      <button type="submit" class="custom-button" style = "color: #757373;" >Post</button>
+      <button id = "submit" type="submit" class="custom-button" style = "color: #757373;" >Post</button>
     </div>
   </div>
 
@@ -104,6 +104,46 @@
       });
     }
   </script>
+  
+<script type="module">
+  const form = document.getElementById("commentBox");
 
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    status.textContent = 'Checking login...';
+
+    const loginRes = await fetch('/api/auth/logged-in');
+    if (!loginRes.ok) {
+      status.textContent = 'You must be logged in to post.';
+      return;
+    }
+
+    const { user } = await loginRes.json();
+
+    const formData = new FormData(form);
+    const post = {
+      title: formData.get('title'),
+      content: formData.get('content'),
+      userId: user.id,
+      username: user.user_metadata.username,
+    };
+
+    status.textContent = 'Saving post...';
+
+    const saveRes = await fetch('/api/auth/posts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(post),
+    });
+
+    if (saveRes.ok) {
+      status.textContent = 'Post saved!';
+      form.reset();
+    } else {
+      const err = await saveRes.json();
+      status.textContent = 'Error saving post: ' + (err.message || 'Unknown error');
+    }
+  });
+</script>
 </body>
 </html>

@@ -15,12 +15,13 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    // Optional Supabase insert (comment this out if not needed yet)
-    /*
+      const {  data: { user } } = await supabase.auth.getUser()
+      const userId = user.id
+      
     const { data, error } = await supabase.from('comments').insert({
       content: body.comment,
       post_id: body.postId,
-      user_id: body.userId || null, // or get from session if applicable
+      author_id: userId, // or get from session if applicable
       parent_id: body.parentId || null,
     });
 
