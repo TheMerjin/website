@@ -59,4 +59,18 @@ const today = new Date();
 	.social-links a:hover {
 		color: rgb(var(--gray-dark));
 	}
+	@media (max-width: 600px) {
+		footer {
+			padding: 1em 0.5em 2em 0.5em;
+			font-size: 0.95em;
+		}
+		.social-links {
+			flex-direction: column;
+			gap: 0.5em;
+		}
+		.social-links a svg {
+			width: 28px;
+			height: 28px;
+		}
+	}
 </style>

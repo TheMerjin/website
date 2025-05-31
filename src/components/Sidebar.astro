@@ -66,4 +66,21 @@ import HeaderLink from './HeaderLink.astro';
     .overlay.visible {
         display: block;
     }
+
+    @media (max-width: 600px) {
+        .sidebar {
+            width: 100vw;
+            left: -100vw;
+            top: var(--header-height);
+            height: calc(100% - var(--header-height));
+            padding-top: 0.5em;
+        }
+        .sidebar.open {
+            left: 0;
+        }
+        .sidebar-nav a {
+            font-size: 1.2em;
+            padding: 1em 1.5em;
+        }
+    }
 </style> 

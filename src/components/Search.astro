@@ -44,6 +44,20 @@
   .search-icon:hover {
     color: var(--accent); /* Hover effect */
   }
+
+  @media (max-width: 600px) {
+    .search-form {
+      width: 100%;
+    }
+    .search-input.active {
+      width: 100vw;
+      font-size: 1.1em;
+    }
+    .search-icon {
+      padding: 0.8em;
+      font-size: 1.2em;
+    }
+  }
 </style>
 
 <script is:inline>

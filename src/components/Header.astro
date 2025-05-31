@@ -136,13 +136,20 @@ import BaseHead from './BaseHead.astro';
 			padding: 0.5em 1em;
 			--header-height: 3.5em; /* Adjust header height for smaller screens if needed */
 		}
-
 		.nav-left {
 			gap: 0.5em;
 		}
-
 		.site-title {
 			font-size: 0.2em;
+		}
+	}
+	@media (max-width: 500px) {
+		header {
+			padding: 0.3em 0.5em;
+			--header-height: 4em;
+		}
+		.site-title {
+			font-size: 0.95em;
 		}
 	}
 </style>
@@ -209,4 +216,5 @@ import BaseHead from './BaseHead.astro';
     loginElement.appendChild(newElement);
   }
 }
+	</script>
 	</script>

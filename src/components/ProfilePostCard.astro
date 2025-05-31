@@ -78,4 +78,50 @@ const { post } = Astro.props;
     margin: 0;
     overflow: hidden;
   }
+
+  /* Responsive adjustments */
+  @media (max-width: 800px) {
+    .lw-post-card {
+      max-width: 98vw;
+      padding: 0.7rem 0.3rem;
+    }
+    .lw-post-header {
+      flex-direction: column;
+      align-items: flex-start;
+      margin-bottom: 0.5rem;
+    }
+    .lw-post-title {
+      font-size: 1.1rem;
+      text-align: left;
+    }
+    .lw-post-meta {
+      font-size: 0.8rem;
+      margin-top: 0.2rem;
+      align-items: flex-start;
+    }
+    .lw-post-excerpt {
+      font-size: 0.95rem;
+    }
+  }
+  @media (max-width: 500px) {
+    .lw-post-card {
+      max-width: 100vw;
+      padding: 0.5rem 0.1rem;
+      border-radius: 0.5em;
+    }
+    .lw-post-header {
+      margin-bottom: 0.2rem;
+    }
+    .lw-post-title {
+      font-size: 0.92rem;
+      padding-right: 0.2rem;
+    }
+    .lw-post-meta {
+      font-size: 0.7rem;
+      margin-top: 0.1rem;
+    }
+    .lw-post-excerpt {
+      font-size: 0.85rem;
+    }
+  }
 </style>

@@ -71,7 +71,7 @@ export default function CommentEditor({ slug, parentId = null, onPosted }) {
   };
 
   return (
-    <div className="comment-box-container" style={{ maxWidth: '835px', width: '100%', marginLeft: 0, margin: '-1rem auto', padding: 0 }}>
+    <div className="comment-box-container" style={{ maxWidth: typeof window !== 'undefined' && window.innerWidth <= 600 ? '100%' : '835px', width: '100%', marginLeft: 0, margin: '-1rem auto', padding: 0 }}>
       <form id="commentForm" className={slug} onSubmit={handleSubmit}>
         <textarea
           id="commentBox"
