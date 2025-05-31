@@ -1,0 +1,15 @@
+.Replyto {
+    color : #9b958e;
+    padding: 0.4rem 1rem;
+    background-color: var(--bg-color, #ffe0c0);
+    border: 0px solid #ffe0c0;
+    border-radius: 0;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    font-size: 0.5rem;
+  }
+
+  .Replyto:hover {
+    background-color: #ffe0c0;
+  }

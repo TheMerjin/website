@@ -1,7 +1,13 @@
 import { defineConfig } from 'astro/config';
 import vercel from '@astrojs/vercel';
 
+import react from '@astrojs/react';
+
 export default defineConfig({
   output: 'server',
-  adapter: vercel(), // This automatically picks the right mode for Vercel
+
+  // This automatically picks the right mode for Vercel
+  adapter: vercel(),
+
+  integrations: [react()]
 });

@@ -7,22 +7,29 @@ export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
 
-    // Optional: validate expected fields
-    if (!body || !body.comment || !body.postId) {
+    // Validate fields as they actually appear
+    if (!body || !body.content || !body.post_id) {
       return new Response(JSON.stringify({ error: 'Invalid input' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' },
       });
     }
 
-      const {  data: { user } } = await supabase.auth.getUser()
-      const userId = user.id
-      
+    // Get user from Supabase auth
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: 'Not authenticated' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+    console.log(body.username);
     const { data, error } = await supabase.from('comments').insert({
-      content: body.comment,
-      post_id: body.postId,
-      author_id: userId, // or get from session if applicable
-      parent_id: body.parentId || null,
+      content: body.content,
+      post_id: body.post_id,
+      author_id: user.id,
+      parent_id: body.parent_id || null,
+      username : body.username
     });
 
     if (error) {
@@ -31,7 +38,6 @@ export const POST: APIRoute = async ({ request }) => {
         headers: { 'Content-Type': 'application/json' },
       });
     }
-    */
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,

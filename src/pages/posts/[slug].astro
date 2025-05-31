@@ -3,7 +3,8 @@ import WebsiteLayout from "../../layouts/WebsiteLayout.astro";
 import { marked } from "marked";
 import createDOMPurify from "dompurify";
 import { JSDOM } from "jsdom";
-import CommentEditor from "../../components/CommentEditor.astro"
+import CommentEditor from "../../components/CommentEditor.jsx";
+import CommentsTree from "../../components/CommentsTree.jsx";
 export const prerender = false// Adjust path if needed
 const { slug } = Astro.params;
 const res = await fetch(`${import.meta.env.PUBLIC_API_URL}api/auth/get_posts`);
@@ -42,7 +43,7 @@ const date = new Date(correctPost.created_at).toLocaleDateString(undefined, {
     <div class="content" set:html={safeHtml}></div>
   </article>
   <div>
-    <CommentEditor/>
+    <CommentsTree slug={slug} client:load />
   </div>
 </WebsiteLayout>
 
