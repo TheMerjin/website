@@ -51,14 +51,13 @@ export default function CommentsTree({ slug }) {
   function renderTree(nodes, level = 0) {
     return nodes.map(node => (
       <div key={node.id} style={{
-        marginLeft: level === 0 ? 0 : (typeof window !== 'undefined' && window.innerWidth <= 600 ? 8 : 24),
+        marginLeft: level > 0 ? (typeof window !== 'undefined' && window.innerWidth <= 600 ? 8 : 24) : 0,
         background: darken('#fcfcfc', level),
         border: '1px solid #ffe0c0',
         borderRadius: 0,
         marginTop: 12,
         padding: '0.75rem',
         boxShadow: '0 1px 2px #0001',
-        maxWidth: typeof window !== 'undefined' && window.innerWidth <= 600 ? '100%' : 700,
       }}>
         <div style={{ fontWeight: 600, fontSize: '1rem', marginBottom: 4 }}>{node.username}</div>
         <div style={{ fontSize: '0.98rem', marginBottom: 8 }}>{node.content}</div>
