@@ -6,6 +6,7 @@ import Header from '../components/Header.astro';
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>My Site</title>
     <!-- You can add global CSS files here -->
@@ -14,18 +15,20 @@ import Header from '../components/Header.astro';
   <body style="background-color: #fff4ec; margin: 0; margin-left: 0rem;">
     <Header />
 
-    <main style="max-width: 720px; margin: 5rem auto; margin-left : 15rem; padding: 0 1rem;">
+    <main style="max-width: 800px; margin: 5rem auto; margin-left : 15rem; padding: 0 1rem;">
       <slot />  <!-- Page content will be injected here -->
     </main>
     <style>
       @media (max-width: 600px) {
         main {
           max-width: 100vw !important;
-          margin: 0 !important;
+          margin: 0.5rem !important;
           padding: 0 !important;
         }
       }
+
     </style>
+
 
   </body>
 </html>
