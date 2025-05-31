@@ -50,12 +50,16 @@ export default function CommentsTree({ slug }) {
 
   function renderTree(nodes, level = 0) {
     return nodes.map(node => (
-      <div key={node.id} style={{
-        marginLeft: level > 0 ? (typeof window !== 'undefined' && window.innerWidth <= 600 ? 8 : 24) : 0,
+      <div key={node.id}
+      style={{
+        marginLeft: 1,
+        width: '100%', // or set a maxWidth instead
+        maxWidth: 775 -14*level, // keeps it tidy on large screens
         background: darken('#fcfcfc', level),
         border: '1px solid #ffe0c0',
         borderRadius: 0,
-        marginTop: 12,
+        marginTop: 12 ,
+        marginBottom: 12 ,
         padding: '0.75rem',
         boxShadow: '0 1px 2px #0001',
       }}>
@@ -86,7 +90,7 @@ export default function CommentsTree({ slug }) {
   
 
   return (
-    <div style={{ marginTop: 32 }}>
+    <div>
       <h2 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: 16 }}>Comments</h2>
       <CommentEditor slug={slug} parentId={null} onPosted={handlePosted} />
       <div>{renderTree(tree)}</div>

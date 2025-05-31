@@ -37,16 +37,17 @@ const { post } = Astro.props;
   /* Base styles for the card */
   .lw-post-card {
     display: flex;
-    justify-content: space-between; /* Distribute header and stats */
-    align-items: center; /* Vertically align items */
-    max-width: 1000px; /* Slightly wider card */
+    justify-content: space-between;
+    align-items: center;
+    max-width: 800px;
+    width: 100%;
     margin: 0rem 7rem 0rem 7rem;
-    margin-left: 2rem; /* Center the card horizontally, add vertical spacing */
-    padding: 0.75rem 1.0rem; /* More padding for a spacious feel */
-    border-bottom: 1px solid #eee; /* Light bottom border for separation */
-    background-color: #fff; /* White background */
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* Subtle shadow for depth */
-    transition: all 0.2s ease-in-out; /* Smooth transition for hover effects */
+    margin-left: 2rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #eee;
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease-in-out;
   }
 
   .lw-post-card:hover {

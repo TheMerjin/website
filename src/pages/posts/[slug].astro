@@ -3,7 +3,6 @@ import WebsiteLayout from "../../layouts/WebsiteLayout.astro";
 import { marked } from "marked";
 import createDOMPurify from "dompurify";
 import { JSDOM } from "jsdom";
-import CommentEditor from "../../components/CommentEditor.jsx";
 import CommentsTree from "../../components/CommentsTree.jsx";
 export const prerender = false// Adjust path if needed
 const { slug } = Astro.params;
@@ -49,11 +48,11 @@ const date = new Date(correctPost.created_at).toLocaleDateString(undefined, {
 
 <style>
   .post {
-    max-width: 700px;
+    max-width: 800px;
     margin: 0rem auto;
     margin-left: 0rem;
     background-color: #fcfcfc;
-    padding: 0 1rem;
+    padding: 1.8rem 2rem;
     line-height: 1.7;
   }
 

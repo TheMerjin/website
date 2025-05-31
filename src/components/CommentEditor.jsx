@@ -71,7 +71,13 @@ export default function CommentEditor({ slug, parentId = null, onPosted }) {
   };
 
   return (
-    <div className="comment-box-container" style={{ width: '100%', marginLeft: 0, margin: '-1rem auto', padding: 0 }}>
+    <div className="comment-box-container" style={{
+      maxWidth: 800,
+      width: '100%',
+      marginLeft: "0rem",
+      padding: 0,
+      marginBottom : 0,
+    }}>
       <form id="commentForm" className={slug} onSubmit={handleSubmit}>
         <textarea
           id="commentBox"
@@ -81,7 +87,7 @@ export default function CommentEditor({ slug, parentId = null, onPosted }) {
           ref={textareaRef}
           value={content}
           onChange={handleInput}
-          style={{ width: '100%', resize: 'none', overflow: 'hidden', padding: '0.75rem', fontSize: '1rem', boxSizing: 'border-box', border: '1px solid #ffe0c0', borderRadius: 0, backgroundColor: "#fcfcfc" }}
+          style={{ width: '100%', resize: 'none', overflow: 'hidden', padding: '0.75rem', fontSize: '1rem', boxSizing: 'border-box', border: '1px solid #ffe0c0', borderRadius: "0" , backgroundColor: "#fcfcfc" }}
         />
         <div className="button-wrapper" style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '-2.25rem', marginRight: '0.5rem', marginBottom: '0.5rem' }}>
           <button id="submit" type="submit" className="custom-button" disabled={loading}>{loading ? 'Posting...' : 'Post'}
