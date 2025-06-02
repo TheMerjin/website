@@ -13,3 +13,17 @@
   .custom-button:hover {
     background-color: #ffe0c0;
   }
+  #commentBox {
+    width: 100%;
+    resize: none;
+    overflow: hidden;
+    padding: 0.75rem;
+    font-size: 0.8rem;
+    box-sizing: border-box;
+    border-radius: 0;
+    background-color: #fcfcfc;
+    border: 0px solid #ffe0c0;
+  
+    outline: none;         /* Removes the black outline */
+    box-shadow: none;      /* Removes any focus box shadow */
+  }

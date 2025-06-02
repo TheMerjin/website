@@ -39,7 +39,7 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    return new Response(JSON.stringify({ success: true }), {
+    return new Response(JSON.stringify({ comment : data}), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import CommentEditor from './CommentEditor.jsx';
 import '../styles/CommentTreeStyle.css';
+import ParentCommentEditor from './ParentCommentEditor.jsx';
+
 
 // Helper to build a tree from flat comments
 function buildTree(comments) {
@@ -63,9 +65,9 @@ export default function CommentsTree({ slug }) {
         padding: '0.75rem',
         boxShadow: '0 1px 2px #0001',
       }}>
-        <div style={{ fontWeight: 600, fontSize: '1rem', marginBottom: 4 }}>{node.username}</div>
-        <div style={{ fontSize: '0.98rem', marginBottom: 8 }}>{node.content}</div>
-        <div style={{ fontSize: '0.8rem', color: '#888', marginBottom: 4 }}>{new Date(node.created_at).toLocaleString()}</div>
+        <div style={{ fontWeight: 600, fontSize: '0.9rem', marginBottom: 4 }}>{node.username}</div>
+        <div style={{ fontSize: '0.8rem', marginBottom: 8 }}>{node.content}</div>
+        <div style={{ fontSize: '0.7rem', color: '#888', marginBottom: 4 }}>{new Date(node.created_at).toLocaleString()}</div>
         <button
             style={{ '--bg-color': darken('#fcfcfc', level) }}
             className="Replyto"
@@ -91,8 +93,7 @@ export default function CommentsTree({ slug }) {
 
   return (
     <div>
-      <h2 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: 16 }}>Comments</h2>
-      <CommentEditor slug={slug} parentId={null} onPosted={handlePosted} />
+    <ParentCommentEditor slug={slug} parentId={null} onPosted={handlePosted} />
       <div>{renderTree(tree)}</div>
     </div>
   );

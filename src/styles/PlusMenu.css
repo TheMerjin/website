@@ -1,0 +1,60 @@
+.plus-menu-container {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .plus-button {
+    margin-top: 1.20rem;
+    margin-left: 1rem;
+    background-color: #fcfcfc;
+    border: 0px solid #ccc;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    padding: 0;
+    text-align: center;
+  }
+  
+  .plus-button:hover {
+    background-color: #f7f7f7;
+    border-color: #aaa;
+  }
+  
+  .side-menu {
+    position: absolute;
+    top: 50%;
+    left: 36px;
+    transform: translateY(-50%); /* Vertically center with button */
+    display: flex;
+    gap: 6px;
+    background-color: #fff;
+    padding: 4px 6px;
+    border-radius: 4px;
+    z-index: 999;
+  }
+  
+  .side-menu button {
+    background: none;
+    border: none;
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    border-radius: 3px;
+    transition: background 0.2s;
+  }
+  
+  .side-menu button:hover {
+    background-color: #f5f5f5;
+  }
+  .glow {
+    margin-top: 1.52rem;
+    margin-left:1rem ;
+    font-size: 1rem;
+    text-align: center;
+    color: #adadab;
+  }
+  
+ 
