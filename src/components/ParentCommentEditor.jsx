@@ -62,19 +62,23 @@ export default function ParentCommentEditor({ slug, parentId = null, onPosted })
       body: JSON.stringify(comment),
     });
     const saveData = await saveRes.json();
-    const comment_id = saveData.comment?.[0]?.id;
-    console.log(comment_id); // or whatever key your API returns
-    const tagRes = await fetch('/api/auth/post_tags', {
-      method: 'POST', // or 'PUT', etc.
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
-      body: JSON.stringify({
-        comment_id: comment_id,
-        tag: selectedTag
+    console.log(saveData);
+    const comment_id = saveData.data.id;
+    console.log(comment_id);
+    console.log(selectedTag);// or whatever key your API returns
+    if (comment_id && selectedTag) {
+      const tagRes = await fetch('/api/auth/post_tags', {
+        method: 'POST', // or 'PUT', etc.
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+        body: JSON.stringify({
+          comment_id: comment_id,
+          tag: selectedTag
+        })
       })
-    });
+    };
     if (saveRes.ok) {
       setContent('');
       if (textareaRef.current) textareaRef.current.rows = 6;

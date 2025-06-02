@@ -24,14 +24,18 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
     console.log(body.username);
-    const { data, error } = await supabase.from('comments').insert({
+    const { data, error } = await supabase
+    .from('comments')
+    .insert({
       content: body.content,
       post_id: body.post_id,
       author_id: user.id,
       parent_id: body.parent_id || null,
-      username : body.username
-    });
-
+      username: body.username
+    })
+    .select('id') // you can also list specific fields here
+    .maybeSingle(); // returns one row or null
+ 
     if (error) {
       return new Response(JSON.stringify({ error: error.message }), {
         status: 500,
@@ -39,7 +43,7 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    return new Response(JSON.stringify({ comment : data}), {
+    return new Response(JSON.stringify({data}), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });

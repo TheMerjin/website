@@ -10,7 +10,7 @@ export default function PlusMenu({onTagSelect}) {
   const handleClick = (option) => {
     setOpen(false);
     setOption(option);
-    if (onTagSelect) onTagSelect(opt);
+    if (onTagSelect) onTagSelect(option);
   };
 
   return (
