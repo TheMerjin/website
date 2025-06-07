@@ -6,14 +6,145 @@ const res = await fetch(`${import.meta.env.PUBLIC_API_URL}api/auth/get_posts`);
 const { posts } = await res.json();
 ---
 <WebsiteLayout>
+	<div class="welcome-section">
+		<div class="header-content">
+			<h1>Agora</h1>
+			<div class="subtitle">Personal space for ideas and discourse</div>
+		</div>
+		<div class="description">
+			<p>Welcome to my corner of the internet. This is where I share my thoughts and engage in meaningful discussions. I've built this space to explore ideas, share knowledge, and connect with others who are curious about the world.</p>
+			<p>Feel free to join the conversation through posting your own things, commenting on posts, or learning more about me in the sidebar. Posts are organized by topic and can be filtered by tags to help you find what interests you most.</p>
+		</div>
+		<div class="navigation-hints">
+			<div class="hint">
+				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<line x1="3" y1="12" x2="21" y2="12"></line>
+					<line x1="3" y1="6" x2="21" y2="6"></line>
+					<line x1="3" y1="18" x2="21" y2="18"></line>
+				</svg>
+				<span>Find my background and interests in the sidebar</span>
+			</div>
+			<div class="hint">
+				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+				</svg>
+				<span>Join the discussion in the comments below</span>
+			</div>
+		</div>
+	</div>
+
 	<main id="posts-container">
-		<script is ="in-line">
-			console.log(posts)
-		</script>
+		<div class="section-header">
+			<h2>Recent Posts</h2>
+			<div class="section-description">Latest thoughts and discussions</div>
+		</div>
 		{posts.length === 0 ? (
-			<p>No posts yet!</p>
+			<p class="empty-state">No posts yet!</p>
 		) : (
 			posts.map((post: any) => <Postcard post={post} key={post.id} />)
 		)}
 	</main>
 </WebsiteLayout>
+
+<style>
+	.welcome-section {
+		max-width: 800px;
+		margin: 2rem auto;
+		padding: 0 1rem;
+	}
+
+	.header-content {
+		margin-bottom: 1.5rem;
+	}
+
+	h1 {
+		font-size: 2.5rem;
+		color: #333;
+		margin: 0;
+		font-weight: 600;
+		font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	}
+
+	.subtitle {
+		font-size: 1.1rem;
+		color: #666;
+		margin-top: 0.5rem;
+		font-weight: 400;
+	}
+
+	.description {
+		font-size: 1rem;
+		line-height: 1.6;
+		color: #444;
+		margin-bottom: 2rem;
+		max-width: 600px;
+	}
+
+	.description p {
+		margin: 0 0 1rem 0;
+	}
+
+	.description p:last-child {
+		margin-bottom: 0;
+	}
+
+	.navigation-hints {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		margin-bottom: 2rem;
+	}
+
+	.hint {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		color: #666;
+		font-size: 0.95rem;
+	}
+
+	.hint svg {
+		color: #888;
+		flex-shrink: 0;
+	}
+
+	.section-header {
+		margin-bottom: 1.5rem;
+	}
+
+	.section-header h2 {
+		font-size: 1.5rem;
+		color: #333;
+		margin: 0;
+		font-weight: 600;
+	}
+
+	.section-description {
+		font-size: 0.95rem;
+		color: #666;
+		margin-top: 0.25rem;
+	}
+
+	.empty-state {
+		color: #666;
+		font-style: italic;
+	}
+
+	@media (max-width: 768px) {
+		.welcome-section {
+			margin: 1.5rem auto;
+		}
+
+		h1 {
+			font-size: 2rem;
+		}
+
+		.description {
+			font-size: 0.95rem;
+		}
+
+		.hint {
+			font-size: 0.9rem;
+		}
+	}
+</style>

@@ -2,61 +2,276 @@
 import WebsiteLayout from '../layouts/WebsiteLayout.astro';
 ---
 <WebsiteLayout>
-  <main class="max-w-3xl mx-auto px-6 pt-10">
-    <div class="flex border-b border-gray-300 mb-6">
-      <button
-        class="px-4 py-2 text-sm font-medium border-b-2 border-black"
-      >
-        Write
-      </button>
-      <button
-        class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-black"
-      >
-        Import
-      </button>
+  <main class="editor-container">
+    <div class="editor-header">
+      <div class="editor-tabs">
+        <button class="tab active">Write</button>
+        <button class="tab">Preview</button>
+      </div>
+      <div class="editor-actions">
+        <button class="action-button draft">Save Draft</button>
+        <button id="submit" type="submit" class="action-button draft" form="postForm">Publish</button>
+        <div id="status" class="status-message">.</div>
+      </div>
     </div>
-    <form id="postForm" class="space-y-8">
-      <input
-        type="text"
-        name="title"
-        placeholder="Title"
-        required
-        class="w-full text-3xl font-bold placeholder-gray-500 bg-transparent border-none outline-none"
-      />
-      <textarea
-        name="content"
-        placeholder="Write your post here..."
-        rows="12"
-        required
-        class="w-full text-lg leading-relaxed placeholder-gray-500 bg-transparent border-none outline-none resize-y"
-      ></textarea>
-      <div class="flex justify-end gap-4 pt-4">
-        <button
-          type="button"
-          class="px-4 py-2 border rounded transition"
-          style="background-color: #fff4ec; border-color: #fff4ec;"
-          onmouseover="this.style.backgroundColor='#ffe0c0'"
-          onmouseout="this.style.backgroundColor='#fff4ec'"
-        >
-          Save Draft
-        </button>
-        <button
-          type="submit"
-          class="px-4 py-2 border rounded transition bg-blue-500 text-white hover:bg-blue-600"
-        >
-          Publish
-        </button>
+
+    <form id="postForm" class="editor-form">
+      <div class="form-group">
+        <input
+          type="text"
+          name="title"
+          placeholder="Title"
+          required
+          class="title-input"
+        />
+        <div class="form-group">
+          <div class="editor-toolbar">
+            <button type="button" class="toolbar-button" title="Bold">B</button>
+            <button type="button" class="toolbar-button" title="Italic">I</button>
+            <button type="button" class="toolbar-button" title="Link">🔗</button>
+            <button type="button" class="toolbar-button" title="Quote">❝</button>
+            <button type="button" class="toolbar-button" title="Code">{ }</button>
+          </div>
+      </div>
+      
+      
+        <textarea
+          name="content"
+          placeholder="Write your post here... Use markdown for formatting."
+          required
+          class="content-input"
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <div class="tags-section">
+          <label>Tags</label>
+          <div class="tags-input">
+            <input type="text" placeholder="Add tags..." />
+            <div class="tags-list"></div>
+          </div>
+        </div>
       </div>
     </form>
   </main>
 </WebsiteLayout>
 
-<script type="module">
-  const form = document.getElementById('postForm');
+<style>
+  .editor-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: transparent;
+  }
+
+  .editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding-bottom: 1rem;
+  }
+
+  .editor-tabs {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .tab {
+    background: none;
+    border: none;
+    padding: 0.5rem 1rem;
+    font-size: 0.95rem;
+    color: #666;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .tab.active {
+    color: #333;
+    font-weight: 500;
+  }
+
+  .tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1rem;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: #333;
+  }
+
+  .editor-actions {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .action-button {
+    padding: 0.5rem 1rem;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: transparent;
+  }
+
+  .action-button.draft {
+    color: #666;
+  }
+
+  .submit {
+    background: #333;
+    color: white;
+    border-color: #333;
+  }
+
+  .action-button:hover {
+    opacity: 0.9;
+  }
+
+  .editor-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    background: transparent;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    background: transparent; 
+  }
+
+  .title-input {
+    font-size: 1.8rem;
+    font-weight: 600;
+    padding: 0.5rem 0;
+    border: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    outline: none;
+    width: 100%;
+    color: #333;
+    background: transparent;
+  }
+
+  .title-input::placeholder {
+    color: #999;
+  }
+
+  .editor-toolbar {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    background: transparent;
+  }
+
+  .toolbar-button {
+    background: transparent;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    color: #666;
+  }
+
+  .toolbar-button:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  .content-input {
+    min-height: 400px;
+    padding: 1rem 0;
+    border: none;
+    outline: none;
+    resize: vertical;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #333;
+    background: transparent;
+  }
+
+  .content-input::placeholder {
+    color: #999;
+  }
+
+  .tags-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    background: transparent;
+  }
+
+  .tags-section label {
+    font-size: 0.9rem;
+    color: #666;
+    font-weight: 500;
+  }
+
+  .tags-input {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    background: transparent;
+  }
+
+  .tags-input input {
+    padding: 0.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    font-size: 0.9rem;
+    background: transparent;
+  }
+
+  .tags-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    background: transparent;
+  }
+
+  @media (max-width: 768px) {
+    .editor-container {
+      margin: 1rem auto;
+    }
+
+    .editor-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .editor-actions {
+      width: 100%;
+      justify-content: flex-end;
+    }
+
+    .title-input {
+      font-size: 1.5rem;
+    }
+  }
+</style>
+
+<script>
+  
+  const form = document.getElementById('postForm') as HTMLFormElement;
   const status = document.getElementById('status');
+
+  if (!form) {
+    console.error('Post form not found');
+    throw new Error('Post form not found');
+  }
+  
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (!status) return;
     status.textContent = 'Checking login...';
 
     const loginRes = await fetch('/api/auth/logged-in');
@@ -90,5 +305,42 @@ import WebsiteLayout from '../layouts/WebsiteLayout.astro';
       const err = await saveRes.json();
       status.textContent = 'Error saving post: ' + (err.message || 'Unknown error');
     }
+  });
+
+  // Add toolbar button functionality
+  document.querySelectorAll('.toolbar-button').forEach(button => {
+    button.addEventListener('click', () => {
+      const textarea = document.querySelector('.content-input') as HTMLTextAreaElement;
+      if (!textarea) return;
+
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const text = textarea.value;
+      const selectedText = text.substring(start, end);
+
+      let newText = '';
+      switch(button.getAttribute('title')) {
+        case 'Bold':
+          newText = `**${selectedText}**`;
+          break;
+        case 'Italic':
+          newText = `*${selectedText}*`;
+          break;
+        case 'Link':
+          newText = `[${selectedText}](url)`;
+          break;
+        case 'Quote':
+          newText = `> ${selectedText}`;
+          break;
+        case 'Code':
+          newText = `\`${selectedText}\``;
+          break;
+      }
+
+      textarea.value = text.substring(0, start) + newText + text.substring(end);
+      textarea.focus();
+      textarea.selectionStart = start + newText.length;
+      textarea.selectionEnd = start + newText.length;
+    });
   });
 </script>

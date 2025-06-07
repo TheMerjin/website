@@ -31,7 +31,7 @@ function darken(color, percent) {
 
 // Fetch tags for a comment
 async function fetchTags(commentId) {
-  const res = await fetch(`/api/auth/get_comment_tags?comment_id=${commentId}`);
+  const res = await fetch(`/api/auth/get_tags?comment_id=${commentId}`);
   if (!res.ok) return [];
   const data = await res.json();
   return data.tags || [];
@@ -93,7 +93,16 @@ export default function CommentsTree({ slug }) {
         boxShadow: '0 1px 2px #0001',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ fontWeight: 600, fontSize: '0.9rem', marginBottom: 4 }}>{node.username}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>{node.username}</div>
+            {tagsMap[node.id] && tagsMap[node.id].length > 0 && (
+              <div style={{ display: 'flex', gap: 4 }}>
+                {tagsMap[node.id].map((tag, i) => (
+                  <span key={i} style={{ color: '#888', fontSize: '0.75rem', fontWeight: 500 }}>#{tag}</span>
+                ))}
+              </div>
+            )}
+          </div>
           <button
             style={{ fontSize: '0.8rem', background: 'none', border: 'none', color: '#888', cursor: 'pointer', marginLeft: 8 }}
             onClick={() => toggleCollapse(node.id)}
@@ -102,14 +111,6 @@ export default function CommentsTree({ slug }) {
             {collapsed[node.id] ? '[+]' : '[-]'}
           </button>
         </div>
-        {/* Tags display */}
-        {tagsMap[node.id] && tagsMap[node.id].length > 0 && (
-          <div style={{ marginBottom: 4, marginTop: 2, display: 'flex', gap: 6 }}>
-            {tagsMap[node.id].map((tag, i) => (
-              <span key={i} style={{ background: '#f0f0f0', color: '#888', borderRadius: 8, padding: '1px 8px', fontSize: '0.75rem', fontWeight: 500 }}>#{tag}</span>
-            ))}
-          </div>
-        )}
         {!collapsed[node.id] && <>
           <div style={{ fontSize: '0.8rem', marginBottom: 8 }}>{node.content}</div>
           <div style={{ fontSize: '0.7rem', color: '#888', marginBottom: 4 }}>{new Date(node.created_at).toLocaleString()}</div>
