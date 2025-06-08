@@ -44,6 +44,7 @@ if (error) {
   });
 
   cookies.set("sb-refresh-token", refresh_token, {
+    
     path: "/",
     httpOnly: true,
     sameSite: "strict",
