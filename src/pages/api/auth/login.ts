@@ -14,17 +14,17 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
     return new Response("Email and password are required", { status: 400 });
   }
 
-  const { data, error: error } = await supabase.auth.signInWithPassword({
+  const { data, error : error } = await supabase.auth.signInWithPassword({
     email,
     password,
   });
   
 
-  if (error) {
-    console.error('Error signing out:', error.message);
-  } else {
-    console.log('User signed out successfully');
-  }
+if (error) {
+  console.error('Error signing out:', error.message);
+} else {
+  console.log('User signed out successfully');
+}
 
   if (error) {
     return new Response(error.message, { status: 401 }); // Use 401 for unauthorized
@@ -44,20 +44,13 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
   });
 
   cookies.set("sb-refresh-token", refresh_token, {
-    
     path: "/",
     httpOnly: true,
     sameSite: "strict",
     secure: true,
     maxAge: 60 * 60 * 24 * 30, // 30 days
   });
-  return new Response(null, {
-    status: 303,
-    headers: {
-      Location: `${import.meta.env.PUBLIC_API_URL}?msg=LoggedInThankyou`.trim(),
-    },
-  });
 
+  return redirect(`${import.meta.env.PUBLIC_API_URL}?msg=LoggedInThankyou`);
 
 };
-
