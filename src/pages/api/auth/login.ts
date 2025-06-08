@@ -51,12 +51,13 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
     secure: true,
     maxAge: 60 * 60 * 24 * 30, // 30 days
   });
-
   return new Response(null, {
     status: 303,
     headers: {
-      Location: `${import.meta.env.PUBLIC_API_URL}?msg=LoggedInThankyou`
-    }
+      Location: `${import.meta.env.PUBLIC_API_URL}?msg=LoggedInThankyou`.trim(),
+    },
   });
+
+
 };
 
