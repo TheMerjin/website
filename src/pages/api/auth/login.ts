@@ -3,6 +3,7 @@ import type { APIRoute } from "astro";
 import { supabase } from "../../../lib/supabase";
 
 
+
 export const POST: APIRoute = async ({ request, cookies, redirect }) => {
   const formData = await request.formData();
   const email = formData.get("email")?.toString();
@@ -50,6 +51,12 @@ if (error) {
     maxAge: 60 * 60 * 24 * 30, // 30 days
   });
 
-  return redirect(`${import.meta.env.PUBLIC_API_URL}?msg=LoggedInThankyou`);
+  return new Response(null, {
+    status: 303,
+    headers: {
+      Location: `${import.meta.env.PUBLIC_API_URL}?msg=LoggedInThankyou`
+    }
+  });
+}
 
 };
