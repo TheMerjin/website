@@ -4,9 +4,9 @@ const { post } = Astro.props;
 
 <article class="lw-post-card">
   <header class="lw-post-header">
-    <a href={`/${post.id}`} class="lw-post-title">
+    <a href={`posts/${post.id}`} class="lw-post-title">
       {post.title}
-    </a>
+    </a> 
     <div class="lw-post-meta">
       <span class="lw-post-author">{post.username}</span>
       <time datetime={post.created_at} class="lw-post-date">

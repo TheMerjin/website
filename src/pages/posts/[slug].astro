@@ -1,52 +1,49 @@
 ---
 import WebsiteLayout from "../../layouts/WebsiteLayout.astro";
 import { marked } from "marked";
+import markedKatex from "marked-katex-extension";
 import createDOMPurify from "dompurify";
 import { JSDOM } from "jsdom";
 import CommentsTree from "../../components/CommentsTree.jsx";
-export const prerender = false// Adjust path if needed
+
+export const prerender = false;
+
 const { slug } = Astro.params;
+
+// Fetch posts
 const res = await fetch(`${import.meta.env.PUBLIC_API_URL}api/auth/get_posts`);
 const { posts } = await res.json();
-let correctPost = null;
-for (const post of posts) {
-  if (post.id == slug){
-    correctPost = post;
-  } // do something with each post
-}
 
+// Find the correct post
+const correctPost = posts.find((post) => post.id == slug);
 
-// Setup DOMPurify with JSDOM (since Astro runs on server)
+// Setup DOMPurify
 const window = new JSDOM("").window;
 const DOMPurify = createDOMPurify(window);
 
-// Convert markdown to HTML
-const rawHtml = marked.parse(correctPost.content) as string;
+// Use KaTeX extension in marked
+marked.use(markedKatex({
+  throwOnError: false,
+  displayMode: true, // optional, applies to $$...$$
+}));
 
-// Sanitize HTML output
-const safeHtml = DOMPurify.sanitize(rawHtml);
+// Convert and sanitize
+const rawHtml = marked.parse(correctPost.content);
+const safeHtml = DOMPurify.sanitize(rawHtml, { ADD_TAGS: ['math', 'mi', 'mo', 'mn', 'mrow', 'annotation'], ADD_ATTR: ['display'] });
 
-// Format date nicely
+// Format date
 const date = new Date(correctPost.created_at).toLocaleDateString(undefined, {
   year: "numeric",
   month: "long",
   day: "numeric",
 });
+
+
 ---
 <WebsiteLayout>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- KaTeX CSS and auto-renderer -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
-  onload="renderMathInElement(document.body, {
-    delimiters: [
-      {left: '$$', right: '$$', display: true},
-      {left: '$', right: '$', display: false}
-    ],
-    throwOnError: false
-  });"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css">
   </head>
   <article class="post">
     <h1 class="title">{correctPost.title}</h1>
