@@ -1,0 +1,165 @@
+---
+// pages/search.astro
+import PostCard from '../components/PostCard.jsx';
+import WebsiteLayout from '../layouts/WebsiteLayout.astro';
+import SearchResults from '../components/SearchResults.jsx';
+
+// Extract query parameters
+const url = new URL(Astro.request.url);
+const query = url.searchParams.get('q') || '';
+const limit = url.searchParams.get('limit') || '100';
+
+// If there's a query, perform search
+let searchResults = [];
+if (query) {
+  try {
+    const res = await fetch(`${import.meta.env.PUBLIC_API_URL}api/auth/search_similar`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, limit: parseInt(limit) }),
+    });
+    const data = await res.json();
+    searchResults = data.postData || [];
+  } catch (error) {
+    console.error('Search error:', error);
+  }
+}
+
+// Get all posts for initial display (when no search query)
+const res = await fetch(`${import.meta.env.PUBLIC_API_URL}api/auth/get_posts`);
+const { posts } = await res.json();
+
+// Get initial query and results on the server
+let initialResults = [];
+if (query) {
+  const res = await fetch(`${import.meta.env.PUBLIC_API_URL}api/auth/search_similar`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query, limit: 100 }),
+  });
+  const data = await res.json();
+  initialResults = data.postData || [];
+}
+---
+<WebsiteLayout>
+<div style={{ display: 'flex', margin: '20px auto', maxWidth: '1200px', padding: '0 20px' }}>
+  {/* Filters Section */}
+  <div style={{ flex: '0 0 250px', marginRight: '40px', paddingTop: '10px' }}>
+    <h2 style={{ marginBottom: '20px' }}>Filters</h2>
+
+    {/* Filter by posted date */}
+    <div style={{ marginBottom: '20px' }}>
+      <div style={{ fontWeight: '600', marginBottom: '10px' }}>Filter by posted date</div>
+      <div>
+        <label style={{ display: 'block', marginBottom: '5px' }}>
+          <input type="radio" name="post_date" value="all" checked /> All
+        </label>
+        <label style={{ display: 'block', marginBottom: '5px' }}>
+          <input type="radio" name="post_date" value="24h" /> Past 24 hours
+        </label>
+        <label style={{ display: 'block', marginBottom: '5px' }}>
+          <input type="radio" name="post_date" value="week" /> Past week
+        </label>
+        <label style={{ display: 'block', marginBottom: '5px' }}>
+          <input type="radio" name="post_date" value="month" /> Past month
+        </label>
+        <label style={{ display: 'block', marginBottom: '5px' }}>
+          <input type="radio" name="post_date" value="year" /> Past year
+        </label>
+      </div>
+    </div>
+
+    {/* Filter by wikilags */}
+    <div style={{ marginBottom: '20px' }}>
+      <input
+        type="text"
+        placeholder="Filter by wikilags"
+        style={{
+          width: '100%',
+          padding: '8px',
+          border: '1px solid #ccc',
+          borderRadius: '4px',
+          outline: 'none',
+        }}
+      />
+    </div>
+
+    {/* Checkboxes */}
+    <div style={{ marginBottom: '20px' }}>
+      <label style={{ display: 'block', marginBottom: '10px' }}>
+        <input type="checkbox" /> Curated
+      </label>
+      <label style={{ display: 'block', marginBottom: '10px' }}>
+        <input type="checkbox" checked /> Exclude events
+      </label>
+    </div>
+
+    <button
+      style={{
+        background: 'none',
+        border: 'none',
+        color: '#007bff',
+        cursor: 'pointer',
+        padding: '0',
+        fontSize: '0.9rem',
+      }}
+    >
+      Clear all filters
+    </button>
+  </div>
+
+  {/* Search Results Section (hydrated React) */}
+  <div style={{ flex: 1 }}>
+    <SearchResults initialResults={initialResults} initialQuery={query} client:load />
+  </div>
+</div>
+
+<style>
+  .search-post-card {
+    margin: 0 auto;
+    max-width: 900px;
+    padding: 32px 36px 28px 36px;
+    margin-bottom: 40px;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 4px 24px 0 rgba(60,60,60,0.10), 0 2px 8px 0 rgba(60,60,60,0.06);
+    border: 1px solid #ececec;
+    transition: box-shadow 0.2s, background 0.2s;
+    cursor: pointer;
+    position: relative;
+  }
+  .search-post-card:hover {
+    background: #f8f4f0;
+    box-shadow: 0 8px 32px 0 rgba(60,60,60,0.16), 0 4px 16px 0 rgba(60,60,60,0.10);
+  }
+  .search-post-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin-bottom: 18px;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+  .search-post-title a {
+    text-decoration: none;
+    color: #222;
+    transition: color 0.2s;
+  }
+  .search-post-title a:hover {
+    color: #666;
+  }
+  .search-post-meta {
+    font-size: 1.05rem;
+    color: #888;
+    margin-bottom: 22px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+  .search-post-content {
+    font-size: 1.13rem;
+    line-height: 1.7;
+    color: #333;
+    margin-bottom: 0;
+    word-break: break-word;
+  }
+</style>
+</WebsiteLayout>

@@ -1,0 +1,137 @@
+---
+import Header from '../components/Header.astro';
+// No frontmatter needed for static layout
+---
+
+<Header />
+<div class="notes-root">
+  <aside class="obsidian-sidebar">
+    <div class="obsidian-sidebar-header">NOTES</div>
+    <div class="obsidian-notes-list">
+      <div class="obsidian-note-item selected">Welcome.md</div>
+      <div class="obsidian-note-item">Project Ideas.md</div>
+      <div class="obsidian-note-item">Reading List.md</div>
+      <div class="obsidian-note-item">Journal/2024-06-01.md</div>
+      <div class="obsidian-note-item">Journal/2024-06-02.md</div>
+      <div class="obsidian-note-item">Work/Meeting Notes.md</div>
+    </div>
+  </aside>
+  <main class="obsidian-main">
+    <div class="obsidian-topbar">Welcome.md</div>
+    <textarea class="obsidian-editor" placeholder="Start writing in Markdown...">
+# Welcome to Your Notes
+
+This is a placeholder for your Obsidian-style notes app.
+
+- Use the sidebar to browse notes
+- The main area is your Markdown editor
+- Add features like linking, tags, and search as you go!
+    </textarea>
+  </main>
+</div>
+
+<style>
+.notes-root {
+  display: flex;
+  height: calc(100vh - var(--header-height, 3em));
+  width: 100vw;
+  background: #fff4ec;
+  position: relative;
+  top: 0;
+}
+.obsidian-sidebar {
+  width: 250px;
+  background: rgb(var(--gray-light));
+  border-right: 1px solid rgb(var(--gray));
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  height: 100%;
+}
+.obsidian-sidebar-header {
+  padding: 1.2rem 1rem 1rem 1rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border-bottom: 1px solid rgb(var(--gray));
+  letter-spacing: 1px;
+  color: rgb(var(--black));
+}
+.obsidian-notes-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem 0;
+}
+.obsidian-note-item {
+  padding: 0.7rem 1.2rem;
+  cursor: pointer;
+  border-radius: 4px;
+  margin: 0.2rem 0.5rem;
+  color: rgb(var(--black));
+  transition: background 0.15s;
+}
+.obsidian-note-item.selected {
+  background: #cebdb2;
+  
+}
+.obsidian-note-item:hover {
+color: #b3a69d;
+}
+.obsidian-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #fff4ec;
+  height: 100%;
+}
+.obsidian-topbar {
+  height: 48px;
+  background: #fff;
+  border-bottom: 1px solid rgb(var(--gray));
+  display: flex;
+  align-items: center;
+  padding: 0.8rem 1.5rem 3rem 1.5rem;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: rgb(var(--black));
+  font-family: 'Inter', sans-serif;
+}
+
+.obsidian-editor {
+  flex: 1;
+  padding: 2rem 2.5rem;
+  background: #fff;
+  color: rgb(var(--black));
+  font-size: 1.1rem;
+  border: none;
+  outline: none;
+  resize: none;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  box-sizing: border-box;
+  box-shadow: var(--box-shadow);
+}
+.obsidian-editor::selection {
+  background: #E6E6FA;
+  color: #000;
+}
+@media (max-width: 800px) {
+  .obsidian-sidebar {
+    width: 60px;
+  }
+  .obsidian-sidebar-header {
+    display: none;
+  }
+  .obsidian-note-item {
+    padding: 0.7rem 0.5rem;
+    font-size: 0.95rem;
+  }
+  .obsidian-main {
+    padding: 0;
+  }
+  .obsidian-editor {
+    padding: 1rem 0.5rem;
+  }
+}
+</style> 

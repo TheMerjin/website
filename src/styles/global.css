@@ -2,8 +2,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
 
 :root {
-	--accent: #2337ff;
-	--accent-dark: #000d8a;
+	--accent: #E0B0FF;
+	--accent-dark: #b07fd6;
 	--black: 15, 18, 25;
 	--gray: 96, 115, 159;
 	--gray-light: 229, 233, 240;
@@ -130,4 +130,9 @@ hr {
 	clip: rect(1px, 1px, 1px, 1px);
 	clip-path: inset(50%);
 	white-space: nowrap;
+}
+
+::selection {
+	background: #E6E6FA;
+	color: #000;
 }
