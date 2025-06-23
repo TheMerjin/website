@@ -114,10 +114,10 @@ export default function CommentEditor({ slug, parentId = null, onPosted }) {
           ref={textareaRef}
           value={content}
           onChange={handleInput}
-          style={{ width: '100%', resize: 'none', overflow: 'hidden', padding: '0.75rem', fontSize: '1rem', boxSizing: 'border-box', border: '1px solid #ffe0c0', borderRadius: "0.3em" , backgroundColor: "#fcfcfc" }}
+          style={{ width: '100%', resize: 'none', overflow: 'hidden', padding: '0.75rem', fontSize: '1.1rem', boxSizing: 'border-box', border: '1px solid #ffe0c0', borderRadius: "0.3em" , backgroundColor: "#fcfcfc" }}
         />
         <div className="button-wrapper" style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '-2.25rem', marginRight: '0.5rem', marginBottom: '0.5rem' }}>
-          <button id="submit" type="submit" className="custom-button" disabled={loading}>{loading ? 'Posting...' : 'Post'}
+          <button id="submit" type="submit" className="custom-button" disabled={loading} style={{fontSize: '1.1rem'}}>{loading ? 'Posting...' : 'Post'}
           </button>
         </div>
       </form>

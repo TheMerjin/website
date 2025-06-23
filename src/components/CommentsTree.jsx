@@ -94,17 +94,17 @@ export default function CommentsTree({ slug }) {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>{node.username}</div>
+            <div style={{ fontWeight: 600, fontSize: '1.1rem' }}>{node.username}</div>
             {tagsMap[node.id] && tagsMap[node.id].length > 0 && (
               <div style={{ display: 'flex', gap: 4 }}>
                 {tagsMap[node.id].map((tag, i) => (
-                  <span key={i} style={{ color: '#888', fontSize: '0.75rem', fontWeight: 500 }}>#{tag}</span>
+                  <span key={i} style={{ color: '#888', fontSize: '0.9rem', fontWeight: 500 }}>#{tag}</span>
                 ))}
               </div>
             )}
           </div>
           <button
-            style={{ fontSize: '0.8rem', background: 'none', border: 'none', color: '#888', cursor: 'pointer', marginLeft: 8 }}
+            style={{ fontSize: '1rem', background: 'none', border: 'none', color: '#888', cursor: 'pointer', marginLeft: 8 }}
             onClick={() => toggleCollapse(node.id)}
             aria-label={collapsed[node.id] ? 'Expand' : 'Collapse'}
           >
@@ -112,8 +112,8 @@ export default function CommentsTree({ slug }) {
           </button>
         </div>
         {!collapsed[node.id] && <>
-          <div style={{ fontSize: '0.8rem', marginBottom: 8 }}>{node.content}</div>
-          <div style={{ fontSize: '0.7rem', color: '#888', marginBottom: 4 }}>{new Date(node.created_at).toLocaleString()}</div>
+          <div style={{ fontSize: '1rem', marginBottom: 8 }}>{node.content}</div>
+          <div style={{ fontSize: '0.9rem', color: '#888', marginBottom: 4 }}>{new Date(node.created_at).toLocaleString()}</div>
           <button
               style={{ '--bg-color': darken('#fcfcfc', level) }}
               className="Replyto"
@@ -124,7 +124,7 @@ export default function CommentsTree({ slug }) {
           {replyTo === node.id && (
             <div style={{ marginTop: 8 }}>
               <CommentEditor slug={slug} parentId={node.id} onPosted={handlePosted} />
-              <button onClick={handleCancel} style={{ marginTop: 4, fontSize: '0.8rem', background: 'none', border: 'none', color: '#c00', cursor: 'pointer' }}>Cancel</button>
+              <button onClick={handleCancel} style={{ marginTop: 4, fontSize: '1rem', background: 'none', border: 'none', color: '#c00', cursor: 'pointer' }}>Cancel</button>
             </div>
           )}
           {node.children && node.children.length > 0 && (

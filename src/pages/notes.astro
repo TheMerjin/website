@@ -1,6 +1,14 @@
 ---
 import Header from '../components/Header.astro';
 // No frontmatter needed for static layout
+import { supabase } from '../lib/client-supabase.js';
+const res1 = await fetch(`${import.meta.env.PUBLIC_API_URL}api/auth/user-data`);
+const data1 = await res1.json();
+const user = data1.user;
+console.log(user);
+const res = await fetch(`/api/auth/posts?user_id=${user.id}`);
+const data = await res.json();
+console.log(data.posts);
 ---
 
 <Header />
@@ -9,16 +17,11 @@ import Header from '../components/Header.astro';
     <div class="obsidian-sidebar-header">NOTES</div>
     <div class="obsidian-notes-list">
       <div class="obsidian-note-item selected">Welcome.md</div>
-      <div class="obsidian-note-item">Project Ideas.md</div>
-      <div class="obsidian-note-item">Reading List.md</div>
-      <div class="obsidian-note-item">Journal/2024-06-01.md</div>
-      <div class="obsidian-note-item">Journal/2024-06-02.md</div>
-      <div class="obsidian-note-item">Work/Meeting Notes.md</div>
     </div>
   </aside>
   <main class="obsidian-main">
     <div class="obsidian-topbar">Welcome.md</div>
-    <textarea class="obsidian-editor" placeholder="Start writing in Markdown...">
+    <textarea id="editor" class="obsidian-editor" placeholder="Start writing in Markdown...">
 # Welcome to Your Notes
 
 This is a placeholder for your Obsidian-style notes app.
@@ -29,6 +32,31 @@ This is a placeholder for your Obsidian-style notes app.
     </textarea>
   </main>
 </div>
+<script>
+  const textarea = document.getElementById('editor');
+  textarea.addEventListener('input', async (event) => {
+    const res1 = await fetch(`api/auth/user-data`);
+    const data = await res1.json();
+    const user = data.user;
+    console.log(user);
+    const content = event.target.value;
+    const title = document.querySelector('.obsidian-note-item.selected').textContent;
+    const res = await fetch('/api/auth/notes', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ user: user, title: title, content: content }),
+    });
+
+    const data2 = await res.json();
+    console.log(data2);
+  });
+</script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+</style>
 
 <style>
 .notes-root {
@@ -71,10 +99,9 @@ This is a placeholder for your Obsidian-style notes app.
 }
 .obsidian-note-item.selected {
   background: #cebdb2;
-  
 }
 .obsidian-note-item:hover {
-color: #b3a69d;
+  color: #b3a69d;
 }
 .obsidian-main {
   flex: 1;
@@ -111,6 +138,7 @@ color: #b3a69d;
   border-radius: 8px;
   box-sizing: border-box;
   box-shadow: var(--box-shadow);
+  font-family: 'Atkinson Hyperlegible', Arial, sans-serif;
 }
 .obsidian-editor::selection {
   background: #E6E6FA;
@@ -134,4 +162,4 @@ color: #b3a69d;
     padding: 1rem 0.5rem;
   }
 }
-</style> 
+</style>
