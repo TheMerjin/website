@@ -15,9 +15,9 @@ export const GET: APIRoute = async ({ request }) => {
     }
 
     const { data: postData, error: profileError } = await supabase
-        .from('notes')
+        .from('notes').select("*")
         .eq("user_id", userId)
-        .select("*")
+        
         .order('created_at', { ascending: false });
 
     if (profileError) {

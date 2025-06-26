@@ -1,18 +1,20 @@
 ---
 // Import your Header component once here
 import Header from '../components/Header.astro';
+import '../styles/global.css';
 ---
 
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-
+   
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>My Site</title>
     <!-- You can add global CSS files here -->
     <link rel="stylesheet" href="/styles/global.css" />
+    <link rel="icon" type="image/jpeg" href="/assets_task_01jyj60hf6fk59efxgcf6aerx2_1750809597_img_0.jpg" />
   </head>
-  <body style="background-color: #fff4ec; margin: 0; margin-left: 0rem;">
+  <body style="background-color: #f8f2e4; margin: 0; margin-left: 0rem;">
     <Header />
 
     <main style="max-width: 800px; margin: 5rem auto; margin-left : 20rem; padding: 0 1rem;">
@@ -31,4 +33,5 @@ import Header from '../components/Header.astro';
 
 
   </body>
+
 </html>

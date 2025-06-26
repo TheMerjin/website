@@ -1,0 +1,133 @@
+.new-note-btn {
+  float: right;
+  background: #f8f2e4;
+  border: none;
+  border-radius: 0;
+  width: 24px;
+  height: 24px;
+  font-size: 16px;
+  font-weight: normal;
+  cursor: pointer;
+  color: #666;
+  transition: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0;
+}
+
+.new-note-btn:hover {
+  background: #f8f2e4;
+  color: #333;
+}
+
+.loading {
+  padding: 1rem;
+  text-align: center;
+  color: #666;
+  font-style: normal;
+}
+
+.no-notes {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: #666;
+}
+
+.no-notes p {
+  margin-bottom: 1rem;
+  font-style: normal;
+}
+
+.no-notes button {
+  background: #f8f2e4;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0;
+  cursor: pointer;
+  color: #666;
+  font-weight: normal;
+  transition: none;
+}
+
+.no-notes button:hover {
+  background: #f8f2e4;
+  color: #333;
+}
+
+.obsidian-note-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border-radius: 0;
+  margin: 0;
+  color: #666;
+  transition: none;
+  border: none;
+  background: #f8f2e4;
+  border-bottom: 1px solid #e6e1d7;
+}
+
+.obsidian-note-item:hover {
+  background: #f8f2e4;
+  color: #333;
+}
+
+.obsidian-note-item.selected {
+  background: #f8f2e4;
+  color: #333;
+  font-weight: bold;
+}
+
+.note-title {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: normal;
+}
+
+.delete-note-btn {
+  background: #f8f2e4;
+  border: none;
+  color: #999;
+  font-size: 14px;
+  font-weight: normal;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 0;
+  opacity: 0;
+  transition: none;
+}
+
+.obsidian-note-item:hover .delete-note-btn {
+  opacity: 1;
+}
+
+.delete-note-btn:hover {
+  background: #f8f2e4;
+  color: #666;
+}
+
+.obsidian-sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: normal;
+  border-bottom: 1px solid #e6e1d7;
+  letter-spacing: 0;
+  color: #666;
+  background: #f8f2e4;
+}
+
+.obsidian-sidebar {
+  background: #f8f2e4;
+}
+
+.obsidian-notes-list {
+  background: #f8f2e4;
+} 

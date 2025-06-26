@@ -178,7 +178,6 @@ import BaseHead from './BaseHead.astro';
 <script>
 	(async () => {
 		const res = await fetch(`${import.meta.env.PUBLIC_API_URL}api/auth/logged-in`);
-		console.log(res);
 	
 		if (res.ok) {
 		  replaceElement();

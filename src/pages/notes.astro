@@ -1,27 +1,24 @@
 ---
 import Header from '../components/Header.astro';
+import SidebarElement from '../components/SidebarElement.jsx';
+import '../styles/global.css';
 // No frontmatter needed for static layout
 import { supabase } from '../lib/client-supabase.js';
-const res1 = await fetch(`${import.meta.env.PUBLIC_API_URL}api/auth/user-data`);
-const data1 = await res1.json();
-const user = data1.user;
-console.log(user);
-const res = await fetch(`/api/auth/posts?user_id=${user.id}`);
-const data = await res.json();
-console.log(data.posts);
----
 
-<Header />
+
+---
+<body>
+<Header/>
 <div class="notes-root">
-  <aside class="obsidian-sidebar">
-    <div class="obsidian-sidebar-header">NOTES</div>
-    <div class="obsidian-notes-list">
-      <div class="obsidian-note-item selected">Welcome.md</div>
-    </div>
-  </aside>
+  <SidebarElement client:load onNoteSelect={null} selectedNoteId={null} />
   <main class="obsidian-main">
     <div class="obsidian-topbar">Welcome.md</div>
-    <textarea id="editor" class="obsidian-editor" placeholder="Start writing in Markdown...">
+    <textarea
+      id="editor"
+      class="obsidian-editor"
+      placeholder="Start writing in Markdown..."
+      data-current-note-id="welcome"
+    >
 # Welcome to Your Notes
 
 This is a placeholder for your Obsidian-style notes app.
@@ -30,32 +27,386 @@ This is a placeholder for your Obsidian-style notes app.
 - The main area is your Markdown editor
 - Add features like linking, tags, and search as you go!
     </textarea>
+    <!-- status bar moved below -->
   </main>
+  
 </div>
+<div id="status-bar" class="status-bar">notes.md 1 line --INSERT--</div>
+</body>
+
 <script>
-  const textarea = document.getElementById('editor');
-  textarea.addEventListener('input', async (event) => {
-    const res1 = await fetch(`api/auth/user-data`);
-    const data = await res1.json();
-    const user = data.user;
-    console.log(user);
-    const content = event.target.value;
-    const title = document.querySelector('.obsidian-note-item.selected').textContent;
-    const res = await fetch('/api/auth/notes', {
+  let currentMode = 'INSERT';
+  let commandMode = false;
+  let currentNoteTitle = 'Untitled'; // Track current note title
+  updateStatusBar();
+  
+  // Mode state (INSERT or NORMAL)
+  
+  
+  // Listen for note selection events from SidebarElement
+  window.addEventListener('noteSelected', ((event: CustomEvent) => {
+    const note = event.detail;
+    selectNote(note);
+  }) as EventListener);
+  
+  // Keyboard shortcuts
+  document.addEventListener('keydown', async (event) => {
+    // Handle command mode input
+    if (commandMode) {
+      handleCommandInput(event);
+      return;
+    }
+    
+    // ESC: Toggle between INSERT and NORMAL mode
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      toggleMode();
+    }
+    
+    // In NORMAL mode, check for ':' to enter command mode
+    if (currentMode === 'NORMAL' && event.key === ':') {
+      event.preventDefault();
+      enterCommandMode();
+      return;
+    }
+    
+    // In NORMAL mode, prevent typing in editor (except for specific shortcuts)
+    if (currentMode === 'NORMAL') {
+      const editor = document.getElementById('editor') as HTMLTextAreaElement;
+      if (editor && document.activeElement === editor) {
+        // Allow only specific keys in NORMAL mode
+        const allowedKeys = ['Escape', ':', 'Control', 'Meta', 'Alt', 'Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Home', 'End', 'PageUp', 'PageDown'];
+        if (!allowedKeys.includes(event.key) && !event.ctrlKey && !event.metaKey && !event.altKey) {
+          event.preventDefault();
+          return;
+        }
+      }
+    }
+    
+    // Ctrl+N: New note
+    if (event.ctrlKey && event.key === 'l') {
+      event.preventDefault();
+      createNewNote();
+    }
+    
+    // Ctrl+S: Save note
+    if (event.ctrlKey && event.key === 's') {
+      event.preventDefault();
+      saveCurrentNote();
+    }
+    
+    // Ctrl+Delete: Delete current note
+    if (event.ctrlKey && event.key === 'm') {
+      event.preventDefault();
+      deleteCurrentNote();
+    }
+    
+    // Ctrl+O: Open note (placeholder)
+    if (event.ctrlKey && event.key === 'o') {
+      event.preventDefault();
+      openNoteDialog();
+    }
+    
+    // Ctrl+F: Find in note
+    if (event.ctrlKey && event.key === 'f') {
+      event.preventDefault();
+      focusFindInNote();
+    }
+    
+    // Ctrl+B: Bold
+    if (event.ctrlKey && event.key === 'b') {
+      event.preventDefault();
+      insertMarkdown('**', '**');
+    }
+    
+    // Ctrl+I: Italic
+    if (event.ctrlKey && event.key === 'i') {
+      event.preventDefault();
+      insertMarkdown('*', '*');
+    }
+    
+    // Ctrl+K: Link
+    if (event.ctrlKey && event.key === 'k') {
+      event.preventDefault();
+      insertMarkdown('[', '](url)');
+    }
+  });
+
+  // Toggle between INSERT and NORMAL mode
+  function toggleMode() {
+    currentMode = currentMode === 'INSERT' ? 'NORMAL' : 'INSERT';
+    commandMode = false; // Exit command mode when switching
+    updateStatusBar();
+    
+    // Optional: Change editor behavior based on mode
+    const editor = document.getElementById('editor') as HTMLTextAreaElement;
+    if (editor) {
+      if (currentMode === 'NORMAL') {
+        editor.blur(); // Remove focus in NORMAL mode
+      } else {
+        editor.focus(); // Restore focus in INSERT mode
+      }
+    }
+  }
+
+  // Enter command mode
+  function enterCommandMode() {
+    commandMode = true;
+    const statusBar = document.getElementById('status-bar');
+    if (statusBar) {
+      // Create input field
+      const input = document.createElement('input');
+input.type = 'text';
+input.style.width = "calc(100% - 15rem)";
+input.style.height = "0.09rem";
+input.className = 'command-input';
+input.placeholder = 'Enter command...';
+input.value = ':';
+
+// Style: no border, custom background, optional text color
+input.style.border = "none";
+input.style.backgroundColor = "#f8f2e4"; // dark gray/black terminal style
+input.style.color = "#4c4c4c"; // white text
+input.style.outline = "none"; // removes blue glow on focus
+input.style.padding = "0.5rem";
+input.style.fontFamily = "monospace";
+input.style.fontSize = "1rem";
+      
+      // Clear status bar and add input
+      statusBar.innerHTML = '';
+      statusBar.appendChild(input);
+      input.focus();
+      input.select();
+    }
+  }
+
+  // Handle command input
+  function handleCommandInput(event: KeyboardEvent) {
+    const input = document.querySelector('.command-input') as HTMLInputElement;
+    if (!input) return;
+
+
+    if (event.key === 'Escape') {
+      // Exit command mode
+      exitCommandMode();
+    } else if (event.key === 'Enter') {
+      // Execute command
+      const command = input.value.substring(1); // Remove the ':'
+      executeCommand(command);
+      exitCommandMode();
+    }
+  }
+
+  // Exit command mode
+  function exitCommandMode() {
+    commandMode = false;
+    updateStatusBar();
+  }
+
+  // Execute command
+  function executeCommand(command: string) {
+    const cmd = command.trim().toLowerCase();
+    
+    // Handle :new {notename} command
+    if (cmd.startsWith('new ')) {
+      const noteName = command.substring(4).trim(); // Remove "new " prefix
+      if (noteName) {
+        createNewNoteWithTitle(noteName);
+        return;
+      } else {
+        console.log('Usage: :new {notename}');
+        return;
+      }
+    }
+    
+    switch (cmd) {
+      case 'q':
+      case 'quit':
+        // Could implement quit functionality
+        console.log('Quit command');
+        break;
+      case 'w':
+      case 'write':
+        saveCurrentNote();
+        break;
+      case 'wq':
+        saveCurrentNote();
+        // Could implement quit after save
+        break;
+      case 'help':
+        alert('Available commands: new {notename}, q(uit), w(rite), wq, help');
+        break;
+      default:
+        console.log(`Unknown command: ${command}`);
+    }
+  }
+
+  // Create new note with custom title
+  function createNewNoteWithTitle(title: string) {
+    // Dispatch custom event with the title - don't click the button
+    window.dispatchEvent(new CustomEvent('createNoteWithTitle', { detail: { title } }));
+  }
+
+  // Helper functions for shortcuts
+  function createNewNote() {
+    // This will be handled by the SidebarElement component
+    const newNoteBtn = document.querySelector('.new-note-btn') as HTMLButtonElement;
+    if (newNoteBtn) {
+      newNoteBtn.click();
+    }
+  }
+
+  function selectNote(note: any) {
+    // Update current note title
+    currentNoteTitle = note.title || 'Untitled';
+    
+    // Update topbar
+    const topbar = document.querySelector('.obsidian-topbar');
+    if (topbar) {
+      topbar.textContent = currentNoteTitle;
+    }
+    
+    // Load note content into editor
+    const editor = document.getElementById('editor') as HTMLTextAreaElement;
+    if (editor) {
+      editor.value = note.content || '';
+      editor.focus();
+    }
+    
+    updateStatusBar();
+  }
+
+  function saveCurrentNote() {
+    const editor = document.getElementById('editor') as HTMLTextAreaElement;
+    const selectedNote = document.querySelector('.obsidian-note-item.selected');
+    
+    if (editor && selectedNote) {
+      const content = editor.value;
+      const title = selectedNote.textContent || 'Untitled';
+      
+      // Save to backend
+      saveNoteToBackend(title, content);
+      
+      // Show save indicator
+      showSaveIndicator();
+    }
+  }
+
+  function saveNoteToBackend(title: string, content: string) {
+    fetch('/api/auth/notes', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ user: user, title: title, content: content }),
+      body: JSON.stringify({ title, content }),
+    }).catch(error => {
+      console.error('Failed to save note:', error);
     });
+  }
 
-    const data2 = await res.json();
-    console.log(data2);
+  function showSaveIndicator() {
+    const statusBar = document.getElementById('status-bar');
+    if (statusBar) {
+      const originalText = statusBar.textContent;
+      statusBar.textContent = originalText?.replace('--INSERT--', '--SAVED--') || '';
+      setTimeout(() => {
+        statusBar.textContent = originalText || '';
+      }, 1000);
+    }
+  }
+
+  function openNoteDialog() {
+    alert('Open note dialog - implement file picker here');
+  }
+
+  function focusFindInNote() {
+    alert('Find in note - implement search within current note');
+  }
+
+  function insertMarkdown(prefix: string, suffix: string) {
+    const editor = document.getElementById('editor') as HTMLTextAreaElement;
+    if (!editor) return;
+    
+    const start = editor.selectionStart;
+    const end = editor.selectionEnd;
+    const selectedText = editor.value.substring(start, end);
+    
+    const newText = prefix + selectedText + suffix;
+    editor.value = editor.value.substring(0, start) + newText + editor.value.substring(end);
+    
+    // Set cursor position
+    editor.selectionStart = start + prefix.length;
+    editor.selectionEnd = end + prefix.length;
+    editor.focus();
+  }
+
+  const textarea = document.getElementById('editor') as HTMLTextAreaElement;
+  textarea?.addEventListener('input', async (event) => {
+    updateStatusBar();
+    
+    const res1 = await fetch(`api/auth/user-data`);
+    const data = await res1.json();
+    const user = data.user;
+    console.log(user);
+    const target = event.target as HTMLTextAreaElement;
+    const content = target.value;
+    
+    // Use the tracked current note title instead of looking for selected note
+    fetch('/api/auth/notes', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ user: user, title: currentNoteTitle, content: content }),
+    });
   });
+
+  // Update status bar
+  function updateStatusBar() {
+    console.log("Status activated");
+    const editor = document.getElementById('editor') as HTMLTextAreaElement;
+    const statusBar = document.getElementById('status-bar');
+    
+    if (editor) {
+      const lines = editor.value.split('\n');
+      for (let i = lines.length; i--; i > -1) {
+        if (lines[i] != "") {
+          break;
+        } else {
+          lines.splice(i, 1);
+        }
+      }
+      const linesLength = lines.length;
+      
+      if (statusBar) {
+        statusBar.textContent = `${currentNoteTitle}  ${linesLength} lines  --${currentMode}--`;
+      }
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const editor = document.getElementById('editor') as HTMLTextAreaElement;
+    editor?.addEventListener('input', () => {
+      updateStatusBar();
+    });
+    updateStatusBar();
+  });
+
+  function deleteCurrentNote() {
+    const selectedNote = document.querySelector('.obsidian-note-item.selected');
+    if (selectedNote) {
+      // Trigger the delete button click on the selected note
+      const deleteBtn = selectedNote.querySelector('.delete-note-btn') as HTMLButtonElement;
+      if (deleteBtn) {
+        deleteBtn.click();
+      }
+    }
+  }
 </script>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@import '../styles/SidebarElement.css';
 </style>
 
 <style>
@@ -63,14 +414,15 @@ This is a placeholder for your Obsidian-style notes app.
   display: flex;
   height: calc(100vh - var(--header-height, 3em));
   width: 100vw;
-  background: #fff4ec;
+  background: #f8f2e4;
+  background-color: #f8f2e4;
   position: relative;
   top: 0;
 }
 .obsidian-sidebar {
-  width: 250px;
-  background: rgb(var(--gray-light));
-  border-right: 1px solid rgb(var(--gray));
+  width: 15.5rem;
+  background: #f8f2e4;
+  border-right: 1px solid #e6e1d7;
   display: flex;
   flex-direction: column;
   padding: 0;
@@ -83,36 +435,43 @@ This is a placeholder for your Obsidian-style notes app.
   border-bottom: 1px solid rgb(var(--gray));
   letter-spacing: 1px;
   color: rgb(var(--black));
+  background: #f8f2e4;
 }
 .obsidian-notes-list {
   flex: 1;
   overflow-y: auto;
   padding: 0.5rem 0;
+  background: #f8f2e4;
 }
 .obsidian-note-item {
-  padding: 0.7rem 1.2rem;
+  padding: 0.5rem 1rem;
   cursor: pointer;
-  border-radius: 4px;
-  margin: 0.2rem 0.5rem;
-  color: rgb(var(--black));
-  transition: background 0.15s;
+  border-radius: 0;
+  margin: 0;
+  color: #666;
+  transition: none;
+  background: #f8f2e4;
+  border-bottom: 1px solid #e6e1d7;
 }
 .obsidian-note-item.selected {
-  background: #cebdb2;
+  background: #f8f2e4;
+  color: #333;
+  font-weight: bold;
 }
 .obsidian-note-item:hover {
-  color: #b3a69d;
+  background: #f8f2e4;
+  color: #333;
 }
 .obsidian-main {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: #fff4ec;
+  background: #f8f2e4;
   height: 100%;
 }
 .obsidian-topbar {
   height: 48px;
-  background: #fff;
+  background: #f8f2e4;
   border-bottom: 1px solid rgb(var(--gray));
   display: flex;
   align-items: center;
@@ -127,7 +486,7 @@ This is a placeholder for your Obsidian-style notes app.
 .obsidian-editor {
   flex: 1;
   padding: 2rem 2.5rem;
-  background: #fff;
+  background: #f8f2e4;
   color: rgb(var(--black));
   font-size: 1.1rem;
   border: none;
@@ -137,12 +496,26 @@ This is a placeholder for your Obsidian-style notes app.
   height: 100%;
   border-radius: 8px;
   box-sizing: border-box;
-  box-shadow: var(--box-shadow);
+  
   font-family: 'Atkinson Hyperlegible', Arial, sans-serif;
+}
+#status-bar {
+  position: fixed;
+  bottom: 0;
+  height: 2rem;
+  left: 15.5rem;
+  width: 100%;
+  background: #f8f2e4;
+  color: #3a363698;
+  padding: 4px 12px;
+  font-family: monospace;
+  font-size: 14px;
+  z-index: 20; /* ensure it's above other elements */
 }
 .obsidian-editor::selection {
   background: #E6E6FA;
   color: #000;
+  
 }
 @media (max-width: 800px) {
   .obsidian-sidebar {
@@ -161,5 +534,39 @@ This is a placeholder for your Obsidian-style notes app.
   .obsidian-editor {
     padding: 1rem 0.5rem;
   }
+}
+
+.status-bar {
+  width: 100%;
+  background: #f8f2e4;
+  color: #666;
+  font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace;
+  font-size: 1rem;
+  padding: 0.2rem 1rem 0.2rem 1rem;
+  border-radius: 0;
+  border-top: 1px solid #e6e1d7;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  letter-spacing: 0.03em;
+  box-sizing: border-box;
+  margin-top: 0;
+}
+
+.command-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #444;
+  font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace;
+  font-size: 1rem;
+  width: 100%;
+  letter-spacing: 0.03em;
+  padding: 0;
+  margin: 0;
+}
+
+.command-input::placeholder {
+  color: #666;
 }
 </style>
