@@ -26,7 +26,13 @@ export default function PostCard({ post_title, username, karma, content, date, p
       {post_title}
     </a></div>
       <div style={{ fontSize: '0.85rem', color: '#555', marginBottom: '10px' }}>
-        {username} &bull; {karma} karma &bull; {date}
+        <a href={`/${username}`} style={{ textDecoration: 'none', color: '#555' }} onMouseEnter={(e) => {
+          e.currentTarget.style.color = '#456650';
+        }} onMouseLeave={(e) => {
+          e.currentTarget.style.color = '#555';
+        }}>
+          {username}
+        </a> &bull; {karma} karma &bull; {date}
       </div>
       <div style={{ fontSize: '0.95rem', lineHeight: '1.5' }}>{truncatedContent}</div>
     </div>

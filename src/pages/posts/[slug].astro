@@ -47,7 +47,7 @@ const date = new Date(correctPost.created_at).toLocaleDateString(undefined, {
   </head>
   <article class="post">
     <h1 class="title">{correctPost.title}</h1>
-    <div class="byline">By {correctPost.username} on {date}</div>
+    <div class="byline">By <a href={`/${correctPost.username}`} class="author-link">{correctPost.username}</a> on {date}</div>
     <div class="content" set:html={safeHtml}></div>
   </article>
   <div>
@@ -76,6 +76,16 @@ const date = new Date(correctPost.created_at).toLocaleDateString(undefined, {
     font-size: 0.9rem;
     color: #666;
     margin-bottom: 2rem;
+  }
+
+  .author-link {
+    color: #456650;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .author-link:hover {
+    text-decoration: underline;
   }
 
   /* Markdown content styles */
