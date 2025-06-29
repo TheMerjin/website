@@ -94,7 +94,11 @@ export default function CommentsTree({ slug }) {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ fontWeight: 600, fontSize: '1.1rem' }}>{node.username}</div>
+            <div style={{ fontWeight: 600, fontSize: '1.1rem' }}>
+              <a href={`/${node.username}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                {node.username}
+              </a>
+            </div>
             {tagsMap[node.id] && tagsMap[node.id].length > 0 && (
               <div style={{ display: 'flex', gap: 4 }}>
                 {tagsMap[node.id].map((tag, i) => (
