@@ -106,26 +106,53 @@ const SidebarElement = ({ onNoteSelect, selectedNoteId }) => {
     }
   };
 
-  const deleteNote = async (noteId, event) => {
+  const deleteNote = async (note, event) => {
     event.stopPropagation();
+    const title = note.title;
     if (confirm('Are you sure you want to delete this note?')) {
-      setNotes(prev => prev.filter(note => note.id !== noteId));
-      // TODO: Add API call to delete from backend
+      try {
+        // Get user info
+        const res = await fetch('/api/auth/user-data');
+        const data = await res.json();
+        const user = data.user;
+        if (!user || !user.id) {
+          alert('User not found.');
+          return;
+        }
+        // Call DELETE API
+        const delRes = await fetch('/api/auth/deletenotes', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user, title}),
+        });
+        const delData = await delRes.json();
+        if (delData.success) {
+          setNotes(prev => prev.filter(note => note.title !== title));
+          alert('Note deleted successfully.');
+        } else {
+          alert('Delete failed: ' + (delData.error || 'Unknown error'));
+        }
+      } catch (err) {
+        alert('Delete failed: ' + err);
+      }
     }
   };
 
   if (loading) {
     return (
+      <div className="container">
       <aside className="obsidian-sidebar" >
         <div className="obsidian-sidebar-header">NOTES</div>
         <div className="obsidian-notes-list">
           <div className="loading">Loading notes...</div>
         </div>
-      </aside>
+        </aside>
+        </div>
     );
   }
 
   return (
+    <div className="container"> 
     <aside className="obsidian-sidebar" >
       <div className="obsidian-sidebar-header">
         NOTES
@@ -153,7 +180,7 @@ const SidebarElement = ({ onNoteSelect, selectedNoteId }) => {
               <span className="note-title">{note.title}</span>
               <button
                 className="delete-note-btn"
-                onClick={(e) => deleteNote(note.id, e)}
+                onClick={(e) => deleteNote(note, e)}
                 title="Delete note"
               >
                 ×
@@ -162,7 +189,8 @@ const SidebarElement = ({ onNoteSelect, selectedNoteId }) => {
           ))
         )}
       </div>
-    </aside>
+      </aside>
+      </div>
   );
 };
 

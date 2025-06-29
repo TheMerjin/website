@@ -1,7 +1,7 @@
 .obsidian-sidebar {
   width: 15.5rem;
-  background: #f8f2e4;
-  border-right: 1px solid #e6e1d7;
+  background: #f6f8fa;
+  border-right: 1px solid #d0d7de;
   display: flex;
   flex-direction: column;
   padding: 0;
@@ -15,7 +15,7 @@
   font-weight: 600;
   text-transform: uppercase;
   color: #57606a;
-  background: #f8f2e4;
+  background: #f6f8fa;
   border-bottom: 1px solid #e6e1d7;
   letter-spacing: 0.05em;
   display: flex;
@@ -42,7 +42,7 @@
 }
 
 .new-note-btn:hover {
-  background: #e6e1d7;
+  background: #eaeef2;
   color: #24292f;
 }
 
@@ -65,7 +65,7 @@
 }
 
 .no-notes button {
-  background: #f8f2e4;
+  background: #f6f8fa;
   border: 1px solid #e6e1d7;
   padding: 0.5rem 1rem;
   border-radius: 6px;
@@ -76,14 +76,14 @@
 }
 
 .no-notes button:hover {
-  background: #e6e1d7;
+  background: #eaeef2;
   color: #24292f;
 }
 
 .obsidian-notes-list {
   flex: 1;
   overflow-y: auto;
-  background: #f8f2e4;
+  background: #f6f8fa;
 }
 
 .obsidian-note-item {
@@ -92,20 +92,20 @@
   padding: 0.5rem 1rem;
   font-size: 1rem;
   color: #24292f;
-  background: #f8f2e4;
+  background: #f6f8fa;
   border-bottom: 1px solid #e6e1d7;
   cursor: pointer;
   transition: background 0.15s;
 }
 
 .obsidian-note-item.selected {
-  background: #e6e1d7;
+  background: #eaeef2;
   font-weight: 600;
   color: #0969da;
 }
 
 .obsidian-note-item:hover {
-  background: #e6e1d7;
+  background: #eaeef2;
 }
 
 .note-title {

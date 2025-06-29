@@ -12,7 +12,9 @@ export const POST: APIRoute = async ({ request }) => {
     const body = await request.json();
     const { user, title, content } = body;
 
-    if (isEmpty(user) || !title || !content) {
+    // Better validation for user object
+    if (!user || !user.id || !title ) {
+      console.error('Validation failed:', { user: !!user, userId: user?.id, title: !!title, content: !!content });
       return new Response(JSON.stringify({ error: "Missing user, title, or content" }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' },
@@ -28,7 +30,7 @@ export const POST: APIRoute = async ({ request }) => {
           content,
         },
         {
-          onConflict: ['user_id', 'title'], // ⚠️ This requires a UNIQUE constraint in DB!
+          onConflict: 'user_id,title',
         }
       );
 

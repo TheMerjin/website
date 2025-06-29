@@ -5,9 +5,16 @@ import '../styles/global.css';
 // No frontmatter needed for static layout
 import { supabase } from '../lib/client-supabase.js';
 
-
+const notename = "{notename}" 
 ---
+<meta charset="UTF-8" />
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <body>
+<div class="notes-page-wrapper">
+  <link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css"
+/>
 <Header/>
 <div class="notes-root">
   <SidebarElement client:load onNoteSelect={null} selectedNoteId={null} />
@@ -16,10 +23,35 @@ import { supabase } from '../lib/client-supabase.js';
     <textarea
       id="editor"
       class="obsidian-editor"
-      placeholder="Start writing in Markdown..."
-      data-current-note-id="welcome"
+      data-placeholder="Start writing in Markdown..."
     >
 # Welcome to Your Notes
+
+## Modes
+- **INSERT mode**: (default) You can type and edit your note. Status bar shows `--INSERT--`.
+  - Press `ESC` to switch to NORMAL mode.
+- **NORMAL mode**: (like Vim) Typing is disabled, only navigation and commands work. Status bar shows `--NORMAL--`.
+  - Press `ESC` again to return to INSERT mode.
+  - In NORMAL mode, type `:` to enter command mode.
+
+## Console Commands (type in command mode)
+  - `:new {notename}` — Create a new note with the given title (must use curly braces)
+  - `:w` or `:write` — Save the current note
+  - `:q` or `:quit` — (placeholder) Quit
+  - `:wq` — Save and quit (placeholder)
+  - `:help` — Show this help message
+
+## Shortcuts
+  - `Ctrl+l` — New note
+  - `Ctrl+S` — Save note
+  - `Ctrl+Delete` — Delete current note
+  - `Ctrl+O` — Open note (placeholder)
+  - `Ctrl+F` — Find in note (placeholder)
+  - `Ctrl+B` — Bold
+  - `Ctrl+I` — Italic
+  - `Ctrl+K` — Insert link
+
+---
 
 This is a placeholder for your Obsidian-style notes app.
 
@@ -27,28 +59,25 @@ This is a placeholder for your Obsidian-style notes app.
 - The main area is your Markdown editor
 - Add features like linking, tags, and search as you go!
     </textarea>
-    <!-- status bar moved below -->
   </main>
   
 </div>
 <div id="status-bar" class="status-bar">notes.md 1 line --INSERT--</div>
+</div>
 </body>
 
 <script>
+  // Mode state (INSERT or NORMAL)
   let currentMode = 'INSERT';
   let commandMode = false;
   let currentNoteTitle = 'Untitled'; // Track current note title
-  updateStatusBar();
-  
-  // Mode state (INSERT or NORMAL)
-  
-  
+
   // Listen for note selection events from SidebarElement
   window.addEventListener('noteSelected', ((event: CustomEvent) => {
     const note = event.detail;
     selectNote(note);
   }) as EventListener);
-  
+
   // Keyboard shortcuts
   document.addEventListener('keydown', async (event) => {
     // Handle command mode input
@@ -156,21 +185,10 @@ This is a placeholder for your Obsidian-style notes app.
     if (statusBar) {
       // Create input field
       const input = document.createElement('input');
-input.type = 'text';
-input.style.width = "calc(100% - 15rem)";
-input.style.height = "0.09rem";
-input.className = 'command-input';
-input.placeholder = 'Enter command...';
-input.value = ':';
-
-// Style: no border, custom background, optional text color
-input.style.border = "none";
-input.style.backgroundColor = "#f8f2e4"; // dark gray/black terminal style
-input.style.color = "#4c4c4c"; // white text
-input.style.outline = "none"; // removes blue glow on focus
-input.style.padding = "0.5rem";
-input.style.fontFamily = "monospace";
-input.style.fontSize = "1rem";
+      input.type = 'text';
+      input.className = 'command-input';
+      input.placeholder = 'Enter command...';
+      input.value = ':';
       
       // Clear status bar and add input
       statusBar.innerHTML = '';
@@ -184,7 +202,6 @@ input.style.fontSize = "1rem";
   function handleCommandInput(event: KeyboardEvent) {
     const input = document.querySelector('.command-input') as HTMLInputElement;
     if (!input) return;
-
 
     if (event.key === 'Escape') {
       // Exit command mode
@@ -206,11 +223,46 @@ input.style.fontSize = "1rem";
   // Execute command
   function executeCommand(command: string) {
     const cmd = command.trim().toLowerCase();
-    
-    // Handle :new {notename} command
+
+    // :up {int} command
+    if (cmd.startsWith('up ')) {
+      const match = command.match(/^up\s+(-?\d+)$/i);
+      if (match) {
+        const n = parseInt(match[1], 10);
+        moveCursorUp(n);
+        return;
+      } else {
+        console.log('Usage: :up {int}');
+        return;
+      }
+    }
+
+    // :down {int} command
+    if (cmd.startsWith('down ')) {
+      const match = command.match(/^down\s+(-?\d+)$/i);
+      if (match) {
+        const n = parseInt(match[1], 10);
+        moveCursorUp(-n); // Use negative n to move down
+        return;
+      } else {
+        console.log('Usage: :down {int}');
+        return;
+      }
+    }
+
+    // :{int} command (go to line)
+    if (/^\d+$/.test(cmd)) {
+      const lineNum = parseInt(cmd, 10);
+      moveCursorToLine(lineNum);
+      return;
+    }
+
+    // Handle :new {notename} command with curly braces
     if (cmd.startsWith('new ')) {
-      const noteName = command.substring(4).trim(); // Remove "new " prefix
-      if (noteName) {
+      // Match :new {notename}
+      const match = command.match(/^new\s+\{(.+)\}$/i);
+      if (match && match[1].trim()) {
+        const noteName = match[1].trim();
         createNewNoteWithTitle(noteName);
         return;
       } else {
@@ -218,7 +270,39 @@ input.style.fontSize = "1rem";
         return;
       }
     }
-    
+
+    // Handle :cd {notename} command with curly braces
+    if (cmd.startsWith('cd ')) {
+      // Match :cd {notename}
+      const match = command.match(/^cd\s+\{(.+)\}$/i);
+      if (match && match[1].trim()) {
+        const noteName = match[1].trim().toLowerCase();
+        // Try to find the note in the sidebar's notes list
+        const sidebar = document.querySelector('.obsidian-notes-list');
+        if (sidebar) {
+          const noteItems = Array.from(sidebar.querySelectorAll('.obsidian-note-item'));
+          let found = false;
+          for (const item of noteItems) {
+            const titleSpan = item.querySelector('.note-title');
+            if (titleSpan && titleSpan.textContent && titleSpan.textContent.trim().toLowerCase() === noteName) {
+              (item as HTMLElement).click();
+              found = true;
+              break;
+            }
+          }
+          if (!found) {
+            alert(`Note not found: ${match[1].trim()}`);
+          }
+        } else {
+          alert('Sidebar not found.');
+        }
+        return;
+      } else {
+        alert('Usage: :cd {notename}');
+        return;
+      }
+    }
+
     switch (cmd) {
       case 'q':
       case 'quit':
@@ -234,11 +318,77 @@ input.style.fontSize = "1rem";
         // Could implement quit after save
         break;
       case 'help':
-        alert('Available commands: new {notename}, q(uit), w(rite), wq, help');
+        alert('Available commands: new {notename}, up {int}, down {int}, {int}, q(uit), w(rite), wq, help');
         break;
+      case "d":
+        deleteCurrentNote();
       default:
         console.log(`Unknown command: ${command}`);
     }
+  }
+
+  // Move cursor up/down by n lines (negative n = down)
+  function moveCursorUp(n: number) {
+    const editor = document.getElementById('editor') as HTMLTextAreaElement;
+    if (!editor) return;
+    
+    const value = editor.value;
+    const lines = value.split('\n');
+    const currentPos = editor.selectionStart;
+    
+    // Find current line and column
+    let currentLine = 0;
+    let currentCol = 0;
+    let charCount = 0;
+    
+    for (let i = 0; i < lines.length; i++) {
+      const lineLength = lines[i].length;
+      if (currentPos >= charCount && currentPos <= charCount + lineLength) {
+        currentLine = i;
+        currentCol = currentPos - charCount;
+        break;
+      }
+      charCount += lineLength + 1;
+    }
+    
+    // Calculate target line
+    let targetLine = currentLine - n;
+    if (targetLine < 0) targetLine = 0;
+    if (targetLine >= lines.length) targetLine = lines.length - 1;
+    
+    // Calculate target position
+    let targetPos = 0;
+    for (let i = 0; i < targetLine; i++) {
+      targetPos += lines[i].length + 1;
+    }
+    
+    // Add column offset (clamped to line length)
+    const targetCol = Math.min(currentCol, lines[targetLine].length);
+    targetPos += targetCol;
+    
+    editor.selectionStart = editor.selectionEnd = targetPos;
+    editor.focus();
+  }
+
+  // Move cursor to a specific line number (1-based)
+  function moveCursorToLine(lineNum: number) {
+    const editor = document.getElementById('editor') as HTMLTextAreaElement;
+    if (!editor) return;
+    
+    const value = editor.value;
+    const lines = value.split('\n');
+    
+    // Convert to 0-based index and clamp to valid range
+    const targetLine = Math.max(0, Math.min(lineNum - 1, lines.length - 1));
+    
+    // Calculate position at the start of the target line
+    let targetPos = 0;
+    for (let i = 0; i < targetLine; i++) {
+      targetPos += lines[i].length + 1;
+    }
+    
+    editor.selectionStart = editor.selectionEnd = targetPos;
+    editor.focus();
   }
 
   // Create new note with custom title
@@ -258,7 +408,7 @@ input.style.fontSize = "1rem";
 
   function selectNote(note: any) {
     // Update current note title
-    currentNoteTitle = note.title || 'Untitled';
+    currentNoteTitle = note.title || 'Welcome Guide';
     
     // Update topbar
     const topbar = document.querySelector('.obsidian-topbar');
@@ -293,15 +443,33 @@ input.style.fontSize = "1rem";
   }
 
   function saveNoteToBackend(title: string, content: string) {
-    fetch('/api/auth/notes', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ title, content }),
-    }).catch(error => {
-      console.error('Failed to save note:', error);
-    });
+    // Get user info first
+    fetch('/api/auth/user-data')
+      .then(res => res.json())
+      .then(data => {
+        const user = data.user;
+        if (!user || !user.id) {
+          console.error('No user data available');
+          return;
+        }
+        
+        // Now save with user included
+        return fetch('/api/auth/notes', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ user, title, content }),
+        });
+      })
+      .then(response => {
+        if (response && !response.ok) {
+          throw new Error('Save failed');
+        }
+      })
+      .catch(error => {
+        console.error('Failed to save note:', error);
+      });
   }
 
   function showSaveIndicator() {
@@ -340,30 +508,54 @@ input.style.fontSize = "1rem";
     editor.focus();
   }
 
-  const textarea = document.getElementById('editor') as HTMLTextAreaElement;
-  textarea?.addEventListener('input', async (event) => {
-    updateStatusBar();
+  async function saveNoteContent() {
+    const editor = document.getElementById('editor') as HTMLTextAreaElement;
+    if (!editor) return;
     
-    const res1 = await fetch(`api/auth/user-data`);
-    const data = await res1.json();
-    const user = data.user;
-    console.log(user);
-    const target = event.target as HTMLTextAreaElement;
-    const content = target.value;
-    
-    // Use the tracked current note title instead of looking for selected note
-    fetch('/api/auth/notes', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ user: user, title: currentNoteTitle, content: content }),
-    });
-  });
+    try {
+      const res1 = await fetch(`api/auth/user-data`);
+      if (!res1.ok) {
+        console.error('Failed to get user data:', res1.status);
+        return;
+      }
+      
+      const data = await res1.json();
+      const user = data.user;
+      console.log('User data:', user);
+      
+      if (!user || !user.id) {
+        console.error('No user data available');
+        return;
+      }
+      
+      const content = editor.value;
+      console.log('Saving note:', { title: currentNoteTitle, contentLength: content.length });
+      
+      // Use the tracked current note title instead of looking for selected note
+      const saveResponse = await fetch('/api/auth/notes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ user: user, title: currentNoteTitle, content: content }),
+      });
+      
+      if (!saveResponse.ok) {
+        const errorData = await saveResponse.json();
+        console.error('Save failed:', errorData);
+        return;
+      }
+      
+      const saveResult = await saveResponse.json();
+      console.log('Save successful:', saveResult);
+      
+    } catch (error) {
+      console.error('Error saving note:', error);
+    }
+  }
 
   // Update status bar
   function updateStatusBar() {
-    console.log("Status activated");
     const editor = document.getElementById('editor') as HTMLTextAreaElement;
     const statusBar = document.getElementById('status-bar');
     
@@ -384,16 +576,10 @@ input.style.fontSize = "1rem";
     }
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    const editor = document.getElementById('editor') as HTMLTextAreaElement;
-    editor?.addEventListener('input', () => {
-      updateStatusBar();
-    });
-    updateStatusBar();
-  });
-
   function deleteCurrentNote() {
+    
     const selectedNote = document.querySelector('.obsidian-note-item.selected');
+    console.log(selectedNote);
     if (selectedNote) {
       // Trigger the delete button click on the selected note
       const deleteBtn = selectedNote.querySelector('.delete-note-btn') as HTMLButtonElement;
@@ -402,6 +588,15 @@ input.style.fontSize = "1rem";
       }
     }
   }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const editor = document.getElementById('editor') as HTMLTextAreaElement;
+    editor?.addEventListener('input', () => {
+      updateStatusBar();
+      saveNoteContent();
+    });
+    updateStatusBar();
+  });
 </script>
 
 <style>
@@ -410,6 +605,10 @@ input.style.fontSize = "1rem";
 </style>
 
 <style>
+.notes-page-wrapper {
+  min-height: 100vh;
+  background: #f6f8fa;
+}
 .notes-root {
   display: flex;
   height: calc(100vh - var(--header-height, 3em));
@@ -496,9 +695,9 @@ input.style.fontSize = "1rem";
   height: 100%;
   border-radius: 8px;
   box-sizing: border-box;
-  
   font-family: 'Atkinson Hyperlegible', Arial, sans-serif;
 }
+
 #status-bar {
   position: fixed;
   bottom: 0;
@@ -512,11 +711,7 @@ input.style.fontSize = "1rem";
   font-size: 14px;
   z-index: 20; /* ensure it's above other elements */
 }
-.obsidian-editor::selection {
-  background: #E6E6FA;
-  color: #000;
-  
-}
+
 @media (max-width: 800px) {
   .obsidian-sidebar {
     width: 60px;
