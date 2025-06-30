@@ -43,11 +43,8 @@ export const POST: APIRoute = async ({ request }) => {
         headers: { 'Content-Type': 'application/json' },
       });
     }
-
-    return new Response(JSON.stringify({ game: updated }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return Response.redirect(`${import.meta.env.PUBLIC_API_URL}games/${gameId}?msg=Registration%20successful`, 200);
+    
   } catch (error) {
     return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
       status: 500,
