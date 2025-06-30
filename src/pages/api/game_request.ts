@@ -10,11 +10,26 @@ function isEmpty(obj: any): boolean {
 export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
-    const { user, fen, status } = body;
+    const { white, fen, status } = body;
+
+    // Prevent duplicate open requests for the same user
+    const { data: existing, error: checkError } = await supabase
+      .from('games')
+      .select('id')
+      .eq('white', white.id)
+      .eq('status', 'waiting')
+      .maybeSingle();
+
+    if (existing) {
+      return new Response(JSON.stringify({ error: "You already have an open challenge." }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
 
     // Better validation for user object
-    if (!user || !user.id || !status ) {
-      console.error('Validation failed:', { user: !!user, userId: user?.id, status: !!status, fen: !!fen });
+    if (!white || !white.id || !status ) {
+      console.error('Validation failed:', { user: !!white, userId: white?.id, status: !!status, fen: !!fen });
       return new Response(JSON.stringify({ error: "Missing user, title, or content" }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' },
@@ -23,14 +38,11 @@ export const POST: APIRoute = async ({ request }) => {
 
     const { error: insertError } = await supabase
       .from('games')
-      .upsert(
+      .insert(
         {
-          white: user.id,
+          white: white.id,
           fen: fen,
           status : status,
-        },
-        {
-          onConflict: 'user_id,title',
         }
       );
 
@@ -42,7 +54,7 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    return new Response(JSON.stringify({ success: true, user }), {
+    return new Response(JSON.stringify({ success: true, white }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
