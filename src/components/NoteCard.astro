@@ -1,0 +1,130 @@
+---
+const { note } = Astro.props;
+---
+
+<article class="lw-post-card">
+  <header class="lw-post-header">
+    <a href={`notes/${note.id}`} class="lw-post-title">
+      {note.title}
+    </a>
+    <div class="lw-post-meta">
+      <span class="lw-post-author">
+        <a href="/Sreek" style="color: inherit; text-decoration: none;">
+          Sreek
+        </a>
+      </span>
+      <time datetime={note.created_at} class="lw-post-date">
+        {new Date(note.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+      </time>
+    </div>
+  </header>
+  <div class="lw-post-excerpt">
+    {note.content.length > 150 
+      ? note.content.slice(0, 150) + '…' 
+      : note.content}
+  </div>
+</article>
+
+<style>
+  /* Container: thin vertical spacing */
+  .lw-post-card {
+    max-width: 720px;
+    max-height: 200px;
+    margin: 0rem 0rem;
+    border-top: 1px solid #ddd;
+    padding-top: 1rem;
+  }
+
+  /* Header: title left, meta right */
+  .lw-post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .lw-post-title {
+    font-family: 'Georgia', serif;
+    font-size: 1.5rem;
+    line-height: 1.2;
+    color: #111;
+    text-decoration: none;
+  }
+
+  .lw-post-title:hover {
+    text-decoration: underline;
+  }
+
+  .lw-post-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-family: 'Helvetica Neue', sans-serif;
+    font-size: 0.8rem;
+    color: #666;
+  }
+
+  .lw-post-author {
+    font-weight: 500;
+  }
+
+  .lw-post-date {
+    font-style: normal;
+  }
+
+  /* Excerpt: very thin spacing */
+  .lw-post-excerpt {
+    font-family: 'Georgia', serif;
+    font-size: 1rem;
+    line-height: 1.4;
+    color: #222;
+    margin: 0;
+    overflow: hidden;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 800px) {
+    .lw-post-card {
+      max-width: 98vw;
+      padding: 0.7rem 0.3rem;
+    }
+    .lw-post-header {
+      flex-direction: column;
+      align-items: flex-start;
+      margin-bottom: 0.5rem;
+    }
+    .lw-post-title {
+      font-size: 1.1rem;
+      text-align: left;
+    }
+    .lw-post-meta {
+      font-size: 0.8rem;
+      margin-top: 0.2rem;
+      align-items: flex-start;
+    }
+    .lw-post-excerpt {
+      font-size: 0.95rem;
+    }
+  }
+  @media (max-width: 500px) {
+    .lw-post-card {
+      max-width: 100vw;
+      padding: 0.5rem 0.1rem;
+      border-radius: 0.5em;
+    }
+    .lw-post-header {
+      margin-bottom: 0.2rem;
+    }
+    .lw-post-title {
+      font-size: 0.92rem;
+      padding-right: 0.2rem;
+    }
+    .lw-post-meta {
+      font-size: 0.7rem;
+      margin-top: 0.1rem;
+    }
+    .lw-post-excerpt {
+      font-size: 0.85rem;
+    }
+  }
+</style> 
