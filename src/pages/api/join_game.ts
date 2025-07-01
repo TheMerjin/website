@@ -7,7 +7,7 @@ export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
     const { gameId, blackPlayer } = body;
-
+    const username = blackPlayer?.user_metadata?.username
     // Fetch the game
     const { data: game, error: fetchError } = await supabase
       .from('games')
@@ -32,18 +32,22 @@ export const POST: APIRoute = async ({ request }) => {
     // Update the game: set black player and status to active
     const { data: updated, error: updateError } = await supabase
       .from('games')
-      .update({ black: blackPlayer.id, status: 'in_progress' })
+      .update({ black: blackPlayer.id, status: 'in_progress', black_username : username })
       .eq('id', gameId)
       .select()
       .maybeSingle();
 
     if (updateError || !updated) {
-      return new Response(JSON.stringify({ error:  updateError }), {
+      return new Response(JSON.stringify({ error: updateError ? updateError.message : 'No updated game returned.' }), {
         status: 502,
         headers: { 'Content-Type': 'application/json' },
       });
     }
-    return Response.redirect(`${import.meta.env.PUBLIC_API_URL}games/${gameId}?msg=Registration%20successful`, 200);
+    const url = `${import.meta.env.PUBLIC_API_URL}chess/games/${gameId}`;
+    return new Response(JSON.stringify({ game: updated, url }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
     
   } catch (error) {
     return new Response(JSON.stringify({ error: 'Internal Server Error' }), {

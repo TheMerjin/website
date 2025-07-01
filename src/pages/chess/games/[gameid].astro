@@ -1,0 +1,173 @@
+---
+import ChessWebsiteLayout from '../../../layouts/ChessWebsiteLayout.astro';
+import GameBoard from '../../../components/GameBoard.jsx';
+
+const { gameid } = Astro.params;
+
+// Fetch the game from your API or Supabase
+const res = await fetch(`${import.meta.env.PUBLIC_API_URL}api/get_active_game_requests`);
+const { games } = await res.json();
+if (!games) {
+  throw new Error('Game not found');
+}
+
+const correctPost = games.find((game: any) => game.id == gameid);
+if (!correctPost) {
+  throw new Error('Game not found');
+}
+
+// User data will be fetched on the client side
+
+// Use the actual FEN from the database or default to starting position
+const gameFen = correctPost.fen || "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+---
+
+<ChessWebsiteLayout>
+  <div class="game-container">
+    <div class="game-header">
+      <div class="game-info">
+        <div class="game-title">Game #{gameid?.slice(0, 8) || 'Unknown'}</div>
+        <div class="game-status">{correctPost.status === 'in_progress' ? 'In Progress' : 'Waiting'}</div>
+      </div>
+      <div class="player-info">
+        <div class="player white-player">
+          <div class="player-name">{correctPost.white_username || 'White'}</div>
+          <div class="player-color">White</div>
+        </div>
+        <div class="vs">vs</div>
+        <div class="player black-player">
+          <div class="player-name">{correctPost.black_username || 'Black'}</div>
+          <div class="player-color">Black</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="game-main">
+      {correctPost.status === 'in_progress' && (
+        <GameBoard
+          initialFen={gameFen}
+          gameId={gameid}
+          currentUserId={undefined}
+          whiteUsername={correctPost.white_username}
+          blackUsername={correctPost.black_username}
+          onMove={(move: any, fen: any) => {
+            console.log('Move made:', move, 'New FEN:', fen);
+          }}
+          client:load
+        />
+      )}
+    </div>
+  </div>
+</ChessWebsiteLayout>
+
+<style>
+  .game-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 2rem;
+  }
+
+  .game-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .game-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .game-status {
+    font-size: 0.9rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .player-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .player {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    min-width: 120px;
+  }
+
+  .white-player {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+  }
+
+  .black-player {
+    background: #343a40;
+    color: white;
+  }
+
+  .player-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .player-color {
+    font-size: 0.8rem;
+    opacity: 0.8;
+  }
+
+  .vs {
+    font-weight: 600;
+    color: #666;
+    font-size: 1.1rem;
+  }
+
+  .game-main {
+    display: flex;
+    justify-content: center;
+    align-items: start;
+  }
+
+  @media (max-width: 768px) {
+    .game-container {
+      padding: 1rem;
+    }
+
+    .game-header {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+
+    .game-main {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .player-info {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .player {
+      min-width: 100px;
+    }
+  }
+</style> 

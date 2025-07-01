@@ -23,6 +23,7 @@
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.5",
     "astro": "^5.7.5",
+    "chess.js": "^1.4.0",
     "codemirror": "^6.0.2",
     "dompurify": "^3.2.6",
     "jsdom": "^26.1.0",
@@ -34,6 +35,7 @@
     "math-marked": "^1.0.0",
     "node": "^22.16.0",
     "react": "^19.1.0",
+    "react-chessboard": "^4.7.3",
     "react-dom": "^19.1.0",
     "typescript": "^5.8.3"
   },

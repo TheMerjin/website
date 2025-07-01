@@ -11,7 +11,7 @@ export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
     const { white, fen, status } = body;
-
+    const username = white?.user_metadata?.username
     // Prevent duplicate open requests for the same user
     const { data: existing, error: checkError } = await supabase
       .from('games')
@@ -43,6 +43,7 @@ export const POST: APIRoute = async ({ request }) => {
           white: white.id,
           fen: fen,
           status : status,
+          white_username : username
         }
       );
 

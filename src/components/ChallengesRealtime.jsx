@@ -17,6 +17,7 @@ export default function ChallengesRealtime() {
         setError('Error loading challenges');
         setChallenges([]);
       } else {
+        console.log(data.games);
         setChallenges(data.games || []);
         setError(null);
       }
@@ -43,6 +44,10 @@ export default function ChallengesRealtime() {
       });
       if (response.ok) {
         loadGameRequests();
+        const data = await response.json()
+        if (data.url){
+          window.location.href = data.url;
+        }
         alert('Game joined successfully!');
       } else {
         alert('Failed to join game');
@@ -86,7 +91,7 @@ export default function ChallengesRealtime() {
           key={game.id}
           onClick={() => joinGame(game.id)}
         >
-          <span className="challenge-player">{game.white?.username || 'Anonymous'}</span>
+          <span className="challenge-player">{game?.white_username || 'Anonymous'}</span>
         </div>
       ))}
     </div>
