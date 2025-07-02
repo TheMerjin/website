@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { supabase } from '../../lib/supabase';
-
+import { jStat } from 'jstat';
 export const prerender = false;
 
 export const POST: APIRoute = async ({ request }) => {
@@ -74,8 +74,6 @@ export const POST: APIRoute = async ({ request }) => {
     const moves = game_for_moves.moves;
     
     console.log(moves);
-
-    /*
     const {data: white_data, error : white_error} =  await supabase
     .from('profiles')
     .select('*')
@@ -86,22 +84,94 @@ export const POST: APIRoute = async ({ request }) => {
     const {data: black_data, error : black_error} =  await supabase
     .from('profiles')
     .select('*')
-    .eq('id', whiteUserid)
+    .eq('id', blackUserId)
     .maybeSingle();
     const black_mean = black_data.skill_mean;
     const black_var = black_data.skill_variance;
     if (result === "Draw"){
-	
+      // For draws, we don't update ratings
+      console.log("Game ended in draw - no rating updates needed");
      } else {
     if (winnerColor === "White") {
     const winner_mean = white_mean;
     const winner_var = white_var;    
     const loser_mean = black_mean; const loser_var = black_var;	
-    const elo_diff = winner_mean-loser_mean;
-    const 
+    const c = Math.sqrt(800+ winner_var + loser_var);
+    const z = (winner_mean- loser_mean)/ c;
+    let pWin = jStat.normal.cdf(z, 0, 1);
+    const error = 1- pWin;
+    const v  = (jStat.normal.pdf(z, Math.sqrt(800)))/(jStat.normal.cdf(z, 0, 1));
+    const w = v* (v+z);
+    const new_winner_mean = winner_mean+ winner_var*v/c;
+    const new_loser_mean = loser_mean-winner_var* v/c;
+    const new_winner_var = winner_var * (1- w*(winner_var/c));
+    const new_loser_var = loser_var * (1- w* (winner_var/c));
+    
+    // Update winner (white) profile
+    const { error: updateWinnerError } = await supabase
+      .from('profiles')
+      .update({ 
+        skill_mean: new_winner_mean,
+        skill_variance: new_winner_var
+      })
+      .eq('id', whiteUserid);
+    
+    if (updateWinnerError) {
+      console.error('Error updating winner profile:', updateWinnerError);
+    }
+
+    // Update loser (black) profile
+    const { error: updateLoserError } = await supabase
+      .from('profiles')
+      .update({ 
+        skill_mean: new_loser_mean,
+        skill_variance: new_loser_var
+      })
+      .eq('id', blackUserId);
+    
+    if (updateLoserError) {
+      console.error('Error updating loser profile:', updateLoserError);
+    }
+
      } else {
      const winner_mean = black_mean; const winner_var = black_var;
      const loser_mean = white_mean; const loser_var = white_var;	
+     const c = Math.sqrt(800+ winner_var + loser_var);
+     const z = (winner_mean- loser_mean)/ c;
+     let pWin = jStat.normal.cdf(z, 0, 1);
+     const error = 1- pWin;
+     const v  = (jStat.normal.pdf(z, Math.sqrt(800)))/(jStat.normal.cdf(z, 0, 1));
+     const w = v* (v+z);
+     const new_winner_mean = winner_mean+ winner_var*v/c;
+     const new_loser_mean = loser_mean-winner_var* v/c;
+     const new_winner_var = winner_var * (1- w*(winner_var/c));
+     const new_loser_var = loser_var * (1- w* (winner_var/c));
+     
+    // Update winner (black) profile
+    const { error: updateWinnerError } = await supabase
+      .from('profiles')
+      .update({ 
+        skill_mean: new_winner_mean,
+        skill_variance: new_winner_var
+      })
+      .eq('id', blackUserId);
+    
+    if (updateWinnerError) {
+      console.error('Error updating winner profile:', updateWinnerError);
+    }
+
+    // Update loser (white) profile
+    const { error: updateLoserError } = await supabase
+      .from('profiles')
+      .update({ 
+        skill_mean: new_loser_mean,
+        skill_variance: new_loser_var
+      })
+      .eq('id', whiteUserid);
+    
+    if (updateLoserError) {
+      console.error('Error updating loser profile:', updateLoserError);
+    }
 
      }
      
@@ -109,9 +179,6 @@ export const POST: APIRoute = async ({ request }) => {
      
      }
 	
-
-
-    */
 
 
 
