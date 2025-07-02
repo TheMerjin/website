@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { supabase } from '../../lib/supabase';
-import { jStat } from 'jstat';
+import pkg from 'jstat';
+const { jStat } = pkg;
 export const prerender = false;
 
 export const POST: APIRoute = async ({ request }) => {
