@@ -67,6 +67,7 @@ export const POST: APIRoute = async ({ request }) => {
         headers: { 'Content-Type': 'application/json' },
       });
     }
+
     const { data: game_for_moves, error: fetchError2 } = await supabase
       .from('games')
       .select('*')
@@ -74,6 +75,8 @@ export const POST: APIRoute = async ({ request }) => {
       .maybeSingle();
     const moves = game_for_moves.moves
     console.log(moves);
+
+    /*
     const {data: white_data, error : white_error} =  await supabase
     .from('profiles')
     .select('*')
@@ -109,7 +112,7 @@ export const POST: APIRoute = async ({ request }) => {
 	
 
 
-
+    */
 
 
 
