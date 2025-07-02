@@ -73,7 +73,8 @@ export const POST: APIRoute = async ({ request }) => {
       .select('*')
       .eq('id', gameId)
       .maybeSingle();
-    const moves = game_for_moves.moves
+    const moves = game_for_moves.moves;
+    
     console.log(moves);
 
     /*
@@ -121,6 +122,7 @@ export const POST: APIRoute = async ({ request }) => {
 
 
 
+     
 
     return new Response(JSON.stringify({ 
       success: true, 
