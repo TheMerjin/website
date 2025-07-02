@@ -49,13 +49,11 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Update the game with new FEN and moves
     const { data: updatedGame, error: updateError } = await supabase
-    if   .from('games')
+      .from('games')
       .update({ 
-        status : "completed",
-        result : result,
-        winner_id : winner_id
-        
-
+        status: "completed",
+        result: result,
+        winner_id: winner_id
       })
       .eq('id', gameId)
       .select()
