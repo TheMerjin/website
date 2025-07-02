@@ -49,7 +49,7 @@ export const POST: APIRoute = async ({ request }) => {
     const { data: updatedGame, error: updateError } = await supabase
       .from('games')
       .update({ 
-        status : "finished",
+        status : "completed",
         result : result,
         winner_id : winner_id
         
