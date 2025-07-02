@@ -135,6 +135,9 @@ export const POST: APIRoute = async ({ request }) => {
       console.error('Error updating loser profile:', updateLoserError);
     }
 
+    console.log('White (Winner) - Old mean:', white_mean, 'New mean:', new_winner_mean, 'Old var:', white_var, 'New var:', new_winner_var);
+    console.log('Black (Loser) - Old mean:', black_mean, 'New mean:', new_loser_mean, 'Old var:', black_var, 'New var:', new_loser_var);
+
      } else {
      const winner_mean = black_mean; const winner_var = black_var;
      const loser_mean = white_mean; const loser_var = white_var;	
@@ -174,6 +177,9 @@ export const POST: APIRoute = async ({ request }) => {
     if (updateLoserError) {
       console.error('Error updating loser profile:', updateLoserError);
     }
+
+    console.log('Black (Winner) - Old mean:', black_mean, 'New mean:', new_winner_mean, 'Old var:', black_var, 'New var:', new_winner_var);
+    console.log('White (Loser) - Old mean:', white_mean, 'New mean:', new_loser_mean, 'Old var:', white_var, 'New var:', new_loser_var);
 
      }
      
