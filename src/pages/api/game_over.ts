@@ -102,7 +102,7 @@ export const POST: APIRoute = async ({ request }) => {
     const z = (winner_mean- loser_mean)/ c;
     let pWin = jStat.normal.cdf(z, 0, 1);
     const error = 1- pWin;
-    const v  = (jStat.normal.pdf(z, Math.sqrt(800)))/(jStat.normal.cdf(z, 0, 1));
+    const v  = (jStat.normal.pdf(z,0,1))/(jStat.normal.cdf(z, 0, 1));
     const w = v* (v+z);
     const new_winner_mean = winner_mean+ winner_var*v/c;
     const new_loser_mean = loser_mean-winner_var* v/c;
@@ -145,7 +145,7 @@ export const POST: APIRoute = async ({ request }) => {
      const z = (winner_mean- loser_mean)/ c;
      let pWin = jStat.normal.cdf(z, 0, 1);
      const error = 1- pWin;
-     const v  = (jStat.normal.pdf(z, Math.sqrt(800)))/(jStat.normal.cdf(z, 0, 1));
+     const v  = (jStat.normal.pdf(z, 0,1))/(jStat.normal.cdf(z, 0, 1));
      const w = v* (v+z);
      const new_winner_mean = winner_mean+ winner_var*v/c;
      const new_loser_mean = loser_mean-winner_var* v/c;
