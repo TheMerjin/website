@@ -94,12 +94,11 @@ export const POST: APIRoute = async ({ request }) => {
     if (winnerColor === "White") {
     const winner_mean = white_mean;
     const winner_var = white_var;    
-    const loser_mean = black_mean; const loser_var = black_var;	
-    const elo_diff = winner_mean-loser_mean;
-    const 
+     
+    
      } else {
      const winner_mean = black_mean; const winner_var = black_var;
-     const loser_mean = white_mean; const loser_var = white_var;	
+     	
 
      }
      

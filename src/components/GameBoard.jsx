@@ -5,12 +5,36 @@ import { supabase } from '../lib/client-supabase.js';
 
 export default function GameBoard({ initialFen, onMove, gameId, currentUserId, whiteUsername, blackUsername }) {
   const [moves, setMoves] = useState([]);
+  const [whiteProfile, setWhiteProfile] = useState(null);
+  const [blackProfile, setBlackProfile] = useState(null);
   // Validate and sanitize the FEN string
   const sanitizeFen = (fen) => {
     if (!fen || fen === 'startpos') {
       return 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
     }
     return fen;
+  };
+
+  // Helper function to calculate skill display
+  const getSkillDisplay = (profile) => {
+    if (!profile) return { skill: 'N/A', confidence: 'N/A', color: '#666' };
+    
+    const skill = profile.skill_mean || 25.0;
+    const variance = profile.skill_variance || 8.3333;
+    const confidence = Math.sqrt(variance);
+    
+    // Color coding based on skill level
+    let color = '#666'; // default gray
+    if (skill >= 30) color = '#28a745'; // green for high skill
+    else if (skill >= 25) color = '#17a2b8'; // blue for medium-high
+    else if (skill >= 20) color = '#ffc107'; // yellow for medium
+    else color = '#dc3545'; // red for low skill
+    
+    return {
+      skill: skill.toFixed(1),
+      confidence: confidence.toFixed(1),
+      color
+    };
   };
 
   const [game, setGame] = useState(() => {
@@ -93,6 +117,26 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
         };
         
         fetchGameState();
+        
+        // Fetch player profiles for skill display
+        const fetchPlayerProfiles = async () => {
+          try {
+            const [whiteRes, blackRes] = await Promise.all([
+              fetch(`/api/get_profile?username=${whiteUsername}`),
+              fetch(`/api/get_profile?username=${blackUsername}`)
+            ]);
+            
+            const whiteData = await whiteRes.json();
+            const blackData = await blackRes.json();
+            
+            if (whiteData.success) setWhiteProfile(whiteData.profile);
+            if (blackData.success) setBlackProfile(blackData.profile);
+          } catch (error) {
+            console.error('Error fetching player profiles:', error);
+          }
+        };
+        
+        fetchPlayerProfiles();
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
@@ -340,6 +384,73 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
             ) : (
               <div style={{ color: '#666', fontStyle: 'italic' }}>No moves yet</div>
             )}
+          </div>
+        </div>
+        
+        {/* Player Skills Section */}
+        <div style={{ 
+          background: '#f8f9fa', 
+          border: '1px solid #e9ecef', 
+          borderRadius: '6px', 
+          padding: '1rem' 
+        }}>
+          <h3 style={{ margin: '0 0 1rem 0', fontSize: '1rem', fontWeight: '600', color: '#333' }}>
+            Player Skills
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {/* White Player */}
+            <div style={{ 
+              background: 'white', 
+              border: '2px solid #ddd', 
+              borderRadius: '6px', 
+              padding: '0.75rem',
+              borderLeft: '4px solid #fff'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                <span style={{ fontWeight: '600', color: '#333' }}>⚪ {whiteUsername}</span>
+                <span style={{ 
+                  padding: '0.25rem 0.5rem', 
+                  backgroundColor: getSkillDisplay(whiteProfile).color, 
+                  color: 'white', 
+                  borderRadius: '4px',
+                  fontSize: '0.8rem',
+                  fontWeight: '600'
+                }}>
+                  {getSkillDisplay(whiteProfile).skill}
+                </span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: '#666' }}>
+                <span>Skill: {getSkillDisplay(whiteProfile).skill}</span>
+                <span>±{getSkillDisplay(whiteProfile).confidence}</span>
+              </div>
+            </div>
+            
+            {/* Black Player */}
+            <div style={{ 
+              background: 'white', 
+              border: '2px solid #ddd', 
+              borderRadius: '6px', 
+              padding: '0.75rem',
+              borderLeft: '4px solid #000'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                <span style={{ fontWeight: '600', color: '#333' }}>⚫ {blackUsername}</span>
+                <span style={{ 
+                  padding: '0.25rem 0.5rem', 
+                  backgroundColor: getSkillDisplay(blackProfile).color, 
+                  color: 'white', 
+                  borderRadius: '4px',
+                  fontSize: '0.8rem',
+                  fontWeight: '600'
+                }}>
+                  {getSkillDisplay(blackProfile).skill}
+                </span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: '#666' }}>
+                <span>Skill: {getSkillDisplay(blackProfile).skill}</span>
+                <span>±{getSkillDisplay(blackProfile).confidence}</span>
+              </div>
+            </div>
           </div>
         </div>
         
