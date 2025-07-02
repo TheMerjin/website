@@ -66,6 +66,7 @@ export const POST: APIRoute = async ({ request }) => {
         headers: { 'Content-Type': 'application/json' },
       });
     }
+    
 
     const { data: game_for_moves, error: fetchError2 } = await supabase
       .from('games')
