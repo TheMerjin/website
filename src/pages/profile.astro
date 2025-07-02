@@ -138,6 +138,79 @@ const profile_posts = posts.slice(0,3)
       margin-right: 0.4rem;
       fill: currentColor;
     }
+    
+    .elo-display {
+      margin: 1rem 0;
+    }
+    
+    .elo-badge {
+      display: inline-flex;
+      align-items: center;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border: 1px solid #dee2e6;
+      border-radius: 12px;
+      padding: 0.75rem 1.25rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .elo-badge::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+      pointer-events: none;
+    }
+    
+    .elo-badge:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+      border-color: #adb5bd;
+    }
+    
+    .elo-label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #6c757d;
+      margin-right: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .elo-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #495057;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .elo-value.loading {
+      color: #adb5bd;
+      font-style: italic;
+    }
+    
+    .elo-value.excellent {
+      color: #28a745;
+    }
+    
+    .elo-value.good {
+      color: #17a2b8;
+    }
+    
+    .elo-value.average {
+      color: #ffc107;
+    }
+    
+    .elo-value.beginner {
+      color: #6c757d;
+    }
     .header-nav {
       display: flex;
       align-items: center;
@@ -201,6 +274,15 @@ const profile_posts = posts.slice(0,3)
       }
       .user-stats {
         font-size: 0.85rem;
+      }
+      .elo-badge {
+        padding: 0.5rem 1rem;
+      }
+      .elo-label {
+        font-size: 0.75rem;
+      }
+      .elo-value {
+        font-size: 1.25rem;
       }
     }
   </style>
@@ -312,8 +394,62 @@ const profile_posts = posts.slice(0,3)
       }
 
     
+      async function load_elo_rating() {
+        try {
+          const response = await fetch('/api/auth/user-data', {
+            method: "GET",
+            credentials: "include"
+          });
+    
+          if (!response.ok) {
+            throw new Error("Failed to fetch user");
+          }
+    
+          const data = await response.json();
+          const user = data.user;
+          
+          // Get the user's profile data including skill rating
+          const profileResponse = await fetch('/api/auth/get_bio', {
+            method: "GET",
+            credentials: "include"
+          });
+          
+          if (!profileResponse.ok) {
+            throw new Error("Failed to fetch profile data");
+          }
+          
+          const profileData = await profileResponse.json();
+          const skillMean = profileData.profile.skill_mean || 1500;
+          
+          // Calculate display rating (TrueSkill to ELO approximation)
+          const displayRating = Math.round(skillMean);
+          
+          // Determine rating category and color
+          let ratingClass = 'beginner';
+          if (displayRating >= 2000) ratingClass = 'excellent';
+          else if (displayRating >= 1600) ratingClass = 'good';
+          else if (displayRating >= 1200) ratingClass = 'average';
+          
+          // Update the ELO display
+          const eloValueElem = document.getElementById("elo-value");
+          if (eloValueElem) {
+            eloValueElem.textContent = displayRating.toString();
+            eloValueElem.className = `elo-value ${ratingClass}`;
+          }
+    
+        } catch (error) {
+          console.error('Error loading ELO rating:', error);
+          const eloValueElem = document.getElementById("elo-value");
+          if (eloValueElem) {
+            eloValueElem.textContent = "N/A";
+            eloValueElem.className = "elo-value beginner";
+          }
+        }
+      }
+
       load_user_name();
       load_bio();
+      load_elo_rating();
 
     </script>
 </WebsiteLayout>
