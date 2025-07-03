@@ -27,7 +27,7 @@ const gameFen = correctPost.fen || "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR 
     <div class="game-header">
       <div class="game-info">
         <div class="game-title">Game #{gameid?.slice(0, 8) || 'Unknown'}</div>
-        <div class="game-status">{correctPost.status === 'in_progress' ? 'In Progress' : 'Waiting'}</div>
+        <div class="game-status">{correctPost.status }</div>
       </div>
       <div class="player-info">
         <div class="player white-player">
@@ -43,7 +43,7 @@ const gameFen = correctPost.fen || "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR 
     </div>
     
     <div class="game-main">
-      {correctPost.status === 'in_progress' && (
+      {correctPost.status === 'in_progress' || correctPost.status === "completed" && (
         <GameBoard
           initialFen={gameFen}
           gameId={gameid}
