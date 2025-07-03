@@ -48,6 +48,18 @@ export const POST: APIRoute = async ({ request }) => {
     const currentMoves = game.moves || [];
 
 
+    // Check if game is already completed to prevent duplicate calls
+    if (game.status === "completed") {
+      return new Response(JSON.stringify({ 
+        success: true, 
+        game: game,
+        message: "Game already completed"
+      }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
     // Update the game with new FEN and moves
     const { data: updatedGame, error: updateError } = await supabase
       .from('games')
@@ -106,8 +118,9 @@ export const POST: APIRoute = async ({ request }) => {
     const w = v* (v+z);
     const new_winner_mean = winner_mean+ winner_var*v/c;
     const new_loser_mean = loser_mean-winner_var* v/c;
-    const new_winner_var = winner_var * (1- w*(winner_var/c));
-    const new_loser_var = loser_var * (1- w* (winner_var/c));
+    const beta_squared = 800;
+    const new_winner_var = 1 / (1 / winner_var + 1 / beta_squared);
+    const new_loser_var = 1 / (1 / loser_var + 1 / beta_squared);
     
     // Update winner (white) profile
     const { error: updateWinnerError } = await supabase
@@ -149,8 +162,9 @@ export const POST: APIRoute = async ({ request }) => {
      const w = v* (v+z);
      const new_winner_mean = winner_mean+ winner_var*v/c;
      const new_loser_mean = loser_mean-winner_var* v/c;
-     const new_winner_var = winner_var * (1- w*(winner_var/c));
-     const new_loser_var = loser_var * (1- w* (winner_var/c));
+     const beta_squared = 800;
+     const new_winner_var = 1 / (1 / winner_var + 1 / beta_squared);
+     const new_loser_var = 1 / (1 / loser_var + 1 / beta_squared);
      
     // Update winner (black) profile
     const { error: updateWinnerError } = await supabase

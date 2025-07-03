@@ -29,7 +29,9 @@ import ChallengesRealtime from '../components/ChallengesRealtime';
       <button class="side-btn">Play with Computer</button>
       <button class="side-btn">Tournaments</button>
       <button class="side-btn">Puzzles</button>
-      <button class="side-btn">Learn</button>
+      <a href="/leaderboard" class="side-btn leaderboard-btn">
+        Leaderboard
+      </a>
       <button class="side-btn primary">Create Game</button>
       <div class="stats">
         <div>Online: 1,234</div>
@@ -288,6 +290,13 @@ import ChallengesRealtime from '../components/ChallengesRealtime';
     color: #fff4ec;
     border: 1px solid #333;
   }
+  .leaderboard-btn {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   .stats {
     margin-top: 1.2rem;
     color: #888;

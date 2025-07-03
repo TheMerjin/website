@@ -7,8 +7,7 @@ export const GET: APIRoute = async () => {
   try {
     const { data, error } = await supabase
       .from('games')
-      .select('*')
-      .eq('status', 'in_progress');  // Only get open games waiting for players
+      .select('*')  // Only get open games waiting for players
 
     if (error) {
       console.error('Error fetching game requests:', error);

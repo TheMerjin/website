@@ -1,0 +1,345 @@
+---
+import WebsiteLayout from '../layouts/WebsiteLayout.astro';
+import Leaderboard from '../components/Leaderboard';
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chess Leaderboard - Agora</title>
+</head>
+
+<body style="background-color: #fff4ec; color: #333; margin: 0; padding: 0;">
+<WebsiteLayout>
+  <div class="leaderboard-page">
+    <div class="page-header">
+      <h1>Chess Leaderboard</h1>
+      <p class="page-subtitle">Rankings based on TrueSkill ELO ratings</p>
+    </div>
+    
+    <div class="leaderboard-content">
+      <Leaderboard client:load />
+    </div>
+    
+    <div class="info-section">
+      <h3>About the Rankings</h3>
+      <div class="info-grid">
+        <div class="info-card">
+          <h4>Rating System</h4>
+          <p>We use TrueSkill, a Bayesian rating system that provides more accurate skill estimates than traditional ELO.</p>
+        </div>
+        <div class="info-card">
+          <h4>Rating Tiers</h4>
+          <ul>
+            <li><span class="rating-excellent">2000+</span> - Excellent</li>
+            <li><span class="rating-good">1600-1999</span> - Good</li>
+            <li><span class="rating-average">1200-1599</span> - Average</li>
+            <li><span class="rating-beginner">Below 1200</span> - Beginner</li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <h4>Updates</h4>
+          <p>Ratings update after each completed game. The more games you play, the more accurate your rating becomes.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .leaderboard-page {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 3rem;
+      padding-bottom: 2rem;
+      border-bottom: 2px solid #e6e1d7;
+    }
+
+    .page-header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #333;
+      font-family: 'Inter', sans-serif;
+      margin: 0 0 0.5rem 0;
+      letter-spacing: -1px;
+    }
+
+    .page-subtitle {
+      font-size: 1.1rem;
+      color: #456650;
+      margin: 0;
+      font-weight: 400;
+    }
+
+    .leaderboard-content {
+      background: #f8f4f0;
+      border: 1px solid #e6e1d7;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      margin-bottom: 3rem;
+      overflow: hidden;
+    }
+
+    .info-section {
+      margin-top: 3rem;
+    }
+
+    .info-section h3 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 1.5rem;
+      font-family: 'Inter', sans-serif;
+      text-align: center;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .info-card {
+      background: #f8f4f0;
+      border: 1px solid #e6e1d7;
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .info-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    }
+
+    .info-card h4 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #333;
+      margin: 0 0 1rem 0;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .info-card p {
+      color: #555;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .info-card ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .info-card li {
+      padding: 0.3rem 0;
+      color: #555;
+      display: flex;
+      align-items: center;
+    }
+
+    .rating-excellent {
+      color: #28a745;
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+
+    .rating-good {
+      color: #17a2b8;
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+
+    .rating-average {
+      color: #ffc107;
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+
+    .rating-beginner {
+      color: #6c757d;
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+
+    /* Enhanced leaderboard styles for the dedicated page */
+    .leaderboard-container {
+      padding: 0;
+    }
+
+    .leaderboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 2rem;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border-bottom: 1px solid #dee2e6;
+    }
+
+    .leaderboard-header h3 {
+      margin: 0;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #333;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .refresh-btn {
+      background: none;
+      border: none;
+      font-size: 1.4rem;
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 6px;
+      transition: background-color 0.2s;
+      color: #6c757d;
+    }
+
+    .refresh-btn:hover {
+      background-color: #e9ecef;
+      color: #495057;
+    }
+
+    .leaderboard-list {
+      max-height: 600px;
+      overflow-y: auto;
+    }
+
+    .leaderboard-row {
+      display: flex;
+      align-items: center;
+      padding: 1rem 2rem;
+      border-bottom: 1px solid #f1f3f4;
+      transition: background-color 0.2s;
+    }
+
+    .leaderboard-row:last-child {
+      border-bottom: none;
+    }
+
+    .leaderboard-row:hover {
+      background-color: #f8f9fa;
+    }
+
+    .rank-badge {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #6c757d;
+      min-width: 3rem;
+      text-align: center;
+    }
+
+    .player-info {
+      flex: 1;
+      margin-left: 1rem;
+    }
+
+    .player-name {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: #333;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .player-stats {
+      font-size: 0.9rem;
+      color: #6c757d;
+      margin-top: 0.2rem;
+    }
+
+    .rating-display {
+      font-size: 1.2rem;
+      font-weight: 700;
+      font-family: 'Inter', sans-serif;
+      min-width: 4rem;
+      text-align: right;
+    }
+
+    .loading-state, .error-state, .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+      color: #6c757d;
+      font-size: 1rem;
+    }
+
+    .loading-spinner {
+      width: 30px;
+      height: 30px;
+      border: 3px solid #e9ecef;
+      border-top: 3px solid #6c757d;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 1rem;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .retry-btn {
+      background: #456650;
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      margin-top: 1rem;
+      transition: background-color 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .retry-btn:hover {
+      background: #333;
+    }
+
+    @media (max-width: 768px) {
+      .leaderboard-page {
+        padding: 1rem 0.5rem;
+      }
+
+      .page-header h1 {
+        font-size: 2rem;
+      }
+
+      .page-subtitle {
+        font-size: 1rem;
+      }
+
+      .info-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      .leaderboard-header {
+        padding: 1rem;
+      }
+
+      .leaderboard-row {
+        padding: 0.8rem 1rem;
+      }
+
+      .player-name {
+        font-size: 1rem;
+      }
+
+      .rating-display {
+        font-size: 1.1rem;
+      }
+    }
+  </style>
+</WebsiteLayout>
+</body>
+</html> 
