@@ -28,6 +28,16 @@ export const POST: APIRoute = async ({ request }) => {
     if (winnerColor){
         winner_id = game[winnerColor];
     }
+    if (game.status === "completed") {
+        return new Response(JSON.stringify({ 
+            success: true, 
+            game: game,
+            message: "Game already completed"
+          }), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+          });
+    }
     
     if (fetchError || !game) {
       return new Response(JSON.stringify({ error: 'Game not found', fetchError : fetchError }), {
