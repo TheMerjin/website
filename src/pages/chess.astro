@@ -57,6 +57,7 @@ import ChallengesRealtime from '../components/ChallengesRealtime';
   </footer>
 </ChessWebsiteLayout>
 <script type="module">
+    let pollInterval = 2;
     if (document){
     const correspondenceButton = document.getElementById("correspondence-buttton");
     if (correspondenceButton) {
@@ -85,9 +86,33 @@ import ChallengesRealtime from '../components/ChallengesRealtime';
       status : "waiting"
     }),
   });
+  const body = await gameRequestRes.json();
+  console.log(body);
+  const game = body.game;
+  const gameId = game[0].id;
+  console.log(game[0].id);
+  if (gameId){
+    pollInterval = setInterval(() => pollGameStatus(gameId), 2000);
+    console.log(pollInterval);
+  }
 
   } catch (err) {
     console.error('Something went wrong:', err);
+  }
+}
+
+async function pollGameStatus(gameId) {
+  try {
+    const res = await fetch(`api/get_active_game_requests`);
+    const data = await res.json();
+    const correctPost = data.games.find((game) => game.id == gameId);
+    console.log(data);
+    if (correctPost.status === 'in_progress') {
+      clearInterval(pollInterval);
+      window.location.href = `/chess/games/${gameId}`;
+    }
+  } catch (err) {
+    console.error('Error polling game status:', err);
   }
 }
 

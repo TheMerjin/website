@@ -43,7 +43,7 @@ const gameFen = correctPost.fen || "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR 
     </div>
     
     <div class="game-main">
-      {correctPost.status === 'in_progress' || correctPost.status === "completed" && (
+      {(correctPost.status === 'in_progress' || correctPost.status === "completed") && (
         <GameBoard
           initialFen={gameFen}
           gameId={gameid}

@@ -36,7 +36,7 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    const { error: insertError } = await supabase
+    const {data: game, error: insertError } = await supabase
       .from('games')
       .insert(
         {
@@ -45,17 +45,19 @@ export const POST: APIRoute = async ({ request }) => {
           status : status,
           white_username : username
         }
-      );
+        
+      ).select();
+      
 
     if (insertError) {
       console.error('Insert error:', insertError);
-      return new Response(JSON.stringify({ error: insertError.message }), {
+      return new Response(JSON.stringify({ error: insertError.message, game : game }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' },
       });
     }
 
-    return new Response(JSON.stringify({ success: true, white }), {
+    return new Response(JSON.stringify({ success: true, game : game  }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
