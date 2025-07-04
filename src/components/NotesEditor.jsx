@@ -5,12 +5,23 @@ import Link from '@tiptap/extension-link';
 import '../styles/SidebarElement.css';
 
 export default function NotesEditor() {
+  // Process content to add styling to note links
+  const processContentWithNoteLinks = useCallback((content) => {
+    if (!content) return content;
+    
+    const noteLinkRegex = /\[{([^}]+)}\]/g;
+    return content.replace(noteLinkRegex, (match, noteName) => {
+      return `<span class="note-link-text" data-note-name="${noteName.trim()}">${match}</span>`;
+    });
+  }, []);
+
   const [mode, setMode] = useState('INSERT');
   const [commandMode, setCommandMode] = useState(false);
   const [title, setTitle] = useState('Untitled');
   const [status, setStatus] = useState('');
-  const [content, setContent] = useState('<h1>Welcome to Your Notes</h1><p>Start writing here...</p>');
+  const [content, setContent] = useState(processContentWithNoteLinks('<h1>Welcome to Your Notes</h1><p>Start writing here... Try creating a note link with [{Note Name}]</p>'));
   const [commandInput, setCommandInput] = useState(':');
+  const [lineNumbers, setLineNumbers] = useState(false);
   const statusBarRef = useRef(null);
   const inputRef = useRef(null);
   
@@ -31,7 +42,8 @@ export default function NotesEditor() {
     content,
     immediatelyRender: false,
     onUpdate: ({ editor }) => {
-      setContent(editor.getHTML());
+      const newContent = editor.getHTML();
+      setContent(newContent);
     },
     editorProps: {
       attributes: {
@@ -39,6 +51,93 @@ export default function NotesEditor() {
       },
     },
   });
+
+  // Handle note link clicks
+  const handleNoteLinkClick = useCallback((noteName) => {
+    const note = notes.find(n => n.title === noteName);
+    if (note) {
+      selectNote(note);
+    } else {
+      alert(`Note "${noteName}" not found. You can create it with :new {${noteName}}`);
+    }
+  }, [notes]);
+
+  // Extract all note links from content for graph construction
+  const extractNoteLinks = useCallback((content) => {
+    const noteLinkRegex = /\[{([^}]+)}\]/g;
+    const links = [];
+    let match;
+    
+    while ((match = noteLinkRegex.exec(content)) !== null) {
+      links.push(match[1].trim());
+    }
+    
+    return links;
+  }, []);
+
+  // Process note links and make them clickable
+  const processNoteLinks = useCallback(() => {
+    if (!editor) return;
+    
+    const editorElement = editor.view.dom;
+    
+    // Add a single click handler to the editor
+    const handleEditorClick = (e) => {
+      const clickedElement = e.target;
+      
+      // Check if clicked on a styled note link
+      if (clickedElement.classList.contains('note-link-text')) {
+        const noteName = clickedElement.getAttribute('data-note-name');
+        if (noteName) {
+          e.preventDefault();
+          e.stopPropagation();
+          handleNoteLinkClick(noteName);
+          return;
+        }
+      }
+      
+      // Fallback: check if the clicked text contains a note link
+      const text = clickedElement.textContent || '';
+      if (text.includes('[{') && text.includes('}]')) {
+        const noteLinkRegex = /\[{([^}]+)}\]/g;
+        let match;
+        
+        while ((match = noteLinkRegex.exec(text)) !== null) {
+          const noteName = match[1].trim();
+          e.preventDefault();
+          e.stopPropagation();
+          handleNoteLinkClick(noteName);
+          return;
+        }
+      }
+    };
+    
+    // Remove existing listener and add new one
+    editorElement.removeEventListener('click', handleEditorClick);
+    editorElement.addEventListener('click', handleEditorClick);
+    
+    // Store the handler for cleanup
+    editorElement._noteLinkHandler = handleEditorClick;
+  }, [editor, handleNoteLinkClick]);
+
+  // Cleanup event listeners
+  useEffect(() => {
+    return () => {
+      if (editor && editor.view.dom._noteLinkHandler) {
+        editor.view.dom.removeEventListener('click', editor.view.dom._noteLinkHandler);
+      }
+    };
+  }, [editor]);
+
+  // Process note links when content changes
+  useEffect(() => {
+    if (editor && content) {
+      // Small delay to ensure editor has updated
+      setTimeout(() => {
+        processNoteLinks();
+      }, 100);
+    }
+  }, [content, editor, processNoteLinks]);
 
   // Load notes for the logged-in user
   const loadNotes = useCallback(async () => {
@@ -63,9 +162,10 @@ export default function NotesEditor() {
   const selectNote = (note) => {
     setSelectedNoteId(note.id);
     setTitle(note.title || 'Untitled');
-    setContent(note.content || '');
+    const processedContent = processContentWithNoteLinks(note.content || '');
+    setContent(processedContent);
     if (editor) {
-      editor.commands.setContent(note.content || '');
+      editor.commands.setContent(processedContent);
     }
   };
 
@@ -154,8 +254,10 @@ export default function NotesEditor() {
     if (!editor) return;
     const html = editor.getHTML();
     const lineCount = (html.match(/<p|<h[1-6]/g) || []).length || 1;
-    setStatus(`${title}  ${lineCount} line${lineCount > 1 ? 's' : ''}  --${mode}${commandMode ? ' [COMMAND]' : ''}--`);
-  }, [editor, content, title, mode, commandMode]);
+    const noteLinks = extractNoteLinks(content);
+    const linksText = noteLinks.length > 0 ? ` (${noteLinks.length} links)` : '';
+    setStatus(`${title}  ${lineCount} line${lineCount > 1 ? 's' : ''}${linksText}  --${mode}${commandMode ? ' [COMMAND]' : ''}--`);
+  }, [editor, content, title, mode, commandMode, extractNoteLinks]);
 
   // Keyboard shortcuts and command mode
   useEffect(() => {
@@ -257,6 +359,34 @@ export default function NotesEditor() {
         return;
       }
     }
+    // :x command - delete current line
+    if (command === 'x') {
+      if (editor) {
+        const { from, to } = editor.state.selection;
+        const $from = editor.state.doc.resolve(from);
+        const lineStart = $from.start();
+        const lineEnd = $from.end();
+        
+        // Delete the entire line
+        editor.commands.deleteRange({ from: lineStart, to: lineEnd });
+      }
+      return;
+    }
+    // :ln command - toggle line numbers
+    if (command === 'ln') {
+      setLineNumbers(prev => !prev);
+      return;
+    }
+    // :links command - show all note links in current note
+    if (command === 'links') {
+      const links = extractNoteLinks(content);
+      if (links.length > 0) {
+        alert(`Note links in "${title}":\n${links.join('\n')}`);
+      } else {
+        alert(`No note links found in "${title}"`);
+      }
+      return;
+    }
     if (command === 'q' || command === 'quit') {
       // Placeholder: could close the editor or navigate away
       alert('Quit (not implemented)');
@@ -266,7 +396,7 @@ export default function NotesEditor() {
       saveNote();
       alert('Quit (not implemented)');
     } else if (command === 'help') {
-      alert('Available commands: new {post}, cd {post}, d {post}, w(rite), q(uit), wq, help');
+      alert('Available commands: new {post}, cd {post}, d {post}, x (delete line), ln (line numbers), links, w(rite), q(uit), wq, help');
     } else {
       alert(`Unknown command: ${command}`);
     }
@@ -325,6 +455,45 @@ export default function NotesEditor() {
       inputRef.current.focus();
     }
   }, [commandMode]);
+
+  // Handle input prevention in NORMAL mode
+  useEffect(() => {
+    if (!editor) return;
+    
+    const handleKeyDown = (event) => {
+      if (mode === 'NORMAL') {
+        // Allow navigation keys and commands
+        const allowedKeys = [
+          'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
+          'Home', 'End', 'PageUp', 'PageDown',
+          'Escape', 'Tab'
+        ];
+        
+        // Allow Ctrl/Cmd combinations
+        if (event.ctrlKey || event.metaKey) {
+          return;
+        }
+        
+        // Allow single character keys for commands (like ':', 'x', etc.)
+        if (event.key === ':' || event.key.length === 1) {
+          // Let the main keydown handler deal with commands
+          return;
+        }
+        
+        // Block other text input
+        if (!allowedKeys.includes(event.key)) {
+          event.preventDefault();
+        }
+      }
+    };
+    
+    const editorElement = editor.view.dom;
+    editorElement.addEventListener('keydown', handleKeyDown);
+    
+    return () => {
+      editorElement.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [mode, editor]);
 
   // Load notes on mount
   useEffect(() => {
@@ -392,7 +561,23 @@ export default function NotesEditor() {
             style={{ fontWeight: 'bold', fontSize: '1.1rem', border: 'none', background: 'transparent' }}
           />
         </div>
-        <EditorContent editor={editor} />
+        <div className={`editor-container ${lineNumbers ? 'with-line-numbers' : ''}`}>
+          {lineNumbers && (
+            <div className="line-numbers">
+              {(() => {
+                // Count actual HTML elements for proper line numbering
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = content;
+                const lineElements = tempDiv.querySelectorAll('p, h1, h2, h3, h4, h5, h6, div, li, blockquote');
+                const lineCount = Math.max(lineElements.length, 1);
+                return Array.from({ length: lineCount }, (_, index) => (
+                  <div key={index} className="line-number">{index + 1}</div>
+                ));
+              })()}
+            </div>
+          )}
+          <EditorContent editor={editor} />
+        </div>
         <div id="status-bar" className="status-bar" ref={statusBarRef}>
           {commandMode ? (
             <input
@@ -412,6 +597,7 @@ export default function NotesEditor() {
           padding: 1.2rem 1.5rem 0.5rem 1.5rem;
         }
         .note-title-input {
+          margin-left: 2rem;
           width: 100%;
           background: #f8f2e4;
           border: none;
@@ -430,6 +616,7 @@ export default function NotesEditor() {
         }
         .tiptap {
           min-height: 340px;
+          max-height: calc(100vh - 200px);
           background: #f8f2e4;
           font-size: 1.08rem;
           outline: none;
@@ -441,11 +628,65 @@ export default function NotesEditor() {
           transition: background 0.2s;
           color: #2d261a;
           font-family: 'Inter', sans-serif;
+          position: relative;
+          flex: 1;
+          overflow-y: auto;
         }
         .tiptap:focus {
           outline: none;
           border: none;
           box-shadow: none;
+        }
+        /* Line numbering styles */
+        .editor-container {
+          display: flex;
+          position: relative;
+          min-height: 0;
+        }
+        .editor-container.with-line-numbers {
+          display: flex;
+        }
+        .line-numbers {
+          background: #e6e1d7;
+          margin-top: 0.65rem;
+          margin-bottom: 1.2rem;
+          border-right: 1px solid #d4cfc5;
+          padding: 1.2rem 0.5rem;
+          font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace;
+          font-size: 0.9rem;
+          color: #666;
+          text-align: right;
+          min-width: 3rem;
+          user-select: none;
+        }
+        .line-number {
+          line-height: 2.5;
+          padding: 0.4rem 0.3rem;
+          height: 1.6rem;
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
+        }
+        .editor-container.with-line-numbers .tiptap {
+          margin-left: 0;
+          border-radius: 0 10px 10px 0;
+          flex: 1;
+        }
+        /* Style for note links */
+        .tiptap {
+          color: #2d261a;
+        }
+        /* Simple green styling for note links */
+        .note-link-text {
+          color: #456650 !important;
+          background: rgba(69, 102, 80, 0.1) !important;
+          padding: 0.1rem 0.2rem !important;
+          border-radius: 2px !important;
+          font-weight: 500 !important;
+          cursor: pointer !important;
+        }
+        .note-link-text:hover {
+          background: rgba(69, 102, 80, 0.2) !important;
         }
         .status-bar {
           width: 100%;
