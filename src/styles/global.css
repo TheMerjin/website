@@ -1,28 +1,13 @@
 /* Import Inter from Google Fonts */
 @font-face {
 	font-family: 'Inter';
-	src: url('/fonts/Inter/static/Inter_18pt-Regular.ttf') format('truetype');
-	font-weight: 300;
+	src: url('/fonts/Inter/Inter-VariableFont_opsz,wght.ttf') format('truetype');
+	font-weight: 100 900;
 	font-style: normal;
 	font-display: swap;
   }
   .notes-root{
 	background-color: yellow;
-  }
-  @font-face {
-	font-family: 'Inter';
-	src: url('/fonts/Inter/static/Inter_18pt-Bold.ttf') format('truetype');
-	font-weight: 700;
-	font-style: normal;
-	font-display: swap;
-  }
-  
-  @font-face {
-	font-family: 'Inter';
-	src: url('/fonts/Inter/static/Inter-Black.ttf') format('truetype');
-	font-weight: 900;
-	font-style: normal;
-	font-display: swap;
   }
   
   
@@ -35,4 +20,11 @@
 	padding: 1rem;
 	box-sizing: border-box;
   }
+
+body {
+	font-family: 'Inter', sans-serif;
+	font-weight: 400;
+	color: #222;
+	font-size: 1rem;
+}
 
