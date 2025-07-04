@@ -116,7 +116,7 @@ export default function CommentsTree({ slug }) {
           </button>
         </div>
         {!collapsed[node.id] && <>
-          <div style={{ fontSize: '1rem', marginBottom: 8 }}>{node.content}</div>
+          <div style={{ whiteSpace : "pre-wrap",fontSize: '1rem', marginBottom: 8 }}>{node.content}</div>
           <div style={{ fontSize: '0.9rem', color: '#888', marginBottom: 4 }}>{new Date(node.created_at).toLocaleString()}</div>
           <button
               style={{ '--bg-color': darken('#fcfcfc', level) }}
