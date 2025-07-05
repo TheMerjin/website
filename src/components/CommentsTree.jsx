@@ -92,12 +92,15 @@ export default function CommentsTree({ slug }) {
         padding: '0.75rem',
         boxShadow: '0 1px 2px #0001',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ fontWeight: 600, fontSize: '1.1rem' }}>
+            <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>
               <a href={`/${node.username}`} style={{ color: 'inherit', textDecoration: 'none' }}>
                 {node.username}
               </a>
+            </div>
+            <div style={{ fontSize: '0.8rem', color: '#888' }}>
+              {new Date(node.created_at).toLocaleString()}
             </div>
             {tagsMap[node.id] && tagsMap[node.id].length > 0 && (
               <div style={{ display: 'flex', gap: 4 }}>
@@ -108,7 +111,7 @@ export default function CommentsTree({ slug }) {
             )}
           </div>
           <button
-            style={{ fontSize: '1rem', background: 'none', border: 'none', color: '#888', cursor: 'pointer', marginLeft: 8 }}
+            style={{ fontSize: '1rem', background: 'none', border: 'none', color: '#888', cursor: 'pointer' }}
             onClick={() => toggleCollapse(node.id)}
             aria-label={collapsed[node.id] ? 'Expand' : 'Collapse'}
           >
@@ -116,10 +119,9 @@ export default function CommentsTree({ slug }) {
           </button>
         </div>
         {!collapsed[node.id] && <>
-          <div style={{ whiteSpace : "pre-wrap",fontSize: '12px', marginBottom: 8 }}>{node.content}</div>
-          <div style={{ fontSize: '0.9rem', color: '#888', marginBottom: 4 }}>{new Date(node.created_at).toLocaleString()}</div>
+          <div style={{ whiteSpace : "pre-wrap",fontSize: '13px', marginBottom: 8 }}>{node.content}</div>
           <button
-              style={{ '--bg-color': darken('#fcfcfc', level) }}
+              style={{ '--bg-color': darken('#fcfcfc', level), fontSize: '0.9rem', padding: '0.5rem 1rem', marginLeft: '0' }}
               className="Replyto"
               onClick={() => handleReply(node.id)}
             >
