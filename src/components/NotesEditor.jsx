@@ -372,6 +372,19 @@ export default function NotesEditor() {
       }
       return;
     }
+    if (command === 'ash init') {
+      async function ash_init() {
+        const res = await fetch('/api/auth/user-data');
+        const data = await res.json();
+        const user = data.user;
+        if (!user || !user.id) return;
+        const res2 = await fetch(`/api/auth/get_notes?user_id=${user.id}`);
+        const notesData = await res2.json();
+    
+
+      }
+ 
+    }
     // :ln command - toggle line numbers
     if (command === 'ln') {
       setLineNumbers(prev => !prev);

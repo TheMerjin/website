@@ -1,0 +1,91 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
+export async function getStaticPaths() {
+  return [
+    { params: { category: 'philosophy' } },
+    { params: { category: 'science' } },
+    { params: { category: 'literature' } },
+    { params: { category: 'history' } },
+    { params: { category: 'fiction' } },
+    { params: { category: 'nonfiction' } },
+  ];
+}
+
+const { category } = Astro.params;
+
+const booksCatalog = JSON.parse(readFileSync(join(process.cwd(), 'src', 'data', 'books.json'), 'utf-8'));
+const books = booksCatalog.books.filter((b: any) => b.category === category);
+const categoryData = {
+  philosophy: { name: 'Philosophy', emoji: '🧠', color: 'blue', description: 'Ancient wisdom to modern thought' },
+  science: { name: 'Science', emoji: '🔬', color: 'green', description: 'Discoveries that shaped our world' },
+  literature: { name: 'Literature', emoji: '📚', color: 'purple', description: 'Timeless stories and poetry' },
+  history: { name: 'History', emoji: '📜', color: 'orange', description: 'Lessons from the past' },
+  fiction: { name: 'Fiction', emoji: '📖', color: 'indigo', description: 'Imaginative storytelling' },
+  nonfiction: { name: 'Non-Fiction', emoji: '📝', color: 'teal', description: 'Real-world knowledge and insights' }
+};
+const currentCategory = categoryData[category];
+---
+
+<BaseLayout title={`${currentCategory.name} Books`}>
+  <main class="container mx-auto px-4 py-8 max-w-2xl">
+    <header class="mb-12">
+      <nav class="mb-6">
+        <a href="/books" class="text-blue-600 hover:text-blue-800 text-sm">← Back to Books</a>
+      </nav>
+      <div class="flex items-center gap-4 mb-6">
+        <div class="text-4xl">{currentCategory.emoji}</div>
+        <div>
+          <h1 class="text-4xl font-bold text-gray-900 font-serif">{currentCategory.name}</h1>
+          <p class="text-lg text-gray-600 mt-2">{currentCategory.description}</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-4 text-sm text-gray-500">
+        <span>{books.length} books</span>
+        <span>•</span>
+        <span>Filter by: Author, Year, Title</span>
+      </div>
+    </header>
+
+    <div class="grid gap-6">
+      {books.map((book: any) => (
+        <div class="bg-white rounded-lg p-6 border border-gray-100 hover:shadow transition-shadow">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <div class="flex items-center gap-3 mb-3">
+                <span class={`text-xs bg-${currentCategory.color}-100 text-${currentCategory.color}-800 px-2 py-1 rounded`}>
+                  {currentCategory.name}
+                </span>
+                <span class="text-xs text-gray-500">{book.year}</span>
+              </div>
+              <h3 class="text-xl font-semibold font-serif mb-2 book-title">
+                <a href={`/books/read/${book.id}`} class="book-title-link">{book.title}</a>
+              </h3>
+              <div class="text-sm text-black mb-2">{book.author}</div>
+              <p class="text-black italic mb-4">{book.description}</p>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </main>
+  <style>
+    .book-title-link {
+      color: #000;
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .book-title-link:hover {
+      color: #6b7280;
+      text-decoration: underline;
+    }
+    .book-title {
+      margin-bottom: 0.5rem;
+    }
+    .font-serif {
+      font-family: 'Merriweather', 'Georgia', serif;
+    }
+  </style>
+</BaseLayout> 
