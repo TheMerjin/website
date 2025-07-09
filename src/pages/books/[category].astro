@@ -1,7 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import { supabase } from '../../lib/client-supabase.js';
 
 export async function getStaticPaths() {
   return [
@@ -16,8 +15,25 @@ export async function getStaticPaths() {
 
 const { category } = Astro.params;
 
-const booksCatalog = JSON.parse(readFileSync(join(process.cwd(), 'src', 'data', 'books.json'), 'utf-8'));
-const books = booksCatalog.books.filter((b: any) => b.category === category);
+let booksCatalog = {};
+let books = [];
+let error = null;
+try {
+  const { data, error: fetchError } = await supabase
+    .storage
+    .from('books')
+    .download('books.json');
+  if (data) {
+    const text = await data.text();
+    booksCatalog = JSON.parse(text);
+    books = booksCatalog.books.filter((b) => b.category === category);
+  } else {
+    error = fetchError?.message || 'Failed to fetch books catalog';
+  }
+} catch (e) {
+  error = e.message;
+}
+
 const categoryData = {
   philosophy: { name: 'Philosophy', emoji: '🧠', color: 'blue', description: 'Ancient wisdom to modern thought' },
   science: { name: 'Science', emoji: '🔬', color: 'green', description: 'Discoveries that shaped our world' },
@@ -48,9 +64,11 @@ const currentCategory = categoryData[category];
         <span>Filter by: Author, Year, Title</span>
       </div>
     </header>
-
+    {error ? (
+      <div class="text-red-600 font-bold">{error}</div>
+    ) : (
     <div class="grid gap-6">
-      {books.map((book: any) => (
+      {books.map((book) => (
         <div class="bg-white rounded-lg p-6 border border-gray-100 hover:shadow transition-shadow">
           <div class="flex items-start justify-between">
             <div class="flex-1">
@@ -70,6 +88,7 @@ const currentCategory = categoryData[category];
         </div>
       ))}
     </div>
+    )}
   </main>
   <style>
     .book-title-link {

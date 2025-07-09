@@ -1,40 +1,49 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import { supabase } from '../../../lib/client-supabase.js';
 
-// Always read book files as UTF-8 to ensure correct character encoding
-// Example: readFileSync(filePath, 'utf-8')
-
-// Load the book catalog
-const booksCatalog = JSON.parse(readFileSync(join(process.cwd(), 'src', 'data', 'books.json'), 'utf-8'));
-const books: any[] = booksCatalog.books;
-
-export async function getStaticPaths() {
-  return books.map((book: any) => ({ params: { bookid: book.id } }));
-}
+let booksCatalog = {};
+let books = [];
+let book = null;
+let bookContent = '';
+let toc = [];
+let error = null;
 
 const { bookid } = Astro.params;
-const book = books.find((b: any) => b.id === bookid);
-let bookContent = '';
 
 try {
-  // Try to read the actual HTML file
-  const filePath = join(process.cwd(), 'public', 'standard-ebooks-output', book.filename);
-  bookContent = readFileSync(filePath, 'utf-8'); // Always use 'utf-8' encoding
-} catch (error) {
-  // Fallback content if file not found
-  bookContent = `
-    <div class="book-content">
-      <h1>${book?.title || 'Book Not Found'}</h1>
-      <p>This book is not available in the current collection.</p>
-      <p>Please check back later or contact the administrator.</p>
-    </div>
-  `;
+  // Fetch books.json from Supabase Storage
+  const { data: catalogData, error: catalogError } = await supabase
+    .storage
+    .from('books')
+    .download('books.json');
+  if (catalogData) {
+    const text = await catalogData.text();
+    booksCatalog = JSON.parse(text);
+    books = booksCatalog.books;
+    book = books.find((b) => b.id === bookid);
+    if (book) {
+      // Fetch the xhtml file from Supabase Storage
+      const { data: fileData, error: fileError } = await supabase
+        .storage
+        .from('books')
+        .download(`books-output/${book.filename}`);
+      if (fileData) {
+        bookContent = await fileData.text();
+      } else {
+        bookContent = `<div class=\"book-content\"><h1>${book?.title || 'Book Not Found'}</h1><p>This book is not available in the current collection.</p></div>`;
+      }
+    } else {
+      bookContent = `<div class=\"book-content\"><h1>Book Not Found</h1><p>This book is not available in the current collection.</p></div>`;
+    }
+  } else {
+    error = catalogError?.message || 'Failed to fetch books catalog';
+  }
+} catch (e) {
+  error = e.message;
 }
 
 // Extract a simple table of contents from <h2> and <h3> tags
-let toc: { level: number, text: string }[] = [];
 if (bookContent) {
   const h2s = [...bookContent.matchAll(/<h2[^>]*>(.*?)<\/h2>/gi)];
   const h3s = [...bookContent.matchAll(/<h3[^>]*>(.*?)<\/h3>/gi)];

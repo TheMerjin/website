@@ -1,20 +1,37 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import { supabase } from '../lib/client-supabase.js';
 
-const booksCatalog = JSON.parse(readFileSync(join(process.cwd(), 'src', 'data', 'books.json'), 'utf-8'));
-const books = booksCatalog.books;
-const booksJson = JSON.stringify(books);
+let booksCatalog = {};
+let books = [];
+let categories = [];
+let booksByCategory = {};
+let booksJson = '';
+let booksByCategoryJson = '';
+let error = null;
 
-// Get unique categories
-const categories: string[] = Array.from(new Set(books.map((b: any) => b.category)));
-// Group books by category
-const booksByCategory: Record<string, any[]> = {};
-categories.forEach(cat => {
-  booksByCategory[cat] = books.filter((b: any) => b.category === cat);
-});
-const booksByCategoryJson = JSON.stringify(booksByCategory);
+try {
+  const { data, error: fetchError } = await supabase
+    .storage
+    .from('books')
+    .download('books.json');
+  if (data) {
+    const text = await data.text();
+    booksCatalog = JSON.parse(text);
+    books = booksCatalog.books;
+    booksJson = JSON.stringify(books);
+    categories = Array.from(new Set(books.map((b) => b.category)));
+    booksByCategory = {};
+    categories.forEach(cat => {
+      booksByCategory[cat] = books.filter((b) => b.category === cat);
+    });
+    booksByCategoryJson = JSON.stringify(booksByCategory);
+  } else {
+    error = fetchError?.message || 'Failed to fetch books catalog';
+  }
+} catch (e) {
+  error = e.message;
+}
 ---
 
 <BaseLayout title="Book Recommendations">
@@ -25,114 +42,78 @@ const booksByCategoryJson = JSON.stringify(booksByCategory);
         A curated collection of timeless literature and thought-provoking works. Browse and read directly in your browser.
       </p>
     </header>
-
-    <!-- Categories Section -->
-    <section class="w-full max-w-2xl mb-12">
-      <h2 class="text-2xl font-bold mb-6 font-serif">Categories</h2>
-      <div id="categories-list" class="space-y-10">
-        {categories.map((cat) => (
-          <div class="category-block" data-category={cat}>
-            <a href={`/books/${cat}`} class="category-link no-underline">
-              <h3 class="text-xl font-semibold text-black font-serif mb-3 capitalize category-title">{cat}</h3>
-            </a>
-            <ul class="space-y-4 category-books-list">
-              {booksByCategory[cat].slice(0, 5).map((book: any) => (
-                <li class="bg-white rounded-lg px-6 py-4 border border-gray-100 hover:shadow transition-shadow">
-                  <a href={`/books/read/${book.id}`} class="block group no-underline">
-                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                      <div>
-                        <h4 class="text-lg font-semibold text-black font-serif mb-1 book-title">
-                          <a href={`/books/read/${book.id}`} class="book-title-link">{book.title}</a>
-                        </h4>
-                        <div class="text-sm text-black mb-1">{book.author}</div>
-                        <div class="text-xs text-gray-400 mb-1">{book.year}</div>
-                        <div class="text-sm text-black italic">{book.description}</div>
+    {error ? (
+      <div class="text-red-600 font-bold">{error}</div>
+    ) : (
+      <>
+      <!-- Categories Section -->
+      <section class="w-full max-w-2xl mb-12">
+        <h2 class="text-2xl font-bold mb-6 font-serif">Categories</h2>
+        <div id="categories-list" class="space-y-10">
+          {categories.map((cat) => (
+            <div class="category-block" data-category={cat}>
+              <a href={`/books/${cat}`} class="category-link no-underline">
+                <h3 class="text-xl font-semibold text-black font-serif mb-3 capitalize category-title">{cat}</h3>
+              </a>
+              <ul class="space-y-4 category-books-list">
+                {booksByCategory[cat].slice(0, 5).map((book) => (
+                  <li class="bg-white rounded-lg px-6 py-4 border border-gray-100 hover:shadow transition-shadow">
+                    <a href={`/books/read/${book.id}`} class="block group no-underline">
+                      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                        <div>
+                          <h4 class="text-lg font-semibold text-black font-serif mb-1 book-title">
+                            <a href={`/books/read/${book.id}`} class="book-title-link">{book.title}</a>
+                          </h4>
+                          <div class="text-sm text-black mb-1">{book.author}</div>
+                          <div class="text-xs text-gray-400 mb-1">{book.year}</div>
+                          <div class="text-sm text-black italic">{book.description}</div>
+                        </div>
                       </div>
-                    </div>
-                  </a>
-                </li>
-              ))}
-            </ul>
-            {booksByCategory[cat].length > 5 && (
-              <div class="flex justify-center mt-4">
-                <button class="rts-btn load-more-category" data-category={cat}>Load More</button>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    </section>
-
-    <!-- All Books Section -->
-    <section class="w-full max-w-2xl">
-      <h2 class="text-2xl font-bold mb-6 font-serif">All Books</h2>
-      <ul id="book-list" class="space-y-6">
-        {books.slice(0, 25).map((book: any) => (
-          <li class="bg-white rounded-lg px-6 py-5 border border-gray-100 hover:shadow transition-shadow">
-            <a href={`/books/read/${book.id}`} class="block group no-underline">
-              <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                <div>
-                  <h2 class="text-xl font-semibold text-black font-serif mb-1 book-title">
-                    <a href={`/books/read/${book.id}`} class="book-title-link">{book.title}</a>
-                  </h2>
-                  <div class="text-sm text-gray-700 mb-1">{book.author}</div>
-                  <div class="text-xs text-gray-400 mb-1">{book.year}</div>
-                  <div class="text-sm text-gray-500 italic">{book.description}</div>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+              {booksByCategory[cat].length > 5 && (
+                <div class="flex justify-center mt-4">
+                  <button class="rts-btn load-more-category" data-category={cat}>Load More</button>
                 </div>
-                <div class="flex-shrink-0 mt-2 md:mt-0">
-                  <span class="inline-block bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full">{book.category}</span>
-                </div>
-              </div>
-            </a>
-          </li>
-        ))}
-      </ul>
-      {books.length > 25 && (
-        <div class="flex justify-center mt-8">
-          <button id="load-more" class="rts-btn">Load More</button>
+              )}
+            </div>
+          ))}
         </div>
-      )}
-    </section>
+      </section>
+
+      <!-- All Books Section -->
+      <section class="w-full max-w-2xl">
+        <h2 class="text-2xl font-bold mb-6 font-serif">All Books</h2>
+        <ul id="book-list" class="space-y-6">
+          {books.map((book) => (
+            <li class="bg-white rounded-lg px-6 py-5 border border-gray-100 hover:shadow transition-shadow">
+              <a href={`/books/read/${book.id}`} class="block group no-underline">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                  <div>
+                    <h2 class="text-xl font-semibold text-black font-serif mb-1 book-title">
+                      <a href={`/books/read/${book.id}`} class="book-title-link">{book.title}</a>
+                    </h2>
+                    <div class="text-sm text-gray-700 mb-1">{book.author}</div>
+                    <div class="text-xs text-gray-400 mb-1">{book.year}</div>
+                    <div class="text-sm text-gray-500 italic">{book.description}</div>
+                  </div>
+                  <div class="flex-shrink-0 mt-2 md:mt-0">
+                    <span class="inline-block bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full">{book.category}</span>
+                  </div>
+                </div>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+      </>
+    )}
   </main>
 
   <script type="module">
-    const books = {booksJson};
-    let loaded = 25;
-    const bookList = document.getElementById('book-list');
-    const loadMoreBtn = document.getElementById('load-more');
-    if (loadMoreBtn) {
-      loadMoreBtn.addEventListener('click', () => {
-        const next = books.slice(loaded, loaded + 25);
-        next.forEach(book => {
-          const li = document.createElement('li');
-          li.className = 'bg-white rounded-lg px-6 py-5 border border-gray-100 hover:shadow transition-shadow';
-          li.innerHTML = `
-            <a href="/books/read/${book.id}" class="block group no-underline">
-              <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                <div>
-                  <h2 class="text-xl font-semibold text-black font-serif mb-1 book-title">
-                    <a href="/books/read/${book.id}" class="book-title-link">${book.title}</a>
-                  </h2>
-                  <div class="text-sm text-gray-700 mb-1">${book.author}</div>
-                  <div class="text-xs text-gray-400 mb-1">${book.year}</div>
-                  <div class="text-sm text-gray-500 italic">${book.description}</div>
-                </div>
-                <div class="flex-shrink-0 mt-2 md:mt-0">
-                  <span class="inline-block bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full">${book.category}</span>
-                </div>
-              </div>
-            </a>
-          `;
-          bookList.appendChild(li);
-        });
-        loaded += 25;
-        if (loaded >= books.length) {
-          loadMoreBtn.style.display = 'none';
-        }
-      });
-    }
-
-    // Category load more logic
+    // Remove all books load more logic
     const booksByCategory = {booksByCategoryJson};
     const categories = Object.keys(booksByCategory);
     categories.forEach(cat => {
