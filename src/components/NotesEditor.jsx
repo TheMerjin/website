@@ -825,6 +825,65 @@ export default function NotesEditor() {
             transform: translateX(0);
           }
         }
+        @media (max-width: 430px) {
+          .mobile-header-bar {
+            display: flex;
+            align-items: center;
+            height: 3.2rem;
+            background: #f8f2e4;
+            border-bottom: 1px solid #e6e1d7;
+            padding: 0 1rem;
+            z-index: 101;
+            position: sticky;
+            top: 0;
+          }
+          .sidebar-toggle-btn {
+            background: none;
+            border: none;
+            font-size: 2.4rem;
+            color: #232323;
+            margin-right: 1rem;
+            cursor: pointer;
+            padding: 0.2rem 0.5rem;
+          }
+          .mobile-title {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #232323;
+            font-family: 'Inter', sans-serif;
+          }
+          .mobile-sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.32);
+            z-index: 100;
+            transition: opacity 0.2s;
+            opacity: 0;
+            pointer-events: none;
+          }
+          .mobile-sidebar-overlay.open {
+            display: block;
+            opacity: 1;
+            pointer-events: all;
+          }
+          .mobile-sidebar {
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            width: 85vw;
+            max-width: 320px;
+            background: #f6f8fa;
+            box-shadow: 2px 0 16px rgba(0,0,0,0.13);
+            z-index: 101;
+            transform: translateX(-100%);
+            transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+            overflow-y: auto;
+          }
+          .mobile-sidebar.open {
+            transform: translateX(0);
+          }
+        }
       `}</style>
       <style jsx>{`
         @media (max-width: 800px) {
