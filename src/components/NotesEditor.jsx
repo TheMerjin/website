@@ -29,6 +29,7 @@ export default function NotesEditor() {
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedNoteId, setSelectedNoteId] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const editor = useEditor({
     extensions: [
@@ -521,46 +522,65 @@ export default function NotesEditor() {
     }
   }, [notes]);
 
+  const handleSidebarToggle = () => setSidebarOpen((open) => !open);
+  const handleSidebarClose = () => setSidebarOpen(false);
+
+  useEffect(() => {
+    const onResize = () => {
+      if (window.innerWidth > 800 && sidebarOpen) setSidebarOpen(false);
+    };
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [sidebarOpen]);
+
   return (
     <div style={{ display: 'flex', height: '100%', width: '100%' }}>
-      {/* Sidebar */}
-      <div className="obsidian-sidebar">
-        <div className="obsidian-sidebar-header">
-          NOTES
-          <button
-            className="new-note-btn"
-            onClick={createNewNote}
-            title="Create new note (Ctrl+N)"
-          >
-            +
-          </button>
-        </div>
-        <div className="obsidian-notes-list">
-          {loading ? (
-            <div className="loading">Loading notes...</div>
-          ) : notes.length === 0 ? (
-            <div className="no-notes">
-              <p>No notes yet</p>
-              <button onClick={createNewNote}>Create your first note</button>
-            </div>
-          ) : (
-            notes.map(note => (
-              <div
-                key={note.id || note.title}
-                className={`obsidian-note-item ${selectedNoteId === note.id ? 'selected' : ''}`}
-                onClick={() => selectNote(note)}
-              >
-                <span className="note-title">{note.title}</span>
-                <button
-                  className="delete-note-btn"
-                  onClick={e => deleteNote(note, e)}
-                  title="Delete note"
-                >
-                  ×
-                </button>
+      <div className="mobile-header-bar">
+        <button className="sidebar-toggle-btn" onClick={handleSidebarToggle} aria-label="Open notes sidebar">
+          <span className="hamburger-icon">☰</span>
+        </button>
+        <span className="mobile-title">Notes</span>
+      </div>
+      <div className={`mobile-sidebar-overlay${sidebarOpen ? ' open' : ''}`} onClick={handleSidebarClose} />
+      <div className={`mobile-sidebar${sidebarOpen ? ' open' : ''}`}>
+        <div className="obsidian-sidebar">
+          <div className="obsidian-sidebar-header">
+            NOTES
+            <button
+              className="new-note-btn"
+              onClick={createNewNote}
+              title="Create new note (Ctrl+N)"
+            >
+              +
+            </button>
+          </div>
+          <div className="obsidian-notes-list">
+            {loading ? (
+              <div className="loading">Loading notes...</div>
+            ) : notes.length === 0 ? (
+              <div className="no-notes">
+                <p>No notes yet</p>
+                <button onClick={createNewNote}>Create your first note</button>
               </div>
-            ))
-          )}
+            ) : (
+              notes.map(note => (
+                <div
+                  key={note.id || note.title}
+                  className={`obsidian-note-item ${selectedNoteId === note.id ? 'selected' : ''}`}
+                  onClick={() => selectNote(note)}
+                >
+                  <span className="note-title">{note.title}</span>
+                  <button
+                    className="delete-note-btn"
+                    onClick={e => deleteNote(note, e)}
+                    title="Delete note"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
         </div>
       </div>
 
@@ -738,6 +758,85 @@ export default function NotesEditor() {
             margin-right: 0.5rem;
             padding-left: 0.5rem;
             padding-right: 0.5rem;
+          }
+        }
+      `}</style>
+      <style jsx>{`
+        .mobile-header-bar {
+          display: none;
+        }
+        @media (max-width: 800px) {
+          .mobile-header-bar {
+            display: flex;
+            align-items: center;
+            height: 3.2rem;
+            background: #f8f2e4;
+            border-bottom: 1px solid #e6e1d7;
+            padding: 0 1rem;
+            z-index: 101;
+            position: sticky;
+            top: 0;
+          }
+          .sidebar-toggle-btn {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: #232323;
+            margin-right: 1rem;
+            cursor: pointer;
+            padding: 0.2rem 0.5rem;
+          }
+          .mobile-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #232323;
+            font-family: 'Inter', sans-serif;
+          }
+          .mobile-sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.32);
+            z-index: 100;
+            transition: opacity 0.2s;
+            opacity: 0;
+            pointer-events: none;
+          }
+          .mobile-sidebar-overlay.open {
+            display: block;
+            opacity: 1;
+            pointer-events: all;
+          }
+          .mobile-sidebar {
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            width: 80vw;
+            max-width: 340px;
+            background: #f6f8fa;
+            box-shadow: 2px 0 16px rgba(0,0,0,0.13);
+            z-index: 101;
+            transform: translateX(-100%);
+            transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+            overflow-y: auto;
+          }
+          .mobile-sidebar.open {
+            transform: translateX(0);
+          }
+        }
+      `}</style>
+      <style jsx>{`
+        @media (max-width: 800px) {
+          .obsidian-status-bar, .obsidian-terminal {
+            min-height: 0 !important;
+            height: 1.5rem !important;
+            font-size: 0.85rem !important;
+            padding: 0.1rem 0.5rem !important;
+            line-height: 1.2;
+            background: #f8f2e4;
+            border-top: 1px solid #e6e1d7;
+            box-shadow: none;
+            overflow: hidden;
           }
         }
       `}</style>
