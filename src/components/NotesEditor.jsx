@@ -755,6 +755,7 @@ export default function NotesEditor() {
         @media (max-width: 800px) {
           .tiptap {
             margin-left: 0.5rem;
+            font-size: 1.5rem;
             margin-right: 0.5rem;
             padding-left: 0.5rem;
             padding-right: 0.5rem;
@@ -830,7 +831,7 @@ export default function NotesEditor() {
           .obsidian-status-bar, .obsidian-terminal {
             min-height: 0 !important;
             height: 1.5rem !important;
-            font-size: 0.85rem !important;
+            font-size: 1.5rem !important;
             padding: 0.1rem 0.5rem !important;
             line-height: 1.2;
             background: #f8f2e4;
