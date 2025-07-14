@@ -527,7 +527,7 @@ export default function NotesEditor() {
 
   useEffect(() => {
     const onResize = () => {
-      if (window.innerWidth > 800 && sidebarOpen) setSidebarOpen(false);
+      if (window.innerWidth > 430 && sidebarOpen) setSidebarOpen(false);
     };
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
@@ -755,7 +755,7 @@ export default function NotesEditor() {
         @media (max-width: 800px) {
           .tiptap {
             margin-left: 0.5rem;
-            font-size: 1.5rem;
+            font-size: 2rem;
             margin-right: 0.5rem;
             padding-left: 0.5rem;
             padding-right: 0.5rem;
