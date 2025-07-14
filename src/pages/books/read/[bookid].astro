@@ -56,7 +56,7 @@ if (bookContent) {
 
 <head>
   <meta charset="utf-8">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.17.0/dist/katex.min.css">
+  <!-- Removed KaTeX CSS due to CDN issues -->
 </head>
 
 <BaseLayout title={book?.title || 'Book Reader'}>
@@ -96,15 +96,345 @@ if (bookContent) {
         <div set:html={bookContent}></div>
       </article>
     </main>
+
+    <!-- Annotation Popup -->
+    <div id="annotation-popup" class="annotation-popup hidden">
+      <div class="annotation-header">
+        <h3 class="annotation-title">Add Annotation</h3>
+        <button id="close-popup" class="close-btn">×</button>
+      </div>
+      <div class="annotation-content">
+        <div class="selected-text-container">
+          <label class="text-label">Selected Text:</label>
+          <div id="selected-text-display" class="selected-text"></div>
+        </div>
+        <div class="comment-container">
+          <label for="comment-text" class="text-label">Your Analysis:</label>
+          <textarea id="comment-text" class="comment-textarea" placeholder="Add your insights, analysis, or questions about this passage..."></textarea>
+        </div>
+        <div class="annotation-actions">
+          <button id="save-annotation" class="save-btn">Save Annotation</button>
+          <button id="cancel-annotation" class="cancel-btn">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Annotation Tooltip -->
+    <div id="annotation-tooltip" class="annotation-tooltip hidden">
+      <div class="tooltip-header">
+        <div class="tooltip-author"></div>
+        <div class="tooltip-date"></div>
+        <button id="close-tooltip" class="tooltip-close-btn">×</button>
+      </div>
+      <div class="tooltip-content">
+        <div class="tooltip-selected-text"></div>
+        <div class="tooltip-comment"></div>
+      </div>
+    </div>
   </div>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.17.0/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.17.0/dist/contrib/auto-render.min.js"
-    onload="renderMathInElement(document.getElementById('book-content'), {delimiters: [
-      {left: '$$', right: '$$', display: true},
-      {left: '$', right: '$', display: false},
-      {left: '\\(', right: '\\)', display: false},
-      {left: '\\[', right: '\\]', display: true}
-    ]});"></script>
+  <!-- Removed KaTeX for now due to CDN issues -->
+    <script>
+    let annotations = [];
+    let markerList = [];
+    let originalBookHTML = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const bookContentDiv = document.getElementById('book-content');
+      if (bookContentDiv) {
+        originalBookHTML = bookContentDiv.innerHTML;
+      }
+      loadAnnotations();
+    });
+
+    async function loadAnnotations() {
+      try {
+        const url = window.location.href;
+        const bookId = url.split('/').pop();
+        const response = await fetch(`/api/auth/get_book_annotations?book_id=${bookId}`);
+        const data = await response.json();
+        if (response.ok) {
+          annotations = data.annotations || [];
+          renderAnnotations();
+        } else {
+          console.error('Error loading annotations:', data.error);
+        }
+      } catch (error) {
+        console.error('Error loading annotations:', error);
+      }
+    }
+
+    function renderAnnotations() {
+      const bookContentDiv = document.getElementById('book-content');
+      if (!bookContentDiv || annotations.length === 0 || !originalBookHTML) return;
+
+      // Reset to original HTML
+      bookContentDiv.innerHTML = originalBookHTML;
+
+      // Get all text nodes in order
+      const textNodes = [];
+      function getTextNodes(node) {
+        if (node.nodeType === Node.TEXT_NODE) {
+          textNodes.push(node);
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+          for (let child of node.childNodes) {
+            getTextNodes(child);
+          }
+        }
+      }
+      getTextNodes(bookContentDiv);
+
+      // Build a flat string and map of node positions
+      let fullText = '';
+      const nodeRanges = [];
+      for (let node of textNodes) {
+        nodeRanges.push({ node, start: fullText.length, end: fullText.length + node.textContent.length });
+        fullText += node.textContent;
+      }
+
+      // Sort annotations by start position, last first (so earlier ones don't break later ones)
+      const sorted = [...annotations].sort((a, b) => b.start_position - a.start_position);
+
+      for (let ann of sorted) {
+        let { start_position: start, end_position: end } = ann;
+        // Find start and end nodes/offsets
+        let startNode, startOffset, endNode, endOffset;
+        for (let range of nodeRanges) {
+          if (start >= range.start && start < range.end) {
+            startNode = range.node;
+            startOffset = start - range.start;
+          }
+          if (end > range.start && end <= range.end) {
+            endNode = range.node;
+            endOffset = end - range.start;
+          }
+        }
+        if (startNode && endNode) {
+          const range = document.createRange();
+          range.setStart(startNode, startOffset);
+          range.setEnd(endNode, endOffset);
+          const span = document.createElement('span');
+          span.className = 'annotation-highlight';
+          span.setAttribute('data-annotation-id', ann.id);
+          span.setAttribute('data-annotation', JSON.stringify(ann));
+          try {
+            range.surroundContents(span);
+          } catch (e) {
+            // If the range is invalid, skip this annotation
+            console.warn('Could not apply highlight for annotation:', ann.id, e);
+          }
+        }
+      }
+    }
+
+    // Popup management
+    let currentSelection = null;
+    let currentPosition = null;
+
+    function showAnnotationPopup(selection, position) {
+      const popup = document.getElementById('annotation-popup');
+      const selectedTextDisplay = document.getElementById('selected-text-display');
+      const commentTextarea = document.getElementById('comment-text');
+      
+      selectedTextDisplay.textContent = selection;
+      commentTextarea.value = '';
+      currentSelection = selection;
+      currentPosition = position;
+      
+      popup.classList.remove('hidden');
+      setTimeout(() => {
+        popup.classList.add('show');
+      }, 10);
+      
+      commentTextarea.focus();
+    }
+
+    function hideAnnotationPopup() {
+      const popup = document.getElementById('annotation-popup');
+      popup.classList.remove('show');
+      setTimeout(() => {
+        popup.classList.add('hidden');
+      }, 300);
+      currentSelection = null;
+      currentPosition = null;
+    }
+
+    async function saveAnnotation() {
+      const commentText = document.getElementById('comment-text').value.trim();
+      if (!commentText) {
+        alert('Please enter a comment');
+        return;
+      }
+      
+      if (currentSelection && currentPosition) {
+        const url = window.location.href;
+        const bookId = url.split('/').pop();
+        console.log(bookId);
+
+        try {
+          const response = await fetch('/api/auth/save_book_annotation', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              bookId: `${bookId}`, 
+              selectedText: currentSelection,
+              commentText: commentText,
+              position: currentPosition
+            })
+          });
+
+          const data = await response.json();
+          
+          if (response.ok) {
+            console.log('Annotation saved successfully:', data);
+            alert('Annotation saved successfully!');
+            hideAnnotationPopup();
+          } else {
+            console.error('Error saving annotation:', data.error);
+            alert('Error saving annotation: ' + data.error);
+          }
+        } catch (error) {
+          console.error('Error saving annotation:', error);
+          alert('Error saving annotation. Please try again.');
+        }
+      }
+    }
+
+    function getSelectionText() {
+      let text = "";
+      if (window.getSelection) {
+        text = window.getSelection()?.toString() || "";
+      }
+      return text;
+    }
+
+    function getSelectionPosition() {
+      const selection = window.getSelection();
+      if (!selection || selection.rangeCount === 0) return null;
+      const range = selection.getRangeAt(0);
+      const bookContent = document.getElementById('book-content');
+      if (!bookContent) return null;
+
+      // Create a range from start of content to selection start
+      const startRange = document.createRange();
+      startRange.setStart(bookContent, 0);
+      startRange.setEnd(range.startContainer, range.startOffset);
+
+      // Create a range from start of content to selection end
+      const endRange = document.createRange();
+      endRange.setStart(bookContent, 0);
+      endRange.setEnd(range.endContainer, range.endOffset);
+
+      return {
+        start: startRange.toString().length,
+        end: endRange.toString().length,
+        text: selection.toString()
+      };
+    }
+
+    // Restore the event listener for selection
+    document.addEventListener('mouseup', async function() {
+      const selection = getSelectionText();
+      if (selection && selection.length > 0) {
+        const position = getSelectionPosition();
+        // Fetch user data
+        try {
+          const userResponse = await fetch('/api/auth/user-data');
+          const userData = await userResponse.json();
+          if (userData.user) {
+            showAnnotationPopup(selection, position);
+          } else {
+            alert('Please log in to add annotations');
+          }
+        } catch (error) {
+          alert('Please log in to add annotations');
+        }
+      }
+    });
+
+    // Close popup when clicking outside
+    document.addEventListener('click', function(e) {
+      const popup = document.getElementById('annotation-popup');
+      if (!popup.contains(e.target) && !e.target.closest('#book-content')) {
+        hideAnnotationPopup();
+      }
+    });
+
+    // Tooltip management
+    let currentTooltip = null;
+
+    function showTooltip(annotation, element) {
+      const tooltip = document.getElementById('annotation-tooltip');
+      const authorEl = tooltip.querySelector('.tooltip-author');
+      const dateEl = tooltip.querySelector('.tooltip-date');
+      const selectedTextEl = tooltip.querySelector('.tooltip-selected-text');
+      const commentEl = tooltip.querySelector('.tooltip-comment');
+
+      authorEl.textContent = annotation.username;
+      dateEl.textContent = new Date(annotation.created_at).toLocaleDateString();
+      selectedTextEl.textContent = annotation.selected_text;
+      commentEl.textContent = annotation.comment_text;
+
+      // Position tooltip near the element
+      const rect = element.getBoundingClientRect();
+      const tooltipRect = tooltip.getBoundingClientRect();
+      
+      let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+      let top = rect.bottom + 10;
+
+      // Adjust if tooltip goes off screen
+      if (left < 10) left = 10;
+      if (left + tooltipRect.width > window.innerWidth - 10) {
+        left = window.innerWidth - tooltipRect.width - 10;
+      }
+      if (top + tooltipRect.height > window.innerHeight - 10) {
+        top = rect.top - tooltipRect.height - 10;
+      }
+
+      tooltip.style.left = left + 'px';
+      tooltip.style.top = top + 'px';
+
+      tooltip.classList.remove('hidden');
+      setTimeout(() => {
+        tooltip.classList.add('show');
+      }, 10);
+
+      currentTooltip = tooltip;
+    }
+
+    function hideTooltip() {
+      if (currentTooltip) {
+        currentTooltip.classList.remove('show');
+        setTimeout(() => {
+          currentTooltip.classList.add('hidden');
+        }, 200);
+        currentTooltip = null;
+      }
+    }
+
+    // Event listeners for highlights
+    document.addEventListener('click', function(e) {
+      const highlight = e.target.closest('.annotation-highlight');
+      if (highlight) {
+        const annotationData = highlight.getAttribute('data-annotation');
+        if (annotationData) {
+          const annotation = JSON.parse(annotationData);
+          showTooltip(annotation, highlight);
+        }
+      } else if (!e.target.closest('#annotation-tooltip')) {
+        hideTooltip();
+      }
+    });
+
+    // Close tooltip button
+    document.getElementById('close-tooltip').addEventListener('click', hideTooltip);
+
+    // Button event listeners
+    document.getElementById('close-popup').addEventListener('click', hideAnnotationPopup);
+    document.getElementById('cancel-annotation').addEventListener('click', hideAnnotationPopup);
+    document.getElementById('save-annotation').addEventListener('click', saveAnnotation);
+    </script>
 </BaseLayout>
 
 <style>
@@ -197,9 +527,503 @@ if (bookContent) {
   .rts-reader-content abbr {
     text-decoration: underline dotted;
   }
+
+  /* Handle missing book CSS files */
+  .rts-reader-content img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .rts-reader-content .titlepage {
+    text-align: center;
+    margin: 2rem 0;
+  }
+
+  .rts-reader-content .titlepage img {
+    max-width: 200px;
+    margin: 1rem auto;
+  }
+
+  /* Basic styling for book content */
+  .rts-reader-content h1 {
+    font-size: 2rem;
+    margin: 2rem 0 1rem;
+  }
+
+  .rts-reader-content h2 {
+    font-size: 1.5rem;
+    margin: 1.5rem 0 0.75rem;
+  }
+
+  .rts-reader-content h3 {
+    font-size: 1.25rem;
+    margin: 1.25rem 0 0.5rem;
+  }
+
+  .rts-reader-content h4 {
+    font-size: 1.1rem;
+    margin: 1rem 0 0.5rem;
+  }
+
+  .rts-reader-content h5 {
+    font-size: 1rem;
+    margin: 0.75rem 0 0.25rem;
+  }
+
+  .rts-reader-content h6 {
+    font-size: 0.9rem;
+    margin: 0.5rem 0 0.25rem;
+  }
+  /* Annotation Popup Styles */
+  .annotation-popup {
+    position: fixed;
+    top: 50%;
+    right: -400px;
+    transform: translateY(-50%);
+    width: 380px;
+    max-height: 80vh;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border: 1px solid #e5e7eb;
+    z-index: 1000;
+    transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+  }
+
+  .annotation-popup.show {
+    right: 20px;
+  }
+
+  .annotation-popup.hidden {
+    right: -400px;
+  }
+
+  .annotation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid #f3f4f6;
+    background: #fafafa;
+  }
+
+  .annotation-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+  }
+
+  .close-btn:hover {
+    background-color: #f3f4f6;
+    color: #374151;
+  }
+
+  .annotation-content {
+    padding: 20px 24px;
+  }
+
+  .selected-text-container {
+    margin-bottom: 20px;
+  }
+
+  .text-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 8px;
+  }
+
+  .selected-text {
+    background: #fef3c7;
+    border: 1px solid #f59e0b;
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #92400e;
+    max-height: 100px;
+    overflow-y: auto;
+  }
+
+  .comment-container {
+    margin-bottom: 20px;
+  }
+
+  .comment-textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    line-height: 1.5;
+    font-family: inherit;
+    resize: vertical;
+    transition: border-color 0.2s;
+  }
+
+  .comment-textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .annotation-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+  }
+
+  .save-btn {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  .save-btn:hover {
+    background: #2563eb;
+  }
+
+  .cancel-btn {
+    background: #f3f4f6;
+    color: #374151;
+    border: 1px solid #d1d5db;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  .cancel-btn:hover {
+    background: #e5e7eb;
+  }
+
+  /* Annotation Highlights */
+  .annotation-highlight {
+    background: linear-gradient(120deg, #fef3c7 0%, #fde68a 100%);
+    border-bottom: 2px solid #f59e0b;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 2px;
+    padding: 1px 2px;
+  }
+
+  .annotation-highlight:hover {
+    background: linear-gradient(120deg, #fde68a 0%, #fbbf24 100%);
+    box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+  }
+
+  /* Annotation Tooltip */
+  .annotation-tooltip {
+    position: fixed;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    max-width: 400px;
+    z-index: 1001;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+  }
+
+  .annotation-tooltip.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+  }
+
+  .annotation-tooltip.hidden {
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+  }
+
+  .tooltip-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px 8px;
+    border-bottom: 1px solid #f3f4f6;
+    background: #fafafa;
+    border-radius: 8px 8px 0 0;
+  }
+
+  .tooltip-author {
+    font-weight: 600;
+    font-size: 14px;
+    color: #374151;
+  }
+
+  .tooltip-date {
+    font-size: 12px;
+    color: #6b7280;
+  }
+
+  .tooltip-close-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #9ca3af;
+    cursor: pointer;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.2s;
+  }
+
+  .tooltip-close-btn:hover {
+    background-color: #f3f4f6;
+    color: #374151;
+  }
+
+  .tooltip-content {
+    padding: 12px 16px;
+  }
+
+  .tooltip-selected-text {
+    background: #fef3c7;
+    border: 1px solid #f59e0b;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 13px;
+    line-height: 1.4;
+    color: #92400e;
+    margin-bottom: 12px;
+    font-style: italic;
+  }
+
+  .tooltip-comment {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #374151;
+    white-space: pre-wrap;
+  }
+
   /* Responsive adjustments */
   @media (max-width: 1024px) {
     .rts-sidebar { display: none; }
     .rts-main { max-width: 100vw; border-radius: 0; }
+    .annotation-popup {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      top: auto;
+      width: 100vw;
+      max-width: 100vw;
+      max-height: 80vh;
+      min-height: 320px;
+      border-radius: 18px 18px 0 0;
+      box-shadow: 0 -8px 32px rgba(0,0,0,0.18);
+      margin: 0;
+      padding: 0;
+      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+      z-index: 1002;
+      right: 0 !important;
+    }
+    .annotation-popup.show {
+      transform: translateY(0);
+    }
+    .annotation-popup.hidden {
+      transform: translateY(100%);
+    }
+    .annotation-header {
+      border-radius: 18px 18px 0 0;
+      padding-top: 16px;
+      padding-bottom: 8px;
+      position: relative;
+      background: #fafbfc;
+    }
+    .annotation-header::before {
+      content: '';
+      display: block;
+      width: 40px;
+      height: 5px;
+      background: #e5e7eb;
+      border-radius: 3px;
+      margin: 0 auto 10px auto;
+    }
+    .annotation-title {
+      font-size: 18px;
+      text-align: center;
+      width: 100%;
+    }
+    .close-btn {
+      position: absolute;
+      right: 18px;
+      top: 18px;
+      font-size: 28px;
+      background: none;
+      border: none;
+      color: #9ca3af;
+      z-index: 2;
+    }
+    .annotation-content {
+      padding: 18px 18px 12px 18px;
+    }
+    .selected-text {
+      font-size: 15px;
+      padding: 10px;
+      border-radius: 8px;
+      background: #fef3c7;
+      border: 1px solid #fbbf24;
+      color: #92400e;
+    }
+    .comment-textarea {
+      font-size: 16px;
+      min-height: 90px;
+      border-radius: 8px;
+      padding: 12px;
+    }
+    .annotation-actions {
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .save-btn, .cancel-btn {
+      width: 100%;
+      font-size: 16px;
+      padding: 14px 0;
+      border-radius: 8px;
+    }
+    .save-btn {
+      background: #3b82f6;
+      color: #fff;
+      border: none;
+      font-weight: 600;
+    }
+    .save-btn:active {
+      background: #2563eb;
+    }
+    .cancel-btn {
+      background: #f3f4f6;
+      color: #374151;
+      border: 1px solid #d1d5db;
+      font-weight: 500;
+    }
+    .cancel-btn:active {
+      background: #e5e7eb;
+    }
+    .annotation-tooltip {
+      left: 0 !important;
+      right: 0 !important;
+      top: auto !important;
+      bottom: 0 !important;
+      max-width: 100vw;
+      width: 100vw;
+      border-radius: 18px 18px 0 0;
+      box-shadow: 0 -8px 32px rgba(0,0,0,0.18);
+      padding-bottom: 18px;
+      z-index: 1003;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+    .annotation-tooltip.show {
+      transform: translateY(0);
+    }
+    .annotation-tooltip.hidden {
+      transform: translateY(100%);
+    }
+    .tooltip-header {
+      border-radius: 18px 18px 0 0;
+      padding-top: 16px;
+      padding-bottom: 8px;
+      position: relative;
+      background: #fafbfc;
+    }
+    .tooltip-header::before {
+      content: '';
+      display: block;
+      width: 40px;
+      height: 5px;
+      background: #e5e7eb;
+      border-radius: 3px;
+      margin: 0 auto 10px auto;
+    }
+    .tooltip-close-btn {
+      position: absolute;
+      right: 18px;
+      top: 18px;
+      font-size: 24px;
+      color: #9ca3af;
+      background: none;
+      border: none;
+      z-index: 2;
+    }
+    .tooltip-content {
+      padding: 18px 18px 12px 18px;
+    }
+    .tooltip-selected-text {
+      font-size: 15px;
+      padding: 10px;
+      border-radius: 8px;
+      background: #fef3c7;
+      border: 1px solid #fbbf24;
+      color: #92400e;
+      margin-bottom: 10px;
+    }
+    .tooltip-comment {
+      font-size: 16px;
+      color: #374151;
+      border-radius: 8px;
+      background: #f8fafc;
+      padding: 12px;
+    }
   }
+  /* --- General improvements for all screens --- */
+  .annotation-popup, .annotation-tooltip {
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    border: none;
+  }
+  .annotation-popup .annotation-header, .annotation-tooltip .tooltip-header {
+    background: #fafbfc;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .annotation-popup .annotation-title, .annotation-tooltip .tooltip-author {
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    font-weight: 600;
+  }
+  .annotation-popup .selected-text, .annotation-tooltip .tooltip-selected-text {
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+  }
+  .annotation-popup .comment-textarea, .annotation-tooltip .tooltip-comment {
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+  }
+  .annotation-popup .save-btn, .annotation-popup .cancel-btn {
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+  }
+</style> 
 </style> 
