@@ -28,3 +28,264 @@ body {
 	font-size: 1rem;
 }
 
+/* LessWrong/epistemic calendar styles */
+.calendar-epistemic-root {
+  background: inherit;
+  font-family: 'Merriweather', Georgia, serif;
+  color: #232323;
+  padding: 0;
+  margin: 0;
+}
+.calendar-epistemic-header {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0.5rem 0 0.5rem 0;
+  margin-bottom: 0.5rem;
+  background: inherit;
+}
+.calendar-epistemic-title {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 1.5rem 0 0;
+  letter-spacing: 0.01em;
+  color: #232323;
+}
+.calendar-epistemic-add-btn {
+  border: 1px solid #bdbdbd;
+  background: none;
+  color: #232323;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-size: 1rem;
+  padding: 0.35rem 1.1rem;
+  margin-right: 1rem;
+  margin-left: 0;
+  border-radius: 0;
+  box-shadow: none;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  outline: none;
+}
+.calendar-epistemic-add-btn:hover, .calendar-epistemic-btn:hover {
+  border-color: #232323;
+  background: #f5f5f5;
+}
+.calendar-epistemic-loading {
+  font-size: 0.95rem;
+  color: #888;
+  margin-left: 1rem;
+}
+.calendar-epistemic-error {
+  font-size: 0.95rem;
+  color: #b91c1c;
+  margin-left: 1rem;
+}
+.calendar-epistemic-container {
+  background: inherit;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+}
+/* Modal styles */
+.calendar-epistemic-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(245,245,245,0.92);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.calendar-epistemic-modal {
+  background: #fff;
+  border: 1px solid #bdbdbd;
+  border-radius: 0;
+  box-shadow: none;
+  min-width: 320px;
+  max-width: 98vw;
+  width: 400px;
+  padding: 0;
+  font-family: 'Merriweather', Georgia, serif;
+}
+.calendar-epistemic-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0.5rem 1rem;
+  background: #f8f9fa;
+  border-radius: 0;
+}
+.calendar-epistemic-modal-title {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #232323;
+}
+.calendar-epistemic-modal-close {
+  border: none;
+  background: none;
+  color: #232323;
+  font-size: 1.3rem;
+  cursor: pointer;
+  border-radius: 0;
+  padding: 0 0.5rem;
+  line-height: 1;
+}
+.calendar-epistemic-modal-body {
+  padding: 1rem 1rem 0.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.calendar-epistemic-label {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-size: 0.98rem;
+  color: #232323;
+  margin-bottom: 0.1rem;
+  font-weight: 500;
+}
+.calendar-epistemic-input {
+  font-family: 'Merriweather', Georgia, serif;
+  font-size: 1rem;
+  border: 1px solid #bdbdbd;
+  border-radius: 0;
+  background: #fafafa;
+  color: #232323;
+  padding: 0.3rem 0.5rem;
+  margin-bottom: 0.2rem;
+  box-shadow: none;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.15s;
+}
+.calendar-epistemic-input:focus {
+  border-color: #232323;
+  background: #fff;
+}
+.calendar-epistemic-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.2rem;
+}
+.calendar-epistemic-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  border-top: 1px solid #e5e7eb;
+  padding: 0.7rem 1rem;
+  background: #f8f9fa;
+  border-radius: 0;
+}
+.calendar-epistemic-btn {
+  border: 1px solid #bdbdbd;
+  background: none;
+  color: #232323;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-size: 1rem;
+  padding: 0.3rem 1.1rem;
+  border-radius: 0;
+  box-shadow: none;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  outline: none;
+}
+.calendar-epistemic-btn-save {
+  border-color: #232323;
+  color: #232323;
+  font-weight: 600;
+}
+.calendar-epistemic-btn-delete {
+  border-color: #b91c1c;
+  color: #b91c1c;
+}
+/* Calendar event styles: sharp, muted, no shadow */
+.fc .fc-event {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  font-family: 'Merriweather', Georgia, serif;
+  font-size: 0.98rem;
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-color: #bdbdbd !important;
+  background: #f5f5f5 !important;
+  color: #232323 !important;
+  padding: 0.1rem 0.2rem !important;
+}
+.fc .fc-event:hover {
+  border-color: #232323 !important;
+  background: #e5e7eb !important;
+}
+.fc .fc-toolbar-title {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #232323;
+}
+.fc .fc-button {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border: 1px solid #bdbdbd !important;
+  background: none !important;
+  color: #232323 !important;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-size: 1rem !important;
+  padding: 0.2rem 0.7rem !important;
+  margin: 0 0.1rem !important;
+  transition: border-color 0.15s;
+}
+.fc .fc-button-primary:not(:disabled):hover {
+  border-color: #232323 !important;
+  background: #f5f5f5 !important;
+}
+.fc .fc-button-primary:disabled {
+  color: #bdbdbd !important;
+  border-color: #e5e7eb !important;
+}
+.fc .fc-daygrid-day {
+  border-radius: 0 !important;
+}
+.fc .fc-daygrid-day-number {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-size: 0.98rem;
+  color: #232323;
+}
+.fc .fc-list-event {
+  border-radius: 0 !important;
+  background: #f8f9fa !important;
+  color: #232323 !important;
+  font-family: 'Merriweather', Georgia, serif;
+}
+.fc .fc-list-event:hover {
+  background: #e5e7eb !important;
+}
+.fc .fc-today-button:hover {
+  background: #e5e7eb !important;
+  color: #232323 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+/* Responsive styles */
+@media (max-width: 600px) {
+  .calendar-epistemic-modal {
+    min-width: 98vw;
+    width: 98vw;
+    max-width: 98vw;
+    left: 0;
+    right: 0;
+    top: 0;
+    border-radius: 0;
+    padding: 0;
+  }
+  .calendar-epistemic-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+  }
+  .calendar-epistemic-title {
+    margin-bottom: 0.5rem;
+  }
+}
+
