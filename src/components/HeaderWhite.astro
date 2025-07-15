@@ -1,0 +1,188 @@
+---
+import { SITE_TITLE } from '../consts';
+import Search from './Search.astro';
+import Sidebar from './Sidebar.astro';
+import BaseHead from './BaseHead.astro';
+---
+
+<header style="background-color: #fff;">
+	<nav>
+		<div class="nav-left">
+			<button class="menu-icon" id="menuIcon" aria-label="Toggle menu">
+				<svg xmlns="http://www.w3.org/2000/svg" style="margin-left: 2rem;" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+			</button>
+			<a href="/" class="site-title">{SITE_TITLE}</a>
+		</div>
+		<div class="nav-right-group">
+			<div class="nav-right">
+				<Search />
+			</div>
+			<div id="login">
+				<a href="/login" class="login-button">Login</a>
+			</div>
+	</div>
+	</nav>
+</header>
+
+<div class="overlay" id="sidebarOverlay"></div>
+<Sidebar />
+
+<style>
+:root {
+	--header-height: 3em;
+}
+.header {
+	background-color: #fff;
+	padding: 1.5rem;
+	text-align: left;
+	border-bottom: 1px solid #ffe0c0;
+}
+.header h1 {
+	margin: 0;
+	font-family: 'Inter', sans-serif;
+	font-size: 2rem;
+	font-weight: 700;
+}
+header {
+	margin: 0;
+	padding: 0.5em 0.5em;
+	background: #fff;
+	box-shadow: none;
+	position: sticky;
+	top: 0;
+	z-index: 10000000;
+	height: var(--header-height);
+	display: flex;
+	align-items: left;
+}
+nav {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+}
+.nav-left {
+	display: flex;
+	align-items: center;
+	gap: 1em;
+}
+.menu-icon {
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 0.5em;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: rgb(var(--black));
+}
+.menu-icon:hover {
+	color: var(--accent);
+}
+.site-title {
+	font-size: 1.5em;
+	font-weight: bold;
+	text-decoration: none;
+	color: rgb(var(--black));
+}
+.nav-right {
+	display: flex;
+	align-items: center;
+	gap: 1em;
+}
+.login-button {
+	font-size: 0.95em;
+	text-decoration: none;
+	color: inherit;
+	padding: 0.4em 1em;
+}
+.nav-right input[type="search"],
+.nav-right .search-input {
+	font-size: 0.95em;
+	padding: 0.4em 0.8em;
+}
+.nav-middle {
+	display: none;
+}
+.nav-right-group {
+	display: flex;
+	align-items: center;
+	gap: 1em;
+	margin-left: auto;
+}
+@media (max-width: 768px) {
+	header {
+		padding: 0.5em 1em;
+		--header-height: 3.5em;
+	}
+	.nav-left {
+		gap: 0.5em;
+	}
+	.site-title {
+		font-size: 0.2em;
+	}
+}
+@media (max-width: 500px) {
+	header {
+		padding: 0.3em 0.5em;
+		--header-height: 4em;
+	}
+	.site-title {
+		font-size: 0.95em;
+	}
+}
+</style>
+
+<script is:inline>
+const menuIcon = document.getElementById('menuIcon');
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('sidebarOverlay');
+const body = document.body;
+function toggleSidebar() {
+	sidebar.classList.toggle('open');
+	overlay.classList.toggle('visible');
+	body.classList.toggle('sidebar-open');
+}
+menuIcon.addEventListener('click', toggleSidebar);
+overlay.addEventListener('click', toggleSidebar);
+window.addEventListener('resize', () => {
+	if (window.innerWidth > 768 && sidebar.classList.contains('open')) {
+		toggleSidebar();
+	}
+});
+</script>
+<script>
+(async () => {
+	const res = await fetch(`${import.meta.env.PUBLIC_API_URL}api/auth/logged-in`);
+	if (res.ok) {
+	  replaceElement();
+	} else {
+	  re_replaceElement();
+	}
+})();
+function replaceElement() {
+  const newElement = document.createElement('img');
+  newElement.src = "/assets_task_01jw77ts1xfxa9cbxf8r57zr1g_1748294820_img_2.jpg";
+  newElement.alt = "Profile Icon";
+  newElement.style = "width: 60px; height: 60px; border-radius: 50%; object-fit: cover;display: block;object-position: center top;";
+  newElement.style.cursor = "pointer";
+  newElement.onclick = () => {
+	window.location.href = "/profile";
+  }
+  const loginElement = document.getElementById("login");
+  if (loginElement) {
+	loginElement.replaceWith(newElement);
+  }
+}
+function re_replaceElement() {
+  const loginElement = document.getElementById('login');
+  if (loginElement) {
+    loginElement.innerHTML = '';
+    const newElement = document.createElement('a');
+    newElement.href = '/login';
+    newElement.className = 'login-button';
+    newElement.textContent = 'Login';
+    loginElement.appendChild(newElement);
+  }
+}
+</script> 

@@ -1,9 +1,10 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
 import CalendarComponent from '../components/CalendarComponent.jsx';
 ---
 
-  <CalendarComponent client:load />
+<Header />
+<CalendarComponent client:load />
 
 
 <style>

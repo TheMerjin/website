@@ -1,0 +1,31 @@
+---
+
+import HeaderLink from './HeaderLink.astro';
+---
+<aside class="sidebar-white" id="sidebar">
+    <nav class="sidebar-nav">
+        <HeaderLink href="/">Home</HeaderLink>
+        <HeaderLink href="/blog">Blog</HeaderLink>
+        <HeaderLink href="/books">Books</HeaderLink>
+        <HeaderLink href="/notes">Notes</HeaderLink>
+        <HeaderLink href="/dashboard">Dashboard</HeaderLink>
+        <HeaderLink href="/about">About</HeaderLink>
+        <HeaderLink href="/chess">Chess</HeaderLink>
+        {/* Add other links as needed */}
+    </nav>
+</aside>
+<style>
+.sidebar-white {
+  background: #fff;
+  border-right: 1px solid #e5e7eb;
+  padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+  width: 200px;
+  min-height: 100vh;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+}
+.sidebar-nav {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+</style> 

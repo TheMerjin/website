@@ -1,0 +1,243 @@
+---
+import HeaderWhite from '../components/HeaderWhite.astro';
+let tasks: any[] = [];
+try {
+  const res = await fetch('/api/tasks');
+  const data = await res.json();
+  tasks = (data.tasks || []).sort((a: any, b: any) => new Date(a.due_date).getTime() - new Date(b.due_date).getTime()).slice(0, 5);
+} catch (e) {
+  tasks = [];
+}
+---
+<HeaderWhite />
+<main class="lw-main">
+  <div class="epistemic-status"><p><em>Epistemic status: This dashboard summarizes your current tasks and links to all core tools. Minimal, neutral, and information-dense.</em></p></div>
+  <h1 class="lw-title">Dashboard</h1>
+  <section class="lw-section">
+    <h2 class="lw-h2">Today's Tasks</h2>
+    <ul class="lw-list">
+      <li><span class="lw-task-title">Math HW 5.2</span> <span class="lw-task-status overdue">Overdue</span></li>
+      <li><span class="lw-task-title">English Essay Draft</span> <span class="lw-task-status due">Due Today</span></li>
+    </ul>
+    <h2 class="lw-h2">Next 7 Days</h2>
+    <ul class="lw-list">
+      <li><span class="lw-task-title">Bio Quiz</span> <span class="lw-task-date">Thu</span></li>
+      <li><span class="lw-task-title">History Project</span> <span class="lw-task-date">Mon</span></li>
+    </ul>
+    <button class="lw-btn lw-btn-add">Quick Add Task/Note</button>
+    <a href="/notes" class="lw-link">Go to Daily Notes</a>
+    <div class="lw-quicklinks">
+      <span class="lw-h3">Quick Links:</span>
+      <a href="#" class="lw-link">Google Classroom</a>
+      <a href="#" class="lw-link">OneNote</a>
+      <a href="#" class="lw-link">Albert</a>
+      <a href="#" class="lw-link">Drive</a>
+    </div>
+  </section>
+  <hr class="lw-hr" />
+  <section class="lw-section">
+    <h2 class="lw-h2">Master Tracker (Preview)</h2>
+    <div class="lw-table-scroll">
+      <table class="lw-table">
+        <thead>
+          <tr>
+            <th>Class</th><th>Item</th><th>Type</th><th>Due</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {tasks.length === 0 && (
+            <tr><td colspan="5" style="text-align:center;color:#888;font-style:italic;">No tasks found.</td></tr>
+          )}
+          {tasks.map((task: any) => (
+            <tr>
+              <td>{task.class}</td>
+              <td>{task.item}</td>
+              <td>{task.type}</td>
+              <td>{task.due_date}</td>
+              <td>{task.status}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+  <hr class="lw-hr" />
+  <section class="lw-section lw-nav-row">
+    <a href="/master-tracker" class="lw-btn">Master Tracker</a>
+    <a href="/calendar" class="lw-btn">Calendar</a>
+    <a href="/error-log" class="lw-btn">Error Log</a>
+    <a href="/digital-archive" class="lw-btn">Digital Archive</a>
+  </section>
+</main>
+<style>
+body {
+  background: #f9f9f9;
+  color: #1a1a1a;
+}
+.lw-layout {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  background: #fff;
+  min-height: 100vh;
+}
+.lw-main {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 1rem 1.5rem 1rem;
+  font-family: Georgia, serif;
+  background: #fff;
+  flex: 1 1 0%;
+}
+.epistemic-status {
+  background: #f3f3f3;
+  border: 1px solid #eee;
+  font-size: 0.98rem;
+  font-style: italic;
+  color: #444;
+  margin: 0 0 1rem 0;
+  padding: 0.5rem 0.8rem;
+  border-radius: 0;
+}
+.lw-title {
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+  text-align: left;
+}
+.lw-section {
+  margin: 0 0 0.7rem 0;
+  padding: 0;
+  border: none;
+}
+.lw-h2 {
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: #232323;
+  margin: 0 0 0.3rem 0;
+  border: none;
+  text-align: left;
+}
+.lw-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.5rem 0;
+}
+.lw-task-title {
+  font-weight: 600;
+  margin-right: 0.4rem;
+}
+.lw-task-status {
+  color: #b91c1c;
+  font-weight: 500;
+  border: 1px solid #ddd;
+  background: #f5f5f5;
+  border-radius: 0;
+  padding: 0.05rem 0.3rem;
+  margin-left: 0.4rem;
+  font-size: 0.98em;
+}
+.lw-task-status.due {
+  color: #92400e;
+}
+.lw-task-date {
+  color: #374151;
+  font-size: 0.97rem;
+  margin-left: 0.4rem;
+}
+.lw-btn {
+  display: inline-block;
+  border: 1px solid #aaa;
+  background: #eee;
+  color: #111;
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 1rem;
+  padding: 0.18rem 0.8rem;
+  border-radius: 0;
+  text-decoration: none;
+  margin: 0 0.3rem 0.3rem 0;
+  transition: background 0.15s, border-color 0.15s;
+  min-width: 0;
+}
+.lw-btn:hover {
+  background: #e2e2e2;
+  border-color: #888;
+}
+.lw-btn:active {
+  background: #e2e2e2;
+  border-color: #888;
+}
+.lw-btn:focus {
+  outline: 2px solid #2b6cb0;
+}
+.lw-btn-add {
+  border-color: #232323;
+  font-weight: 600;
+}
+.lw-link {
+  color: #2b6cb0;
+  text-decoration: underline;
+  border: 1px solid #bdbdbd;
+  border-radius: 0;
+  background: none;
+  padding: 0.1rem 0.5rem;
+  margin-right: 0.5rem;
+  font-size: 1.01rem;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  transition: border-color 0.15s, background 0.15s;
+}
+.lw-link:hover {
+  border-color: #232323;
+  background: #f5f5f5;
+}
+.lw-table-scroll {
+  overflow-x: auto;
+  margin-bottom: 0.5rem;
+}
+.lw-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.97rem;
+  background: none;
+  border: none;
+}
+.lw-table th, .lw-table td {
+  border: 1px solid #ddd;
+  padding: 0.18rem 0.3rem;
+  text-align: left;
+  font-family: Georgia, serif;
+}
+.lw-table th {
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-weight: 600;
+  background: #f5f5f5;
+}
+.lw-hr {
+  border: none;
+  border-bottom: 1px solid #ddd;
+  margin: 0.7rem 0 0.7rem 0;
+}
+.lw-nav-row {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 0.2rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+.lw-nav-row .lw-btn {
+  margin-bottom: 0;
+}
+@media (max-width: 900px) {
+  .lw-layout {
+    flex-direction: column;
+  }
+  .lw-main {
+    max-width: 100vw;
+    padding: 0.5rem 0.2rem 1rem 0.2rem;
+  }
+}
+</style> 
