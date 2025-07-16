@@ -24,8 +24,9 @@ function MasterTracker() {
       link: form.link.value,
       notes: form.notes.value,
       est_time: form.est_time.value,
-      time_left : intToFloat(form.est_time.value, 2)
+      time_left: parseFloat(form.est_time.value) || 0
     };
+    console.log(task);
     fetch('/api/tasks', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -37,6 +38,7 @@ function MasterTracker() {
         form.reset();
         setShowForm(false);
       });
+      console.log(res);
       fetch('/api/auth/calendar_events/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
