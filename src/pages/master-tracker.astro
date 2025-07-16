@@ -4,19 +4,12 @@ import MasterTracker from '../components/MasterTracker.jsx';
 ---
 <HeaderWhite />
 <main class="lw-main">
+  <div class="lw-header-row">
+    <h1 class="lw-title">Master Tracker</h1>
+    <a href="/dashboard" class="lw-btn lw-btn-back" aria-label="Return to Dashboard">Return to Dashboard</a>
+  </div>
   <div class="epistemic-status"><p><em>Epistemic status: This is your single source of truth for all tasks and assignments.</em></p></div>
-  <h1 class="lw-title">Master Tracker</h1>
-  <table class="lw-table">
-    <thead>
-      <tr>
-        <th>Class</th><th>Item</th><th>Type</th><th>Due Date</th><th>Status</th><th>Link</th><th>Notes</th>
-      </tr>
-    </thead>
-    <tbody>
-      <MasterTracker client:load />
-    </tbody>
-  </table>
-  <a href="/dashboard" class="lw-btn">Back to Dashboard</a>
+  <MasterTracker client:load />
 </main>
 <style>
 body {
@@ -38,12 +31,20 @@ body {
   background: #fff;
   flex: 1 1 0%;
 }
+.lw-header-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+}
 .lw-title {
+  margin: 0;
   font-family: 'Inter', Helvetica, Arial, sans-serif;
   font-size: 1.2rem;
   font-weight: 700;
-  margin: 0 0 1rem 0;
-  text-align: left;
+  color: #1a1a1a;
 }
 .epistemic-status {
   background: #f3f3f3;
@@ -88,6 +89,28 @@ body {
 .lw-btn:hover {
   background: #e2e2e2;
   border-color: #888;
+}
+.lw-btn-back {
+  border: 1px solid #aaa;
+  background: #eee;
+  color: #111;
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 1rem;
+  padding: 0.18rem 0.8rem;
+  border-radius: 0;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.15s, border-color 0.15s;
+  box-shadow: none;
+  outline: none;
+  display: inline-block;
+}
+.lw-btn-back:hover {
+  background: #e2e2e2;
+  border-color: #888;
+}
+.lw-btn-back:focus {
+  outline: 2px solid #2b6cb0;
 }
 @media (max-width: 900px) {
   .lw-layout {

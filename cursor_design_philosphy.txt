@@ -1,0 +1,186 @@
+Absolutely! Here’s a full LessWrong design style guide, starting from abstract principles and progressing all the way down to very specific UI/visual details — no rounded corners, minimal decoration, focused on clarity and neutrality, fitting the LessWrong ethos:
+LessWrong Design Style Guide
+1. Design Philosophy (Abstract Principles)
+
+    Minimalism & clarity: Design to reduce visual clutter, distraction, and ambiguity. Use minimal styling to highlight content and function.
+
+    Neutral and information-dense: Avoid flashy or decorative elements. Prioritize readability and ease of parsing large amounts of information.
+
+    Consistency and predictability: UI elements behave and look consistently, reducing cognitive load and improving user confidence.
+
+    Accessibility-first: Design interfaces that everyone can use, including keyboard navigation, screen readers, and color-blind friendly palettes.
+
+    Function-driven aesthetics: Form follows function; every visual decision must serve clarity, legibility, or usability.
+
+2. Layout & Structure
+
+    Use simple grid or flexbox layouts with clear structure.
+
+    Avoid complex or asymmetrical layouts unless necessary.
+
+    Content is contained in max-width containers (~700-900px) centered horizontally on the page for readability.
+
+    Use white space generously to separate content groups but avoid excess padding/margin that wastes space.
+
+    No floating or overlapping elements.
+
+    No sidebars or overlays that obscure primary content unless explicitly contextual.
+
+3. Typography
+
+    Use serif fonts for body text for readability and a scholarly feel (e.g., Georgia, serif).
+
+    Use sans-serif fonts for UI, headers, and labels (e.g., Inter, Helvetica, Arial).
+
+    Font sizes:
+
+        Body text: ~16px (1rem)
+
+        Headers: progressively larger but restrained (h1 ~1.2rem, h2 ~1.02rem, h3 ~1rem)
+
+    Font weights: Use normal (400) or medium (500-600) for emphasis; avoid ultra-bold or light fonts.
+
+    Line height: 1.4 to 1.6 for good readability.
+
+    Avoid all caps, italics only for subtle emphasis or citations.
+
+    Avoid decorative fonts.
+
+4. Color Palette
+
+    Use neutral colors for backgrounds and text:
+
+        Background: Very light gray or off-white (#f9f9f9 or #fff)
+
+        Primary text: Dark gray or near black (#1a1a1a)
+
+        Secondary text: Medium gray (#444 or #666)
+
+    Use blue tones for links and buttons (#2b6cb0 or similar).
+
+    Use red shades for errors or urgent statuses (#b91c1c).
+
+    Use yellow/orange for warnings or due soon (#92400e).
+
+    Avoid bright or saturated colors.
+
+    Avoid gradients, shadows, or glows.
+
+    Maintain high contrast for accessibility.
+
+    Avoid color combinations problematic for color blindness (use tools to check).
+
+5. UI Elements — Specifics
+Buttons
+
+    Rectangular, no rounded corners (0 border-radius).
+
+    Border: 1px solid neutral gray (#aaa) or blue (#2b6cb0) for primary.
+
+    Background: light gray (#eee) or white for default; blue background for primary buttons.
+
+    Text: dark gray or white depending on background.
+
+    Hover: slightly darker background or border.
+
+    Padding: 0.18rem vertical, 0.8rem horizontal.
+
+    Font: Inter or similar, 1rem.
+
+    No shadows or gradients.
+
+    No icon-only buttons; always use text labels.
+
+Links
+
+    Underlined text by default.
+
+    Color: blue (#2b6cb0).
+
+    On hover: underline remains, color darkens (#232323).
+
+    Border: 1px solid #bdbdbd for button-like links.
+
+    Background: none or very subtle.
+
+    Padding: 0.1rem vertical, 0.5rem horizontal.
+
+    No rounded corners.
+
+Inputs & Forms
+
+    Borders: 1px solid #ddd or #ccc.
+
+    Background: white.
+
+    Text color: #1a1a1a.
+
+    No rounded corners.
+
+    Padding: 0.3rem vertical, 0.5rem horizontal.
+
+    Font: inherit from body.
+
+    Focus: outline with solid 2px blue (#2b6cb0), no shadows.
+
+    Labels above inputs, left-aligned, medium font weight.
+
+Tables
+
+    Full width tables with border-collapse: collapse.
+
+    Borders: 1px solid #ddd for cells.
+
+    Header background: #f5f5f5.
+
+    Header font-weight: 600.
+
+    No rounded corners.
+
+    Row hover: light gray background (#f9f9f9).
+
+    Font: serif for content, sans-serif for headers.
+
+6. Icons & Images
+
+    Use icons sparingly and only where they add clarity.
+
+    No decorative or flashy icons.
+
+    Prefer simple line icons or small SVGs.
+
+    Avoid drop shadows or color gradients on icons.
+
+    Alt text required for accessibility.
+
+7. Spacing & Sizing
+
+    Use a modular scale for spacing, e.g. multiples of 4px or 8px.
+
+    Margins and padding for text blocks: 0.5rem to 1rem.
+
+    No excessive gaps or uneven spacing.
+
+    Buttons and clickable elements should have minimum touch target of 44x44px.
+
+8. Interactions & Animations
+
+    Use minimal animations; only subtle fade or instant feedback.
+
+    Avoid bouncing, sliding, or elaborate transitions.
+
+    Focus states clearly visible (blue outline).
+
+    No automatic pop-ups or modals that distract.
+
+9. Accessibility
+
+    Use semantic HTML5 tags: <main>, <section>, <nav>, <header>.
+
+    Provide aria-label and roles where necessary.
+
+    All interactive elements keyboard accessible.
+
+    Sufficient color contrast (AA level).
+
+    Screen reader friendly order and labels.

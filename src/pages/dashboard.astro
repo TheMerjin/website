@@ -1,13 +1,83 @@
 ---
 import HeaderWhite from '../components/HeaderWhite.astro';
 let tasks: any[] = [];
+
+const cookie = Astro.request.headers.get('cookie') || '';
 try {
-  const res = await fetch('/api/tasks');
+  const res = await fetch('http://localhost:4321/api/tasks', {
+  headers: { cookie }
+});
   const data = await res.json();
-  tasks = (data.tasks || []).sort((a: any, b: any) => new Date(a.due_date).getTime() - new Date(b.due_date).getTime()).slice(0, 5);
+  console.log("Hi");
+  console.log(data);
+  tasks = (data.tasks || []).sort(
+    (a: any, b: any) => new Date(a.due_date).getTime() - new Date(b.due_date).getTime()
+  )
 } catch (e) {
+  console.log(e);
+  console.log("Here");
   tasks = [];
 }
+
+// Helper to compute task priority
+function computePriority(task: any): number {
+  const dbDate = new Date(task.due_date);
+  const now = new Date();
+  const diffMs = now.getTime() - dbDate.getTime();
+
+  const diffDays = Math.max(1, Math.floor(diffMs / (1000 * 60 * 60 * 24))); // Avoid div by 0
+
+  // You can tweak this formula for urgency
+  return (5 / diffDays) + (task.est_time || 1) + ((task.est_time || 1) / diffDays);
+}
+
+let task_priority: Record<string, number> = {};
+for (const task of tasks) {
+  task_priority[task.id] = computePriority(task);
+}
+console.log(tasks);
+console.log("Task prioirty");
+console.log(task_priority);
+const sortedEntries = Object.entries(task_priority)
+  .sort(([, a], [, b]) => b - a); // Sort by value, descending
+console.log(sortedEntries);
+// Filter out tasks with status "Done"
+const incompleteTasks = tasks.filter(task => task.status !== "Done");
+
+// Sort those by their priority (descending)
+const sortedIncompleteTasks = incompleteTasks.sort((a, b) => {
+  const priorityA = task_priority[a.id] || 0;
+  const priorityB = task_priority[b.id] || 0;
+  return priorityB - priorityA; // descending order
+});
+
+// Get the top 2 tasks
+const topTwoTasks = sortedIncompleteTasks.slice(0, 2);
+
+// Get the 3rd and 4th priority tasks for "Next 7 Days"
+const nextTwoTasks = sortedIncompleteTasks.slice(2, 4);
+
+console.log("Top 2 tasks (not Done):", topTwoTasks);
+console.log("Next 2 tasks (not Done):", nextTwoTasks);
+
+// Helper function to get days from now
+function getDaysFromNow(dueDate: string): string {
+  const due = new Date(dueDate);
+  const now = new Date();
+  const diffTime = due.getTime() - now.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  
+  if (diffDays < 0) {
+    return `${Math.abs(diffDays)} days overdue`;
+  } else if (diffDays === 0) {
+    return "Due today";
+  } else if (diffDays === 1) {
+    return "Due tomorrow";
+  } else {
+    return `Due in ${diffDays} days`;
+  }
+}
+
 ---
 <HeaderWhite />
 <main class="lw-main">
@@ -16,13 +86,68 @@ try {
   <section class="lw-section">
     <h2 class="lw-h2">Today's Tasks</h2>
     <ul class="lw-list">
-      <li><span class="lw-task-title">Math HW 5.2</span> <span class="lw-task-status overdue">Overdue</span></li>
-      <li><span class="lw-task-title">English Essay Draft</span> <span class="lw-task-status due">Due Today</span></li>
+      {topTwoTasks.length === 0 ? (
+        <li style="color:#888;font-style:italic;">No tasks for today.</li>
+      ) : (
+        topTwoTasks.map(task => {
+          const dueDate = new Date(task.due_date);
+          const daysFromNow = getDaysFromNow(task.due_date);
+          const isOverdue = dueDate < new Date();
+          let percentCompleted = null;
+          if (task.est_time && task.time_left !== null && task.time_left !== undefined && Number(task.est_time) > 0) {
+            percentCompleted = Math.max(0, Math.min(1, 1 - (Number(task.time_left) / Number(task.est_time))));
+          }
+          
+          return (
+            <li class="lw-task-item">
+              <div class="lw-task-content">
+                <span class="lw-task-title">
+                  <a href={`/tasks/${task.id}`} class="lw-task-link">{task.item}</a>
+                </span>
+                <span class="lw-task-class">{task.class}</span>
+              </div>
+              <div class="lw-task-meta">
+                <span class="lw-task-date">{dueDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
+                <span class={`lw-task-status ${isOverdue ? 'overdue' : ''}`}>
+                  {daysFromNow}
+                </span>
+                <span class="lw-task-percent{percentCompleted === 0 ? ' lw-task-percent-zero' : ''}">
+                  {percentCompleted !== null ? `${Math.round(percentCompleted * 100)}% completed` : 'N/A'}
+                </span>
+              </div>
+            </li>
+          );
+        })
+      )}
     </ul>
     <h2 class="lw-h2">Next 7 Days</h2>
     <ul class="lw-list">
-      <li><span class="lw-task-title">Bio Quiz</span> <span class="lw-task-date">Thu</span></li>
-      <li><span class="lw-task-title">History Project</span> <span class="lw-task-date">Mon</span></li>
+      {nextTwoTasks.length === 0 ? (
+        <li style="color:#888;font-style:italic;">No tasks for the next 7 days.</li>
+      ) : (
+        nextTwoTasks.map(task => {
+          const dueDate = new Date(task.due_date);
+          const daysFromNow = getDaysFromNow(task.due_date);
+          const isOverdue = dueDate < new Date();
+          
+          return (
+            <li class="lw-task-item">
+              <div class="lw-task-content">
+                <span class="lw-task-title">
+                  <a href={`/tasks/${task.id}`} class="lw-task-link">{task.item}</a>
+                </span>
+                <span class="lw-task-class">{task.class}</span>
+              </div>
+              <div class="lw-task-meta">
+                <span class="lw-task-date">{dueDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
+                <span class={`lw-task-status ${isOverdue ? 'overdue' : ''}`}>
+                  {daysFromNow}
+                </span>
+              </div>
+            </li>
+          );
+        })
+      )}
     </ul>
     <button class="lw-btn lw-btn-add">Quick Add Task/Note</button>
     <a href="/notes" class="lw-link">Go to Daily Notes</a>
@@ -51,7 +176,7 @@ try {
           {tasks.map((task: any) => (
             <tr>
               <td>{task.class}</td>
-              <td>{task.item}</td>
+              <td><a href={`/tasks/${task.id}`} class="lw-task-link">{task.item}</a></td>
               <td>{task.type}</td>
               <td>{task.due_date}</td>
               <td>{task.status}</td>
@@ -120,32 +245,70 @@ body {
   border: none;
   text-align: left;
 }
+.lw-h3 {
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #232323;
+  margin: 0 0.3rem 0 0;
+}
 .lw-list {
   list-style: none;
   padding: 0;
   margin: 0 0 0.5rem 0;
 }
+.lw-task-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0.3rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+.lw-task-item:last-child {
+  border-bottom: none;
+}
+.lw-task-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
 .lw-task-title {
   font-weight: 600;
-  margin-right: 0.4rem;
+  color: #1a1a1a;
+  font-size: 0.98rem;
+}
+.lw-task-class {
+  font-size: 0.9rem;
+  color: #666;
+  font-style: italic;
+}
+.lw-task-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.1rem;
+  min-width: 120px;
+}
+.lw-task-date {
+  color: #374151;
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 .lw-task-status {
-  color: #b91c1c;
+  color: #92400e;
   font-weight: 500;
   border: 1px solid #ddd;
   background: #f5f5f5;
   border-radius: 0;
   padding: 0.05rem 0.3rem;
-  margin-left: 0.4rem;
-  font-size: 0.98em;
+  font-size: 0.85em;
+  text-align: center;
 }
-.lw-task-status.due {
-  color: #92400e;
-}
-.lw-task-date {
-  color: #374151;
-  font-size: 0.97rem;
-  margin-left: 0.4rem;
+.lw-task-status.overdue {
+  color: #b91c1c;
+  background: #fef2f2;
+  border-color: #fecaca;
 }
 .lw-btn {
   display: inline-block;
@@ -191,6 +354,13 @@ body {
 .lw-link:hover {
   border-color: #232323;
   background: #f5f5f5;
+}
+.lw-quicklinks {
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.3rem;
 }
 .lw-table-scroll {
   overflow-x: auto;
@@ -239,5 +409,48 @@ body {
     max-width: 100vw;
     padding: 0.5rem 0.2rem 1rem 0.2rem;
   }
+  .lw-task-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
+  }
+  .lw-task-meta {
+    align-items: flex-start;
+    min-width: auto;
+  }
+}
+.lw-task-link {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  border-radius: 0;
+  outline: none;
+  transition: background 0.15s, color 0.15s;
+  padding: 0.02rem 0.2rem;
+  margin: -0.02rem -0.2rem;
+  display: inline-block;
+}
+.lw-task-link:hover, .lw-task-link:focus {
+  background: #f5f5f5;
+  color: #888;
+}
+.lw-task-percent {
+  display: inline-block;
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 0.98rem;
+  color: #444;
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 0;
+  padding: 0.05rem 0.3rem;
+  margin-top: 0.15rem;
+  margin-left: 0.2rem;
+  text-align: right;
+  min-width: 80px;
+}
+.lw-task-percent-zero {
+  font-size: 0.92rem;
+  color: #888;
+  min-width: 60px;
 }
 </style> 

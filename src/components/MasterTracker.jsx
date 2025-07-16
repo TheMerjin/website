@@ -23,7 +23,8 @@ function MasterTracker() {
       status: form.status.value || 'To Do',
       link: form.link.value,
       notes: form.notes.value,
-      est_time: form.est_time.value
+      est_time: form.est_time.value,
+      time_left : intToFloat(form.est_time.value, 2)
     };
     fetch('/api/tasks', {
       method: 'POST',
@@ -185,59 +186,60 @@ function MasterTracker() {
               </tr>
             </thead>
             <tbody>
-              {tasks.map(task => (
-                <tr key={task.id} style={{ borderBottom: '1px solid #eee' }}>
-                  <td style={{ border: 'none', borderRight: '1px solid #f3f3f3', padding: '7px 6px', color: '#222' }}>{task.class}</td>
-                  <td style={{ border: 'none', borderRight: '1px solid #f3f3f3', padding: '7px 6px', color: '#222' }}>{task.item}</td>
-                  <td style={{ border: 'none', borderRight: '1px solid #f3f3f3', padding: '7px 6px', color: '#222' }}>{task.type}</td>
-                  <td style={{ border: 'none', borderRight: '1px solid #f3f3f3', padding: '7px 6px', color: '#222' }}>{task.due_date}</td>
-                  <td style={{ border: 'none', borderRight: '1px solid #f3f3f3', padding: '7px 6px', color: '#222' }}>{task.est_time}</td>
-                  <td style={{ border: 'none', borderRight: '1px solid #f3f3f3', padding: '7px 6px', color: '#222' }}>
-                    <select
-                      value={task.status}
-                      onChange={e => handleStatusChange(task.id, e.target.value)}
-                      style={{
-                        border: '1px solid #bbb',
-                        borderRadius: 0,
-                        background: '#fff',
-                        color: '#222',
-                        fontFamily: 'Georgia, serif',
-                        fontSize: 15,
-                        padding: '3px 8px',
-                        outline: 'none',
-                        minWidth: 110
-                      }}
-                    >
-                      {STATUS_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                    </select>
-                  </td>
-                  <td style={{ border: 'none', borderRight: '1px solid #f3f3f3', padding: '7px 6px', color: '#222' }}>
-                    {task.link && <a href={task.link} style={{ color: '#2b6cb0', textDecoration: 'underline', wordBreak: 'break-all' }}>{task.link}</a>}
-                  </td>
-                  <td style={{ border: 'none', borderRight: '1px solid #f3f3f3', padding: '7px 6px', color: '#222' }}>{task.notes}</td>
-                  <td style={{ border: 'none', padding: '7px 6px' }}>
-                    <button
-                      style={{
-                        borderRadius: 0,
-                        border: '1px solid #aaa',
-                        backgroundColor: '#f3f3f3',
-                        color: '#111',
-                        padding: '4px 12px',
-                        fontFamily: 'Inter, Helvetica, Arial, sans-serif',
-                        fontWeight: 500,
-                        fontSize: '14px',
-                        cursor: 'pointer',
-                        boxShadow: 'none',
-                        outline: 'none'
-                      }}
-                      onClick={() => handleDeleteTask(task.id)}
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-              {tasks.length === 0 && (
+              {Array.isArray(tasks) && tasks.length > 0 ? (
+                tasks.filter(Boolean).map(task => (
+                  <tr key={task.id} style={{ borderBottom: '1px solid #eee' }}>
+                    <td style={{ border: 'none', borderRight: '1px solid #f3f3f3', padding: '7px 6px', color: '#222' }}>{task.class}</td>
+                    <td style={{ border: 'none', borderRight: '1px solid #f3f3f3', padding: '7px 6px', color: '#222' }}>{task.item}</td>
+                    <td style={{ border: 'none', borderRight: '1px solid #f3f3f3', padding: '7px 6px', color: '#222' }}>{task.type}</td>
+                    <td style={{ border: 'none', borderRight: '1px solid #f3f3f3', padding: '7px 6px', color: '#222' }}>{task.due_date}</td>
+                    <td style={{ border: 'none', borderRight: '1px solid #f3f3f3', padding: '7px 6px', color: '#222' }}>{task.est_time}</td>
+                    <td style={{ border: 'none', borderRight: '1px solid #f3f3f3', padding: '7px 6px', color: '#222' }}>
+                      <select
+                        value={task.status}
+                        onChange={e => handleStatusChange(task.id, e.target.value)}
+                        style={{
+                          border: '1px solid #bbb',
+                          borderRadius: 0,
+                          background: '#fff',
+                          color: '#222',
+                          fontFamily: 'Georgia, serif',
+                          fontSize: 15,
+                          padding: '3px 8px',
+                          outline: 'none',
+                          minWidth: 110
+                        }}
+                      >
+                        {STATUS_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                      </select>
+                    </td>
+                    <td style={{ border: 'none', borderRight: '1px solid #f3f3f3', padding: '7px 6px', color: '#222' }}>
+                      {task.link && <a href={task.link} style={{ color: '#2b6cb0', textDecoration: 'underline', wordBreak: 'break-all' }}>{task.link}</a>}
+                    </td>
+                    <td style={{ border: 'none', borderRight: '1px solid #f3f3f3', padding: '7px 6px', color: '#222' }}>{task.notes}</td>
+                    <td style={{ border: 'none', padding: '7px 6px' }}>
+                      <button
+                        style={{
+                          borderRadius: 0,
+                          border: '1px solid #aaa',
+                          backgroundColor: '#f3f3f3',
+                          color: '#111',
+                          padding: '4px 12px',
+                          fontFamily: 'Inter, Helvetica, Arial, sans-serif',
+                          fontWeight: 500,
+                          fontSize: '14px',
+                          cursor: 'pointer',
+                          boxShadow: 'none',
+                          outline: 'none'
+                        }}
+                        onClick={() => handleDeleteTask(task.id)}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
                 <tr>
                   <td colSpan={9} style={{ textAlign: 'center', color: '#888', padding: 24, fontFamily: 'Inter, Helvetica, Arial, sans-serif', fontSize: 15 }}>
                     No tasks found.
