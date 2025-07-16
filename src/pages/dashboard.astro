@@ -23,12 +23,29 @@ try {
 function computePriority(task: any): number {
   const dbDate = new Date(task.due_date);
   const now = new Date();
-  const diffMs = now.getTime() - dbDate.getTime();
-
-  const diffDays = Math.max(1, Math.floor(diffMs / (1000 * 60 * 60 * 24))); // Avoid div by 0
-
-  // You can tweak this formula for urgency
-  return (5 / diffDays) + (task.est_time || 1) + ((task.est_time || 1) / diffDays);
+  const diffMs = dbDate.getTime() - now.getTime();
+  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+  
+  const estTime = Number(task.est_time) || 1;
+  const timeLeft = Number(task.time_left) || estTime;
+  const completionRatio = Math.max(0, Math.min(1, (estTime - timeLeft) / estTime));
+  
+  // Base urgency: higher for tasks due sooner (negative for overdue)
+  const timeUrgency = diffDays <= 0 ? 20 + Math.abs(diffDays) * 2 : 10 / Math.max(1, diffDays);
+  
+  // Time investment factor: prioritize tasks that take more time
+  const timeInvestment = Math.min(estTime / 2, 5); // Cap at 5 to avoid overwhelming other factors
+  
+  // Completion bonus: slightly prioritize tasks that are more completed
+  const completionBonus = completionRatio * 3;
+  
+  // Overdue penalty: heavily penalize overdue tasks
+  const overduePenalty = diffDays < 0 ? Math.abs(diffDays) * 5 : 0;
+  
+  // Final priority calculation
+  const priority = timeUrgency + timeInvestment + completionBonus - overduePenalty;
+  
+  return Math.max(0, priority); // Ensure non-negative priority
 }
 
 let task_priority: Record<string, number> = {};
@@ -111,6 +128,9 @@ function getDaysFromNow(dueDate: string): string {
                 <span class={`lw-task-status ${isOverdue ? 'overdue' : ''}`}>
                   {daysFromNow}
                 </span>
+                <span class="lw-task-priority">
+                  Priority: {Math.round(task_priority[task.id] || 0)}
+                </span>
                 <span class="lw-task-percent{percentCompleted === 0 ? ' lw-task-percent-zero' : ''}">
                   {percentCompleted !== null ? `${Math.round(percentCompleted * 100)}% completed` : 'N/A'}
                 </span>
@@ -142,6 +162,9 @@ function getDaysFromNow(dueDate: string): string {
                 <span class="lw-task-date">{dueDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
                 <span class={`lw-task-status ${isOverdue ? 'overdue' : ''}`}>
                   {daysFromNow}
+                </span>
+                <span class="lw-task-priority">
+                  Priority: {Math.round(task_priority[task.id] || 0)}
                 </span>
               </div>
             </li>
@@ -452,5 +475,19 @@ body {
   font-size: 0.92rem;
   color: #888;
   min-width: 60px;
+}
+.lw-task-priority {
+  display: inline-block;
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 0.95rem;
+  color: #666;
+  background: #f8f8f8;
+  border: 1px solid #ddd;
+  border-radius: 0;
+  padding: 0.05rem 0.3rem;
+  margin-top: 0.15rem;
+  margin-left: 0.2rem;
+  text-align: right;
+  min-width: 90px;
 }
 </style> 

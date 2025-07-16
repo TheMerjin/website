@@ -42,124 +42,278 @@ if (query) {
 }
 ---
 <WebsiteLayout>
-<div style={{ display: 'flex', margin: '20px auto', maxWidth: '1200px', padding: '0 20px' }}>
+<div class="search-container">
   {/* Filters Section */}
-  <div style={{ flex: '0 0 250px', marginRight: '40px', paddingTop: '10px' }}>
-    <h2 style={{ marginBottom: '20px' }}>Filters</h2>
+  <div class="filters-section">
+    <h2 class="filters-title">Filters</h2>
 
     {/* Filter by posted date */}
-    <div style={{ marginBottom: '20px' }}>
-      <div style={{ fontWeight: '600', marginBottom: '10px' }}>Filter by posted date</div>
-      <div>
-        <label style={{ display: 'block', marginBottom: '5px' }}>
+    <div class="filter-group">
+      <div class="filter-label">Filter by posted date</div>
+      <div class="radio-group">
+        <label class="radio-label">
           <input type="radio" name="post_date" value="all" checked /> All
         </label>
-        <label style={{ display: 'block', marginBottom: '5px' }}>
+        <label class="radio-label">
           <input type="radio" name="post_date" value="24h" /> Past 24 hours
         </label>
-        <label style={{ display: 'block', marginBottom: '5px' }}>
+        <label class="radio-label">
           <input type="radio" name="post_date" value="week" /> Past week
         </label>
-        <label style={{ display: 'block', marginBottom: '5px' }}>
+        <label class="radio-label">
           <input type="radio" name="post_date" value="month" /> Past month
         </label>
-        <label style={{ display: 'block', marginBottom: '5px' }}>
+        <label class="radio-label">
           <input type="radio" name="post_date" value="year" /> Past year
         </label>
       </div>
     </div>
 
     {/* Filter by wikilags */}
-    <div style={{ marginBottom: '20px' }}>
+    <div class="filter-group">
       <input
         type="text"
         placeholder="Filter by wikilags"
-        style={{
-          width: '100%',
-          padding: '8px',
-          border: '1px solid #ccc',
-          borderRadius: '4px',
-          outline: 'none',
-        }}
+        class="filter-input"
       />
     </div>
 
     {/* Checkboxes */}
-    <div style={{ marginBottom: '20px' }}>
-      <label style={{ display: 'block', marginBottom: '10px' }}>
+    <div class="filter-group">
+      <label class="checkbox-label">
         <input type="checkbox" /> Curated
       </label>
-      <label style={{ display: 'block', marginBottom: '10px' }}>
+      <label class="checkbox-label">
         <input type="checkbox" checked /> Exclude events
       </label>
     </div>
 
-    <button
-      style={{
-        background: 'none',
-        border: 'none',
-        color: '#007bff',
-        cursor: 'pointer',
-        padding: '0',
-        fontSize: '0.9rem',
-      }}
-    >
+    <button class="clear-filters-btn">
       Clear all filters
     </button>
   </div>
 
   {/* Search Results Section (hydrated React) */}
-  <div style={{ flex: 1 }}>
+  <div class="results-section">
     <SearchResults initialResults={initialResults} initialQuery={query} client:load />
   </div>
 </div>
 
 <style>
+  .search-container {
+    display: flex;
+    flex-direction: column;
+    margin: 20px auto;
+    max-width: 1200px;
+    padding: 0 20px;
+    gap: 20px;
+  }
+
+  .filters-section {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 0;
+    padding: 20px;
+    font-family: 'Inter', Helvetica, Arial, sans-serif;
+  }
+
+  .filters-title {
+    font-size: 1.02rem;
+    font-weight: 600;
+    color: #232323;
+    margin: 0 0 20px 0;
+    border: none;
+  }
+
+  .filter-group {
+    margin-bottom: 20px;
+  }
+
+  .filter-label {
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #1a1a1a;
+    font-size: 0.95rem;
+  }
+
+  .radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .radio-label, .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    color: #1a1a1a;
+    cursor: pointer;
+  }
+
+  .filter-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 0;
+    outline: none;
+    font-family: inherit;
+    font-size: 0.95rem;
+    background: #fff;
+    color: #1a1a1a;
+  }
+
+  .filter-input:focus {
+    outline: 2px solid #2b6cb0;
+    border-color: #2b6cb0;
+  }
+
+  .clear-filters-btn {
+    background: none;
+    border: none;
+    color: #2b6cb0;
+    cursor: pointer;
+    padding: 0;
+    font-size: 0.9rem;
+    font-family: inherit;
+    text-decoration: underline;
+  }
+
+  .clear-filters-btn:hover {
+    color: #232323;
+  }
+
+  .results-section {
+    flex: 1;
+  }
+
+  /* Desktop layout */
+  @media (min-width: 768px) {
+    .search-container {
+      flex-direction: row;
+      align-items: flex-start;
+    }
+
+    .filters-section {
+      flex: 0 0 250px;
+      margin-right: 40px;
+      position: sticky;
+      top: 20px;
+    }
+
+    .results-section {
+      flex: 1;
+    }
+  }
+
+  /* Mobile optimizations */
+  @media (max-width: 767px) {
+    .search-container {
+      padding: 0 10px;
+      margin: 10px auto;
+    }
+
+    .filters-section {
+      padding: 15px;
+    }
+
+    .filters-title {
+      font-size: 1rem;
+      margin-bottom: 15px;
+    }
+
+    .filter-group {
+      margin-bottom: 15px;
+    }
+
+    .radio-group {
+      gap: 6px;
+    }
+
+    .radio-label, .checkbox-label {
+      font-size: 0.9rem;
+    }
+
+    .filter-input {
+      padding: 6px;
+      font-size: 0.9rem;
+    }
+  }
+
   .search-post-card {
     margin: 0 auto;
     max-width: 900px;
-    padding: 32px 36px 28px 36px;
-    margin-bottom: 40px;
-    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 0;
     background: #fff;
-    box-shadow: 0 4px 24px 0 rgba(60,60,60,0.10), 0 2px 8px 0 rgba(60,60,60,0.06);
-    border: 1px solid #ececec;
-    transition: box-shadow 0.2s, background 0.2s;
+    border: 1px solid #ddd;
+    transition: background 0.15s;
     cursor: pointer;
     position: relative;
+    box-shadow: none;
   }
+
   .search-post-card:hover {
-    background: #f8f4f0;
-    box-shadow: 0 8px 32px 0 rgba(60,60,60,0.16), 0 4px 16px 0 rgba(60,60,60,0.10);
+    background: #f9f9f9;
   }
+
   .search-post-title {
-    font-size: 1.35rem;
-    font-weight: 700;
-    margin-bottom: 18px;
-    letter-spacing: -0.01em;
-    line-height: 1.2;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    line-height: 1.3;
+    font-family: 'Inter', Helvetica, Arial, sans-serif;
   }
+
   .search-post-title a {
     text-decoration: none;
-    color: #222;
-    transition: color 0.2s;
+    color: #1a1a1a;
+    transition: color 0.15s;
   }
+
   .search-post-title a:hover {
     color: #666;
   }
+
   .search-post-meta {
-    font-size: 1.05rem;
-    color: #888;
-    margin-bottom: 22px;
+    font-size: 0.95rem;
+    color: #666;
+    margin-bottom: 15px;
     font-weight: 500;
-    letter-spacing: 0.01em;
+    font-family: 'Inter', Helvetica, Arial, sans-serif;
   }
+
   .search-post-content {
-    font-size: 1.13rem;
-    line-height: 1.7;
-    color: #333;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #1a1a1a;
     margin-bottom: 0;
     word-break: break-word;
+    font-family: Georgia, serif;
+  }
+
+  /* Mobile post card adjustments */
+  @media (max-width: 767px) {
+    .search-post-card {
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+
+    .search-post-title {
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+    }
+
+    .search-post-meta {
+      font-size: 0.9rem;
+      margin-bottom: 12px;
+    }
+
+    .search-post-content {
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
   }
 </style>
 </WebsiteLayout>

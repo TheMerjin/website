@@ -5,12 +5,17 @@ const STATUS_OPTIONS = ['To Do', 'In Progress', 'Done'];
 function MasterTracker() {
   const [tasks, setTasks] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [showOnlyIncomplete, setShowOnlyIncomplete] = useState(false);
 
   useEffect(() => {
     fetch('/api/tasks')
       .then(res => res.json())
       .then(data => setTasks(data.tasks || []));
   }, []);
+
+  const filteredTasks = showOnlyIncomplete 
+    ? tasks.filter(task => task.status !== "Done")
+    : tasks;
 
   function handleAddTask(e) {
     e.preventDefault();
@@ -96,6 +101,27 @@ function MasterTracker() {
             onClick={() => setShowForm(f => !f)}
           >
             {showForm ? 'Cancel' : 'Add Task'}
+          </button>
+          <button
+            style={{
+              borderRadius: 0,
+              border: '1px solid #aaa',
+              backgroundColor: showOnlyIncomplete ? '#e2e2e2' : '#f3f3f3',
+              color: '#111',
+              padding: '7px 18px',
+              fontFamily: 'Inter, Helvetica, Arial, sans-serif',
+              fontWeight: 500,
+              fontSize: '15px',
+              marginTop: '8px',
+              cursor: 'pointer',
+              boxShadow: 'none',
+              outline: 'none',
+              transition: 'background 0.1s',
+              borderColor: showOnlyIncomplete ? '#888' : '#aaa'
+            }}
+            onClick={() => setShowOnlyIncomplete(f => !f)}
+          >
+            {showOnlyIncomplete ? 'Show All Tasks' : 'Show Incomplete Only'}
           </button>
         </div>
         {showForm && (
@@ -188,8 +214,8 @@ function MasterTracker() {
               </tr>
             </thead>
             <tbody>
-              {Array.isArray(tasks) && tasks.length > 0 ? (
-                tasks.filter(Boolean).map(task => (
+              {Array.isArray(filteredTasks) && filteredTasks.length > 0 ? (
+                filteredTasks.filter(Boolean).map(task => (
                   <tr key={task.id} style={{ borderBottom: '1px solid #eee' }}>
                     <td style={{ border: 'none', borderRight: '1px solid #f3f3f3', padding: '7px 6px', color: '#222' }}>{task.class}</td>
                     <td style={{ border: 'none', borderRight: '1px solid #f3f3f3', padding: '7px 6px', color: '#222' }}>{task.item}</td>
@@ -216,7 +242,24 @@ function MasterTracker() {
                       </select>
                     </td>
                     <td style={{ border: 'none', borderRight: '1px solid #f3f3f3', padding: '7px 6px', color: '#222' }}>
-                      {task.link && <a href={task.link} style={{ color: '#2b6cb0', textDecoration: 'underline', wordBreak: 'break-all' }}>{task.link}</a>}
+                      {task.link ? (
+                        <a href={task.link} style={{ 
+                          color: '#2b6cb0', 
+                          textDecoration: 'none', 
+                          fontFamily: 'Inter, Helvetica, Arial, sans-serif',
+                          fontSize: '0.95rem',
+                          transition: 'color 0.15s, text-decoration 0.15s'
+                        }} 
+                        onMouseEnter={(e) => e.target.style.textDecoration = 'underline'}
+                        onMouseLeave={(e) => e.target.style.textDecoration = 'none'}
+                        onFocus={(e) => e.target.style.textDecoration = 'underline'}
+                        onBlur={(e) => e.target.style.textDecoration = 'none'}
+                        >
+                          here
+                        </a>
+                      ) : (
+                        <span style={{ color: '#888', fontStyle: 'italic' }}>None</span>
+                      )}
                     </td>
                     <td style={{ border: 'none', borderRight: '1px solid #f3f3f3', padding: '7px 6px', color: '#222' }}>{task.notes}</td>
                     <td style={{ border: 'none', padding: '7px 6px' }}>
@@ -244,7 +287,7 @@ function MasterTracker() {
               ) : (
                 <tr>
                   <td colSpan={9} style={{ textAlign: 'center', color: '#888', padding: 24, fontFamily: 'Inter, Helvetica, Arial, sans-serif', fontSize: 15 }}>
-                    No tasks found.
+                    {showOnlyIncomplete ? 'No incomplete tasks found.' : 'No tasks found.'}
                   </td>
                 </tr>
               )}
