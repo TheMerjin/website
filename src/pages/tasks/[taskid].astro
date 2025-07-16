@@ -7,7 +7,7 @@ let task = null;
 let tasks = null;
 const cookie = Astro.request.headers.get('cookie') || '';
 try {
-  const res = await fetch(`http://localhost:4321/api/tasks`, {
+  const res = await fetch(`${import.meta.env.PUBLIC_API_URL}api/tasks`, {
     headers: { cookie }
   });
   
