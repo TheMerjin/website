@@ -7,6 +7,19 @@ function MasterTracker() {
   const [showForm, setShowForm] = useState(false);
   const [showOnlyIncomplete, setShowOnlyIncomplete] = useState(false);
 
+  const taskItemLinkStyle = {
+    color: '#1a1a1a',
+    textDecoration: 'none',
+    borderRadius: 0,
+    outline: 'none',
+    transition: 'background 0.15s, color 0.15s',
+    padding: '0.02rem 0.2rem',
+    margin: '-0.02rem -0.2rem',
+    display: 'inline-block',
+    fontSize: '0.98rem',
+    fontFamily: 'Inter, Helvetica, Arial, sans-serif',
+  };
+
   useEffect(() => {
     fetch('/api/tasks')
       .then(res => res.json())
@@ -54,7 +67,7 @@ function MasterTracker() {
           description: form.class.value + " " + form.item.value+ form.type.value + form.status.value + form.link.value + form.notes.value,
           color: "grey",
         }),
-      });
+      }).then(console.log(res));
   }
 
   function handleDeleteTask(id) {
@@ -218,7 +231,19 @@ function MasterTracker() {
                 filteredTasks.filter(Boolean).map(task => (
                   <tr key={task.id} style={{ borderBottom: '1px solid #eee' }}>
                     <td style={{ border: 'none', borderRight: '1px solid #f3f3f3', padding: '7px 6px', color: '#222' }}>{task.class}</td>
-                    <td style={{ border: 'none', borderRight: '1px solid #f3f3f3', padding: '7px 6px', color: '#222' }}>{task.item}</td>
+                    <td style={{ border: 'none', borderRight: '1px solid #f3f3f3', padding: '7px 6px', color: '#222' }}>
+                      <a
+                        href={`/tasks/${task.id}`}
+                        style={taskItemLinkStyle}
+                        onMouseEnter={e => { e.target.style.background = '#f5f5f5'; e.target.style.color = '#888'; }}
+                        onMouseLeave={e => { e.target.style.background = 'none'; e.target.style.color = '#1a1a1a'; }}
+                        onFocus={e => { e.target.style.background = '#f5f5f5'; e.target.style.color = '#888'; e.target.style.outline = '2px solid #2b6cb0'; }}
+                        onBlur={e => { e.target.style.background = 'none'; e.target.style.color = '#1a1a1a'; e.target.style.outline = 'none'; }}
+                        tabIndex={0}
+                      >
+                        {task.item}
+                      </a>
+                    </td>
                     <td style={{ border: 'none', borderRight: '1px solid #f3f3f3', padding: '7px 6px', color: '#222' }}>{task.type}</td>
                     <td style={{ border: 'none', borderRight: '1px solid #f3f3f3', padding: '7px 6px', color: '#222' }}>{task.due_date}</td>
                     <td style={{ border: 'none', borderRight: '1px solid #f3f3f3', padding: '7px 6px', color: '#222' }}>{task.est_time}</td>
