@@ -8,14 +8,10 @@ try {
   headers: { cookie }
 });
   const data = await res.json();
-  console.log("Hi");
-  console.log(data);
   tasks = (data.tasks || []).sort(
     (a: any, b: any) => new Date(a.due_date).getTime() - new Date(b.due_date).getTime()
   )
 } catch (e) {
-  console.log(e);
-  console.log("Here");
   tasks = [];
 }
 
@@ -52,12 +48,10 @@ let task_priority: Record<string, number> = {};
 for (const task of tasks) {
   task_priority[task.id] = computePriority(task);
 }
-console.log(tasks);
-console.log("Task prioirty");
-console.log(task_priority);
+
 const sortedEntries = Object.entries(task_priority)
   .sort(([, a], [, b]) => b - a); // Sort by value, descending
-console.log(sortedEntries);
+
 // Filter out tasks with status "Done"
 const incompleteTasks = tasks.filter(task => task.status !== "Done");
 
@@ -68,21 +62,29 @@ const sortedIncompleteTasks = incompleteTasks.sort((a, b) => {
   return priorityB - priorityA; // descending order
 });
 
-// Get the top 2 tasks
+// Get the top 2 tasks (excluding Done tasks)
 const topTwoTasks = sortedIncompleteTasks.slice(0, 2);
+console.log("top tasks");
+console.log(topTwoTasks);
 
-// Get the 3rd and 4th priority tasks for "Next 7 Days"
+// Get the 3rd and 4th priority tasks for "Next 7 Days" (excluding Done tasks)
 const nextTwoTasks = sortedIncompleteTasks.slice(2, 4);
 
-console.log("Top 2 tasks (not Done):", topTwoTasks);
-console.log("Next 2 tasks (not Done):", nextTwoTasks);
+
 
 // Helper function to get days from now
 function getDaysFromNow(dueDate: string): string {
-  const due = new Date(dueDate);
+  // Parse the due date directly to avoid timezone issues
+  const [year, month, day] = dueDate.split('-').map(Number);
+  const dueStart = new Date(year, month - 1, day); // month is 0-indexed
+  
   const now = new Date();
-  const diffTime = due.getTime() - now.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  const nowStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  
+  const diffTime = dueStart.getTime() - nowStart.getTime();
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  
+  console.log('getDaysFromNow - dueDate:', dueDate, 'dueStart:', dueStart, 'nowStart:', nowStart, 'diffDays:', diffDays);
   
   if (diffDays < 0) {
     return `${Math.abs(diffDays)} days overdue`;
@@ -109,12 +111,23 @@ function getDaysFromNow(dueDate: string): string {
         topTwoTasks.map(task => {
           const dueDate = new Date(task.due_date);
           const daysFromNow = getDaysFromNow(task.due_date);
+          console.log(task.due_date);
+          console.log(dueDate);
           const isOverdue = dueDate < new Date();
           let percentCompleted = null;
           if (task.est_time && task.time_left !== null && task.time_left !== undefined && Number(task.est_time) > 0) {
             percentCompleted = Math.max(0, Math.min(1, 1 - (Number(task.time_left) / Number(task.est_time))));
           }
           
+          // Format date consistently with priority calculation
+          // Parse the date string directly to avoid timezone issues
+          const [year, month, day] = task.due_date.split('-').map(Number);
+          const dueStart = new Date(year, month - 1, day); // month is 0-indexed
+          console.log('Original date string:', task.due_date);
+          console.log('Parsed components:', { year, month, day });
+          console.log('dueStart:', dueStart);
+          const formattedDate = dueStart.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+          console.log('formattedDate:', formattedDate);
           return (
             <li class="lw-task-item">
               <div class="lw-task-content">
@@ -124,7 +137,7 @@ function getDaysFromNow(dueDate: string): string {
                 <span class="lw-task-class">{task.class}</span>
               </div>
               <div class="lw-task-meta">
-                <span class="lw-task-date">{dueDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
+                <span class="lw-task-date">{formattedDate}</span>
                 <span class={`lw-task-status ${isOverdue ? 'overdue' : ''}`}>
                   {daysFromNow}
                 </span>
@@ -150,6 +163,12 @@ function getDaysFromNow(dueDate: string): string {
           const daysFromNow = getDaysFromNow(task.due_date);
           const isOverdue = dueDate < new Date();
           
+          // Format date consistently with priority calculation
+          // Parse the date string directly to avoid timezone issues
+          const [year, month, day] = task.due_date.split('-').map(Number);
+          const dueStart = new Date(year, month - 1, day); // month is 0-indexed
+          const formattedDate = dueStart.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+          
           return (
             <li class="lw-task-item">
               <div class="lw-task-content">
@@ -159,7 +178,7 @@ function getDaysFromNow(dueDate: string): string {
                 <span class="lw-task-class">{task.class}</span>
               </div>
               <div class="lw-task-meta">
-                <span class="lw-task-date">{dueDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
+                <span class="lw-task-date">{formattedDate}</span>
                 <span class={`lw-task-status ${isOverdue ? 'overdue' : ''}`}>
                   {daysFromNow}
                 </span>
