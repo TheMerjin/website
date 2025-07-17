@@ -3,7 +3,13 @@ import WebsiteLayout from '../layouts/WebsiteLayout.astro';
 import ProfilePostCard from '../components/ProfilePostCard.astro';
 const res = await fetch(`${import.meta.env.PUBLIC_API_URL}api/auth/get_posts`);
 const { posts } = await res.json();
-const profile_posts = posts.slice(0,3)
+
+// Fetch current user id
+const userRes = await fetch(`${import.meta.env.PUBLIC_API_URL}api/auth/user-data`, { headers: { cookie: Astro.request.headers.get('cookie') || '' } });
+const { user } = await userRes.json();
+
+// Filter posts by current user
+const profile_posts = posts.filter((post: any) => post.author_id === user.id).slice(0, 3);
 
 ---
 
@@ -15,274 +21,186 @@ const profile_posts = posts.slice(0,3)
   <title>Profile</title>
 </head>
 
-<body style = " background-color: #fff4ec; color: #333; margin: 0; padding: 0;">
+<body style="background: #f8f2e4; color: #1a1a1a; margin: 0; padding: 0; font-family: Georgia, serif;">
 <WebsiteLayout>
-  <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  </head>
-  <div class="profile-header">
-      <div class="user-info">
-      <h1 id="username">Loading...</h1>
-      <div class="user-stats" id="user-stats">
-          <!-- Stats will be injected -->
-      </div>
-      <div class="elo-display" id="elo-display">
-        <div class="elo-badge">
-          <span class="elo-label">Chess Rating</span>
-          <span class="elo-value" id="elo-value">Loading...</span>
+  <main class="profile-main">
+    <section class="profile-header-lw">
+      <div class="profile-user-info-lw">
+        <h1 id="username" class="profile-username-lw">Loading...</h1>
+        <div class="user-stats-lw" id="user-stats"></div>
+        <div class="elo-display-lw" id="elo-display">
+          <span class="elo-label-lw">Chess Rating</span>
+          <span class="elo-value-lw" id="elo-value">Loading...</span>
         </div>
       </div>
-      <div class="header-nav">
-          <a href="#posts">My Posts</a><span>&bull;</span>
-          <a href="#">Favorites</a><span>&bull;</span>
-          <a href="#">Settings</a>
-          <span class = "spacer"></span>
-          <div id = "new-post-button-and-text">
-          <button id = "new-post" >
-            <img src="/assets_task_01jw742a8nfz48tp2bhjht7wav_1748290863_img_3.jpg" style="width:35px;height:35px;" alt="New post">
-          </button>
-          <h6> New post</h6>
-          </div>
-          <button class="logout-button">Logout</button>
-      </div>
-      </div>
-    <div>
-      <h2> Bio</h2>
-      <h5 id="Bio"> I am a traveler of many lands</h5>
-    </div>
-    <section class = "post-section" id = "posts">
-      <h2> Posts</h2>
-      <section id = "posts">
-        {posts.length === 0 ? (
-          <p>No posts yet!</p>
-        ) : (
-          profile_posts.map((post: any) => <ProfilePostCard post={post} key={post.id} />)
-        )}
-      </section>
+      <nav class="profile-nav-lw">
+        <a href="#posts" class="profile-link-lw">My Posts</a>
+        <span class="profile-nav-sep">&bull;</span>
+        <a href="#" class="profile-link-lw">Favorites</a>
+        <span class="profile-nav-sep">&bull;</span>
+        <a href="#" class="profile-link-lw">Settings</a>
+        <button class="logout-btn-lw" type="button">Logout</button>
+      </nav>
     </section>
-  </div>
+    <section class="profile-bio-lw">
+      <h2 class="profile-section-title-lw">Bio</h2>
+      <div id="Bio" class="profile-bio-text-lw">I am a traveler of many lands</div>
+    </section>
+    <section class="profile-posts-lw" id="posts">
+      <h2 class="profile-section-title-lw">Posts</h2>
+      {posts.length === 0 ? (
+        <p class="profile-empty-lw">No posts yet!</p>
+      ) : (
+        profile_posts.map((post: any) => <ProfilePostCard post={post} key={post.id} />)
+      )}
+    </section>
+  </main>
   <style>
-    .post-section{
-      margin: 0rem;
-      padding: 1rem 0rem;
-    }
-    #new-post-button-and-text{
-      display: contents;
-      margin: 0;
-      padding: 0;
+    .profile-main {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1rem 2rem 1rem;
+      background: #f8f2e4;
       border: none;
-      background: none;
-      font-size: 1rem;
-      color: inherit;
-      line-height: inherit;
+      border-radius: 0;
+      box-shadow: none;
     }
-    .spacer {
-      margin-left: 5vw;
-    }
-    #new-post {
-      background-color: transparent; 
-      border: none;
-      padding: 0;
-      cursor: pointer;
-      border-bottom: 0px solid #fff4ec;
-      max-width: 100vw;
-      margin-left: 8vw;
-      margin-right: auto;
-      outline: none;
-      border: none;
+    .profile-header-lw {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 1rem;
+      margin-bottom: 1.2rem;
       background: none;
     }
-    #new-post:hover {
-      background-color: transparent;
-      outline: none;
-      border: none;
-      background: none;
+    .profile-user-info-lw {
+      margin-bottom: 0.5rem;
     }
-    .logout-button {
-      display: flex;
-      align-items: center;
-      padding: 0.8rem 1.6rem;
-      border-bottom: 0px solid #fff4ec;
-      max-width: 100vw;
-      max-height: 100vw;
-      margin-left: 2vw;
-      margin-right: auto;
-      gap : 1rem;
-    }
-    .profile-header {
-      padding: 1rem 5vw;
-      border-bottom: 1px solid #fff4ec;
-      max-width: 100vw;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    h1 {
-      margin: 3 3 0.5rem 0;
-      font-size: 2rem;
-    }
-    .user-stats {
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-      margin-bottom: 0.75rem;
-      font-size: 1rem;
-      color: #555;
-    }
-    .user-stats span {
-      display: inline-flex;
-      align-items: center;
-    }
-    .user-stats svg {
-      width: 1.1rem;
-      height: 1.1rem;
-      margin-right: 0.4rem;
-      fill: currentColor;
-    }
-    
-    .elo-display {
-      margin: 1rem 0;
-    }
-    
-    .elo-badge {
-      display: inline-flex;
-      align-items: center;
-      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-      border: 1px solid #dee2e6;
-      border-radius: 12px;
-      padding: 0.75rem 1.25rem;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .elo-badge::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-      pointer-events: none;
-    }
-    
-    .elo-badge:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-      border-color: #adb5bd;
-    }
-    
-    .elo-label {
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: #6c757d;
-      margin-right: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    
-    .elo-value {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #495057;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      position: relative;
-      z-index: 1;
-    }
-    
-    .elo-value.loading {
-      color: #adb5bd;
-      font-style: italic;
-    }
-    
-    .elo-value.excellent {
-      color: #28a745;
-    }
-    
-    .elo-value.good {
-      color: #17a2b8;
-    }
-    
-    .elo-value.average {
-      color: #ffc107;
-    }
-    
-    .elo-value.beginner {
-      color: #6c757d;
-    }
-    .header-nav {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
+    .profile-username-lw {
+      font-family: 'Inter', Helvetica, Arial, sans-serif;
       font-size: 1.2rem;
-      margin-left: -0.5rem;
+      font-weight: 700;
+      margin: 0 0 0.3rem 0;
+      color: #1a1a1a;
+    }
+    .user-stats-lw {
+      font-family: 'Inter', Helvetica, Arial, sans-serif;
+      font-size: 1rem;
+      color: #666;
+      margin-bottom: 0.3rem;
+    }
+    .elo-display-lw {
+      font-family: 'Inter', Helvetica, Arial, sans-serif;
+      font-size: 1rem;
+      color: #444;
+      margin-bottom: 0.2rem;
+    }
+    .elo-label-lw {
+      font-size: 0.95rem;
+      color: #888;
+      margin-right: 0.5rem;
+    }
+    .elo-value-lw {
+      font-size: 1.1rem;
+      color: #232323;
+      font-family: 'Inter', Helvetica, Arial, sans-serif;
+    }
+    .profile-nav-lw {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
       gap: 0.5rem;
+      margin-top: 0.2rem;
+      font-family: 'Inter', Helvetica, Arial, sans-serif;
+      font-size: 1rem;
     }
-    .header-nav a {
+    .profile-link-lw {
+      color: #2b6cb0;
+      text-decoration: underline;
+      border: 1px solid #bdbdbd;
+      border-radius: 0;
+      background: none;
+      padding: 0.1rem 0.5rem;
+      font-size: 1rem;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .profile-link-lw:hover, .profile-link-lw:focus {
+      border-color: #232323;
+      background: #f5f5f5;
+      color: #888;
+      outline: 2px solid #2b6cb0;
+    }
+    .profile-nav-sep {
+      color: #bbb;
+      margin: 0 0.2rem;
+    }
+    .logout-btn-lw {
+      border: 1px solid #aaa;
+      background: #eee;
+      color: #111;
+      font-family: 'Inter', Helvetica, Arial, sans-serif;
+      font-size: 1rem;
+      padding: 0.18rem 0.8rem;
+      border-radius: 0;
       text-decoration: none;
-      margin: 0 0.5rem;
-      color: #456650;
       font-weight: 500;
+      transition: background 0.15s, border-color 0.15s;
+      box-shadow: none;
+      outline: none;
+      margin-left: 1.2rem;
+      cursor: pointer;
+      min-width: 0;
     }
-    .header-nav span {
-      color: #999;
+    .logout-btn-lw:hover, .logout-btn-lw:focus {
+      background: #e2e2e2;
+      border-color: #888;
+      outline: 2px solid #2b6cb0;
     }
-    @media (max-width: 800px) {
-      .profile-header {
-        padding: 1rem 2vw;
+    .profile-bio-lw {
+      margin-bottom: 1.2rem;
+    }
+    .profile-section-title-lw {
+      font-family: 'Inter', Helvetica, Arial, sans-serif;
+      font-size: 1.02rem;
+      font-weight: 600;
+      color: #232323;
+      margin: 0 0 0.3rem 0;
+      border: none;
+      text-align: left;
+    }
+    .profile-bio-text-lw {
+      font-family: Georgia, serif;
+      font-size: 1rem;
+      color: #444;
+      margin: 0 0 0.2rem 0;
+    }
+    .profile-posts-lw {
+      margin-bottom: 0.7rem;
+      padding: 0;
+      border: none;
+    }
+    .profile-empty-lw {
+      color: #888;
+      font-style: italic;
+      text-align: center;
+      padding: 2rem;
+    }
+    @media (max-width: 900px) {
+      .profile-main {
         max-width: 100vw;
-        margin-left: auto;
-        margin-right: auto;
+        padding: 0.5rem 0.2rem 1rem 0.2rem;
       }
-      .header-nav {
-        font-size: 1rem;
-        flex-wrap: wrap;
-        gap: 0.3rem;
+      .profile-header-lw {
+        padding-bottom: 0.7rem;
       }
-      .logout-button {
-        padding: 0.5rem 1rem;
+      .profile-nav-lw {
         font-size: 0.95rem;
       }
-      #new-post {
-        margin-left: 2vw;
-      }
-      .spacer {
-        margin-left: 2vw;
-      }
-    }
-    @media (max-width: 500px) {
-      .profile-header {
-        padding: 0.5rem 1vw;
-      }
-      .header-nav {
-        font-size: 0.9rem;
-        gap: 0.2rem;
-      }
-      .logout-button {
-        padding: 0.3rem 0.5rem;
-        font-size: 0.9rem;
-      }
-      #new-post {
-        margin-left: 1vw;
-      }
-      .spacer {
-        margin-left: 1vw;
-      }
-      h1 {
-        font-size: 1.2rem;
-      }
-      .user-stats {
-        font-size: 0.85rem;
-      }
-      .elo-badge {
-        padding: 0.5rem 1rem;
-      }
-      .elo-label {
-        font-size: 0.75rem;
-      }
-      .elo-value {
-        font-size: 1.25rem;
+      .logout-btn-lw {
+        padding: 0.12rem 0.5rem;
+        font-size: 0.95rem;
+        margin-left: 0.5rem;
       }
     }
   </style>
@@ -293,7 +211,7 @@ const profile_posts = posts.slice(0,3)
     }
   import { supabase } from "../lib/client-supabase";
 
-    const logoutButton = document.querySelector('.logout-button');
+    const logoutButton = document.querySelector('.logout-btn-lw');
   if (logoutButton) {
     logoutButton.addEventListener('click', async () => {
       console.log("Running");
