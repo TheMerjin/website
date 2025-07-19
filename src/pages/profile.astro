@@ -48,6 +48,9 @@ const profile_posts = posts.filter((post: any) => post.author_id === user.id).sl
     </section>
     <section class="profile-posts-lw" id="posts">
       <h2 class="profile-section-title-lw">Posts</h2>
+      <button id="new-post-button-and-text" type="button" style="border: 1px solid #2b6cb0; background: #f9f9f9; color: #2b6cb0; font-family: 'Inter', Helvetica, Arial, sans-serif; font-size: 1rem; font-weight: 500; padding: 0.18rem 0.8rem; border-radius: 0; margin-bottom: 1rem; cursor: pointer; outline: none; transition: background 0.1s, border-color 0.1s; text-decoration: underline; display: inline-block;">
+        + New Post
+      </button>
       {posts.length === 0 ? (
         <p class="profile-empty-lw">No posts yet!</p>
       ) : (
