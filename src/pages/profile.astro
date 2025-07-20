@@ -23,7 +23,7 @@ const profile_posts = posts.filter((post: any) => post.author_id === user.id).sl
 
 <body style="background: #f8f2e4; color: #1a1a1a; margin: 0; padding: 0; font-family: Georgia, serif;">
 <WebsiteLayout>
-  <main class="profile-main">
+  <main class="profile-main-lw">
     <section class="profile-header-lw">
       <div class="profile-user-info-lw">
         <h1 id="username" class="profile-username-lw">Loading...</h1>
@@ -42,15 +42,15 @@ const profile_posts = posts.filter((post: any) => post.author_id === user.id).sl
         <button class="logout-btn-lw" type="button">Logout</button>
       </nav>
     </section>
-    <section class="profile-bio-lw">
+    <section class="profile-bio-lw-card">
       <h2 class="profile-section-title-lw">Bio</h2>
       <div id="Bio" class="profile-bio-text-lw">I am a traveler of many lands</div>
     </section>
     <section class="profile-posts-lw" id="posts">
-      <h2 class="profile-section-title-lw">Posts</h2>
-      <button id="new-post-button-and-text" type="button" style="border: 1px solid #2b6cb0; background: #f9f9f9; color: #2b6cb0; font-family: 'Inter', Helvetica, Arial, sans-serif; font-size: 1rem; font-weight: 500; padding: 0.18rem 0.8rem; border-radius: 0; margin-bottom: 1rem; cursor: pointer; outline: none; transition: background 0.1s, border-color 0.1s; text-decoration: underline; display: inline-block;">
-        + New Post
-      </button>
+      <div class="profile-posts-header-lw">
+        <h2 class="profile-section-title-lw">Posts</h2>
+        <button id="new-post-button-and-text" type="button" class="lw-new-post-btn">+ New Post</button>
+      </div>
       {posts.length === 0 ? (
         <p class="profile-empty-lw">No posts yet!</p>
       ) : (
@@ -59,53 +59,59 @@ const profile_posts = posts.filter((post: any) => post.author_id === user.id).sl
     </section>
   </main>
   <style>
-    .profile-main {
-      max-width: 800px;
-      margin: 2rem auto;
-      padding: 0 1rem 2rem 1rem;
-      background: #f8f2e4;
+    .profile-main-lw {
+      max-width: 860px;
+      margin: 2.5rem auto 2rem auto;
+      padding: 0 1.2rem 2rem 1.2rem;
+      background: inherit;
       border: none;
       border-radius: 0;
       box-shadow: none;
+      display: flex;
+      flex-direction: column;
+      gap: 2.2rem;
     }
     .profile-header-lw {
+      background: inherit;
+      border: 1px solid #eee;
+      border-radius: 0;
+      padding: 1.2rem 1.2rem 1rem 1.2rem;
+      margin-bottom: 0;
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      border-bottom: 1px solid #eee;
-      padding-bottom: 1rem;
-      margin-bottom: 1.2rem;
-      background: none;
+      gap: 0.7rem;
     }
     .profile-user-info-lw {
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.2rem;
     }
     .profile-username-lw {
       font-family: 'Inter', Helvetica, Arial, sans-serif;
-      font-size: 1.2rem;
+      font-size: 1.25rem;
       font-weight: 700;
-      margin: 0 0 0.3rem 0;
+      margin: 0 0 0.2rem 0;
       color: #1a1a1a;
+      letter-spacing: -0.5px;
     }
     .user-stats-lw {
       font-family: 'Inter', Helvetica, Arial, sans-serif;
-      font-size: 1rem;
+      font-size: 0.98rem;
       color: #666;
-      margin-bottom: 0.3rem;
+      margin-bottom: 0.1rem;
     }
     .elo-display-lw {
       font-family: 'Inter', Helvetica, Arial, sans-serif;
-      font-size: 1rem;
+      font-size: 0.98rem;
       color: #444;
-      margin-bottom: 0.2rem;
+      margin-bottom: 0.1rem;
     }
     .elo-label-lw {
-      font-size: 0.95rem;
+      font-size: 0.93rem;
       color: #888;
       margin-right: 0.5rem;
     }
     .elo-value-lw {
-      font-size: 1.1rem;
+      font-size: 1.08rem;
       color: #232323;
       font-family: 'Inter', Helvetica, Arial, sans-serif;
     }
@@ -114,23 +120,24 @@ const profile_posts = posts.filter((post: any) => post.author_id === user.id).sl
       flex-direction: row;
       align-items: center;
       gap: 0.5rem;
-      margin-top: 0.2rem;
       font-family: 'Inter', Helvetica, Arial, sans-serif;
       font-size: 1rem;
+      margin-top: 0.1rem;
     }
     .profile-link-lw {
       color: #2b6cb0;
       text-decoration: underline;
-      border: 1px solid #bdbdbd;
+      border: 1px solid #2b6cb0;
       border-radius: 0;
       background: none;
       padding: 0.1rem 0.5rem;
       font-size: 1rem;
-      transition: border-color 0.15s, background 0.15s;
+      font-family: 'Inter', Helvetica, Arial, sans-serif;
+      transition: border-color 0.15s, background 0.15s, color 0.15s;
     }
     .profile-link-lw:hover, .profile-link-lw:focus {
       border-color: #232323;
-      background: #f5f5f5;
+      background: #f9f9f9;
       color: #888;
       outline: 2px solid #2b6cb0;
     }
@@ -140,7 +147,7 @@ const profile_posts = posts.filter((post: any) => post.author_id === user.id).sl
     }
     .logout-btn-lw {
       border: 1px solid #aaa;
-      background: #eee;
+      background: #f5f5f5;
       color: #111;
       font-family: 'Inter', Helvetica, Arial, sans-serif;
       font-size: 1rem;
@@ -160,12 +167,21 @@ const profile_posts = posts.filter((post: any) => post.author_id === user.id).sl
       border-color: #888;
       outline: 2px solid #2b6cb0;
     }
-    .profile-bio-lw {
-      margin-bottom: 1.2rem;
+    .profile-bio-lw-card {
+      background: inherit;
+      border: 1px solid #eee;
+      border-radius: 0;
+      padding: 1.2rem 1.2rem 1rem 1.2rem;
+      margin-bottom: 0;
+      font-family: Georgia, serif;
+      color: #222;
+      font-size: 1.05rem;
+      line-height: 1.5;
+      box-shadow: none;
     }
     .profile-section-title-lw {
       font-family: 'Inter', Helvetica, Arial, sans-serif;
-      font-size: 1.02rem;
+      font-size: 1.05rem;
       font-weight: 600;
       color: #232323;
       margin: 0 0 0.3rem 0;
@@ -182,6 +198,38 @@ const profile_posts = posts.filter((post: any) => post.author_id === user.id).sl
       margin-bottom: 0.7rem;
       padding: 0;
       border: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .profile-posts-header-lw {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      gap: 1.2rem;
+    }
+    .lw-new-post-btn {
+      border: 1px solid #2b6cb0;
+      background: #f9f9f9;
+      color: #2b6cb0;
+      font-family: 'Inter', Helvetica, Arial, sans-serif;
+      font-size: 1rem;
+      font-weight: 500;
+      padding: 0.18rem 0.8rem;
+      border-radius: 0;
+      cursor: pointer;
+      outline: none;
+      text-decoration: underline;
+      transition: background 0.1s, border-color 0.1s, color 0.1s;
+      margin-left: 0.5rem;
+    }
+    .lw-new-post-btn:focus, .lw-new-post-btn:hover {
+      background: #f5f5f5;
+      border-color: #232323;
+      color: #888;
+      outline: 2px solid #2b6cb0;
     }
     .profile-empty-lw {
       color: #888;
@@ -190,12 +238,12 @@ const profile_posts = posts.filter((post: any) => post.author_id === user.id).sl
       padding: 2rem;
     }
     @media (max-width: 900px) {
-      .profile-main {
+      .profile-main-lw {
         max-width: 100vw;
         padding: 0.5rem 0.2rem 1rem 0.2rem;
       }
-      .profile-header-lw {
-        padding-bottom: 0.7rem;
+      .profile-header-lw, .profile-bio-lw-card {
+        padding: 0.7rem 0.7rem 0.5rem 0.7rem;
       }
       .profile-nav-lw {
         font-size: 0.95rem;
