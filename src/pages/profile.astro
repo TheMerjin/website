@@ -49,7 +49,10 @@ const profile_posts = posts.filter((post: any) => post.author_id === user.id).sl
     <section class="profile-posts-lw" id="posts">
       <div class="profile-posts-header-lw">
         <h2 class="profile-section-title-lw">Posts</h2>
-        <button id="new-post-button-and-text" type="button" class="lw-new-post-btn">+ New Post</button>
+        <div style="display: flex; align-items: center; gap: 0.3rem;">
+          <button id="new-post-button-and-text" type="button" class="lw-new-post-btn">+ New Post</button>
+          <button class="lw-plus-btn" aria-label="Quick Add Post">+</button>
+        </div>
       </div>
       {posts.length === 0 ? (
         <p class="profile-empty-lw">No posts yet!</p>
@@ -226,6 +229,32 @@ const profile_posts = posts.filter((post: any) => post.author_id === user.id).sl
       margin-left: 0.5rem;
     }
     .lw-new-post-btn:focus, .lw-new-post-btn:hover {
+      background: #f5f5f5;
+      border-color: #232323;
+      color: #888;
+      outline: 2px solid #2b6cb0;
+    }
+    .lw-plus-btn {
+      border: 1px solid #2b6cb0;
+      background: #f9f9f9;
+      color: #2b6cb0;
+      font-family: 'Inter', Helvetica, Arial, sans-serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      padding: 0.08rem 0.5rem 0.08rem 0.5rem;
+      border-radius: 0;
+      cursor: pointer;
+      outline: none;
+      text-decoration: none;
+      transition: background 0.1s, border-color 0.1s, color 0.1s;
+      margin-left: 0;
+      height: 2rem;
+      min-width: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .lw-plus-btn:focus, .lw-plus-btn:hover {
       background: #f5f5f5;
       border-color: #232323;
       color: #888;
