@@ -1,5 +1,7 @@
 ---
 import HeaderWhite from '../components/HeaderWhite.astro';
+import Analytics from '@vercel/analytics/astro';
+import SpeedInsights from '@vercel/speed-insights/astro';
 let tasks: any[] = [];
 
 const cookie = Astro.request.headers.get('cookie') || '';
@@ -509,4 +511,7 @@ body {
   text-align: right;
   min-width: 90px;
 }
-</style> 
+</style>
+
+<Analytics />
+<SpeedInsights /> 
