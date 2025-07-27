@@ -8,7 +8,7 @@ A comprehensive community platform built with Astro, featuring discussion forums
 - **Comment System**: Nested comments with gratitude/upvoting system
 - **Star Ratings**: Interactive 5-star rating system with distribution histograms
 - **User Profiles**: Individual user pages with activity history
-- **Search**: Full-text search across posts and comments
+- **Search**: Vector search with embeddings trained with a custom word2vec model search across posts and comments
 - **Tags**: Categorization system for posts and comments
 
 ### ♟️ Chess Platform
