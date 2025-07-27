@@ -1,6 +1,6 @@
 # Agora - Community Platform
 
-A comprehensive community platform built with Astro, featuring discussion forums, chess games, task management, digital archives, and more. Designed with a clean, LessWrong-inspired aesthetic focused on clarity and functionality.
+A comprehensive community platform built with Astro, featuring discussion forums, chess games, task management, digital archives, and more. Designed with a clean, minimalist aesthetic focused on clarity and functionality.
 
 ## 🌟 Features
 
@@ -55,17 +55,28 @@ A comprehensive community platform built with Astro, featuring discussion forums
 
 ## 🎨 Design Philosophy
 
-Built following LessWrong design principles:
+Built following minimalist design principles:
 - **Minimalism**: Clean, uncluttered interfaces
 - **Functionality**: Every element serves a purpose
 - **Accessibility**: Keyboard navigation and screen reader support
 - **Information Density**: Efficient use of space
 - **Neutral Aesthetics**: Focus on content over decoration
 
+## 🎭 UI Influences
+
+This platform's design draws inspiration from several thoughtful communities and platforms:
+
+- **[LessWrong](https://lesswrong.com/)** - Epistemic rationality and clean, information-dense interfaces
+- **[Gwern.net](https://gwern.net/)** - Comprehensive research presentation and minimalist aesthetics
+- **[Uli.rocks](https://uli.rocks/)** - Experimental web design and creative layouts
+- **[Mogutable](https://mogutable.com/)** - Community-driven knowledge sharing and discussion
+- **[Reddit](https://reddit.com/)** - Community moderation and threaded discussions
+- **[Bitchat](https://bitchats.app/)** - Decentralized communication and peer-to-peer networking concepts
+
 ## 🛠️ Technical Stack
 
 - **Frontend**: Astro with React components
-- **Styling**: CSS with LessWrong-inspired design system
+- **Styling**: CSS with minimalist design system
 - **Database**: Supabase (PostgreSQL)
 - **Authentication**: Supabase Auth
 - **Real-time**: Supabase real-time subscriptions
