@@ -2,6 +2,8 @@
 import Header from '../components/Header.astro';
 import '../styles/global.css';
 import NotesEditor from '../components/NotesEditor.jsx';
+import Analytics from '@vercel/analytics/astro';
+import SpeedInsights from '@vercel/speed-insights/astro';
 ---
 <meta charset="UTF-8" />
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -273,3 +275,6 @@ import NotesEditor from '../components/NotesEditor.jsx';
 
 <!-- Floating action button for new note (mobile only) -->
 <button class="fab-new-note" title="New Note" onclick="window.dispatchEvent(new CustomEvent('new-note'))">+</button>
+
+<Analytics />
+<SpeedInsights />

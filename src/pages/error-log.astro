@@ -1,5 +1,7 @@
 ---
 import HeaderWhite from '../components/HeaderWhite.astro';
+import Analytics from '@vercel/analytics/astro';
+import SpeedInsights from '@vercel/speed-insights/astro';
 ---
 <HeaderWhite />
 <main class="lw-main">
@@ -98,4 +100,7 @@ body {
     padding: 0.5rem 0.2rem 1rem 0.2rem;
   }
 }
-</style> 
+</style>
+
+<Analytics />
+<SpeedInsights /> 

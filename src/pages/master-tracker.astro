@@ -1,6 +1,8 @@
 ---
 import HeaderWhite from '../components/HeaderWhite.astro';
-import MasterTracker from '../components/MasterTracker.jsx';
+import MasterTrackerComponent from '../components/MasterTracker.jsx';
+import Analytics from '@vercel/analytics/astro';
+import SpeedInsights from '@vercel/speed-insights/astro';
 ---
 <HeaderWhite />
 <main class="lw-main">
@@ -9,7 +11,7 @@ import MasterTracker from '../components/MasterTracker.jsx';
     <a href="/dashboard" class="lw-btn lw-btn-back" aria-label="Return to Dashboard">Return to Dashboard</a>
   </div>
   <div class="epistemic-status"><p><em>Epistemic status: This is your single source of truth for all tasks and assignments.</em></p></div>
-  <MasterTracker client:load />
+  <MasterTrackerComponent client:load />
 </main>
 <style>
 body {
@@ -121,4 +123,7 @@ body {
     padding: 0.5rem 0.2rem 1rem 0.2rem;
   }
 }
-</style> 
+</style>
+
+<Analytics />
+<SpeedInsights /> 

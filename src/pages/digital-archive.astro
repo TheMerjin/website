@@ -1,13 +1,15 @@
 ---
 import HeaderWhite from '../components/HeaderWhite.astro';
-import DigitalArchive from '../components/DigitalArchive.jsx';
+import DigitalArchiveComponent from '../components/DigitalArchive.jsx';
+import Analytics from '@vercel/analytics/astro';
+import SpeedInsights from '@vercel/speed-insights/astro';
 
 ---
 <HeaderWhite />
 <main class="lw-main">
   <div class="epistemic-status"><p><em>Epistemic status: This is your organized digital archive for all class materials and scans.</em></p></div>
   <h1 class="lw-title">Digital Archive</h1>
-  <DigitalArchive client:load />
+  <DigitalArchiveComponent client:load />
   <a href="/dashboard" class="lw-btn">Back to Dashboard</a>
 </main>
 <style>
@@ -87,4 +89,7 @@ body {
     margin-top: 0.7rem;
   }
 }
-</style> 
+</style>
+
+<Analytics />
+<SpeedInsights /> 
