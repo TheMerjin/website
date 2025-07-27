@@ -324,67 +324,85 @@ export default function CommentsTree({ slug }) {
                     left: '0',
                     background: '#fff',
                     border: '1px solid #ddd',
-                    padding: '0.5rem',
+                    padding: '0.75rem',
                     fontSize: '0.8rem',
                     fontFamily: 'Inter, Helvetica, Arial, sans-serif',
                     color: '#1a1a1a',
                     zIndex: 1000,
-                    minWidth: '200px',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                    marginTop: '0.25rem'
+                    minWidth: '220px',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                    marginTop: '0.5rem'
                   }}>
                     <div style={{ 
                       fontWeight: 600, 
-                      marginBottom: '0.5rem',
+                      marginBottom: '0.75rem',
                       fontSize: '0.9rem',
                       borderBottom: '1px solid #eee',
-                      paddingBottom: '0.25rem'
+                      paddingBottom: '0.5rem',
+                      color: '#2b6cb0'
                     }}>
                       Rating Distribution
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                    <div style={{ 
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      gap: '0.3rem',
+                      marginBottom: '0.5rem'
+                    }}>
                       {[5, 4, 3, 2, 1].map((rating) => {
                         const count = ratingDistribution[node.id][rating] || 0;
                         const total = ratingsMap[node.id].count;
-                        const percentage = total > 0 ? (count / total) * 100 : 0;
-                        const maxBarWidth = 120; // Maximum width in pixels
-                        const barWidth = (percentage / 100) * maxBarWidth;
+                        const maxCount = Math.max(...Object.values(ratingDistribution[node.id] || {}));
+                        const barWidth = maxCount > 0 ? (count / maxCount) * 160 : 0; // Scale relative to max count
                         
                         return (
                           <div key={rating} style={{ 
                             display: 'flex', 
                             alignItems: 'center', 
                             gap: '0.5rem',
-                            fontSize: '0.75rem'
+                            fontSize: '0.75rem',
+                            height: '1.2rem'
                           }}>
                             <div style={{ 
-                              width: '0.8rem', 
-                              textAlign: 'center',
-                              color: '#666'
+                              width: '1.2rem', 
+                              textAlign: 'right',
+                              color: '#444',
+                              fontWeight: 500,
+                              fontSize: '0.8rem',
+                              paddingRight: '0.5rem'
                             }}>
                               {rating}
                             </div>
                             <div style={{ 
-                              width: `${maxBarWidth}px`,
+                              width: '160px',
                               height: '0.8rem',
-                              background: '#f5f5f5',
+                              background: `repeating-linear-gradient(
+                                90deg,
+                                transparent,
+                                transparent 19px,
+                                #f0f0f0 19px,
+                                #f0f0f0 20px
+                              )`,
                               border: '1px solid #ddd',
-                              position: 'relative'
+                              position: 'relative',
+                              borderRadius: '0'
                             }}>
                               {count > 0 && (
                                 <div style={{
                                   width: `${barWidth}px`,
                                   height: '100%',
                                   background: '#2b6cb0',
-                                  transition: 'width 0.2s ease'
+                                  transition: 'width 0.3s ease'
                                 }} />
                               )}
                             </div>
                             <div style={{ 
                               minWidth: '1.5rem',
-                              textAlign: 'right',
+                              textAlign: 'left',
                               color: '#666',
-                              fontSize: '0.7rem'
+                              fontSize: '0.7rem',
+                              fontWeight: 500,
+                              paddingLeft: '0.5rem'
                             }}>
                               {count}
                             </div>
@@ -393,13 +411,19 @@ export default function CommentsTree({ slug }) {
                       })}
                     </div>
                     <div style={{ 
-                      marginTop: '0.5rem',
-                      paddingTop: '0.25rem',
+                      marginTop: '0.75rem',
+                      paddingTop: '0.5rem',
                       borderTop: '1px solid #eee',
-                      fontSize: '0.7rem',
-                      color: '#666'
+                      fontSize: '0.75rem',
+                      color: '#666',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
                     }}>
-                      Total: {ratingsMap[node.id].count} ratings
+                      <span>Total: {ratingsMap[node.id].count} ratings</span>
+                      <span style={{ color: '#2b6cb0', fontWeight: 500 }}>
+                        Avg: {ratingsMap[node.id].average}
+                      </span>
                     </div>
                   </div>
                 )}
