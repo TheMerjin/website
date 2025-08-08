@@ -23,6 +23,7 @@ const { post } = Astro.props;
       </time>
     </div>
   </div>
+ 
 
   <!-- Comment count -->
   <div class="lw-comments">
@@ -31,9 +32,57 @@ const { post } = Astro.props;
     </svg>
     <span>{post.comments_count ?? 0}</span>
   </div>
+  <div class="lw-post-preview">
+    <div class = "lw-post-title">
+      {post.title}
+    </div>
+    <div class = "post-length">
+      ({post.content.length} words)
+    </div>
+    {post.preview || post.content.slice(0, 300) + '...'}
+  </div>
 </article>
 
 <style>
+  .lw-post-title {
+    font-size: 2rem;
+    font-weight: 700;
+
+  }
+  .post-length {
+    font-size: 0.7rem;
+    color: #777;
+    margin-bottom: 0.5rem;
+  }
+  .lw-post-preview {
+  position: absolute;
+  background: white;
+  border: 1px solid #ccc;
+  padding: 0.75rem 1rem;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+  max-width: 355px;
+  color: #444;
+  font-size: 0.8rem;
+  line-height: 1.2rem;
+  border-radius: 6px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease-in-out;
+  z-index: 100000000000000;
+  top: 100%;
+  left: 0;
+  margin-left: calc(100% /2.5);
+  margin-top: 0.4rem;
+  white-space: normal;
+  font-weight: 400;
+}
+
+/* Show preview when hovering over the post card */
+.lw-post-card:hover .lw-post-preview,
+.lw-post-card:focus-within .lw-post-preview {
+  opacity: 1;
+  pointer-events: auto;
+}
   .lw-post-card {
     display: grid;
     grid-template-columns: 40px 1fr auto;
