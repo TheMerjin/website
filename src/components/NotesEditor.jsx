@@ -534,71 +534,126 @@ export default function NotesEditor() {
   }, [sidebarOpen]);
 
   return (
-    <div style={{ display: 'flex', height: '100%', width: '100%' }}>
+    <div className="docs-container">
+      {/* Mobile Header */}
       <div className="mobile-header-bar">
         <button className="sidebar-toggle-btn" onClick={handleSidebarToggle} aria-label="Open notes sidebar">
           <span className="hamburger-icon">☰</span>
         </button>
         <span className="mobile-title">Notes</span>
       </div>
+      
+      {/* Mobile Sidebar Overlay */}
       <div className={`mobile-sidebar-overlay${sidebarOpen ? ' open' : ''}`} onClick={handleSidebarClose} />
-      <div className={`mobile-sidebar${sidebarOpen ? ' open' : ''}`}>
-        <div className="obsidian-sidebar">
-          <div className="obsidian-sidebar-header">
-            NOTES
-            <button
-              className="new-note-btn"
-              onClick={createNewNote}
-              title="Create new note (Ctrl+N)"
-            >
-              +
-            </button>
-          </div>
-          <div className="obsidian-notes-list">
-            {loading ? (
-              <div className="loading">Loading notes...</div>
-            ) : notes.length === 0 ? (
-              <div className="no-notes">
-                <p>No notes yet</p>
-                <button onClick={createNewNote}>Create your first note</button>
-              </div>
-            ) : (
-              notes.map(note => (
-                <div
-                  key={note.id || note.title}
-                  className={`obsidian-note-item ${selectedNoteId === note.id ? 'selected' : ''}`}
-                  onClick={() => selectNote(note)}
+      
+      {/* Sidebar */}
+      <div className={`docs-sidebar${sidebarOpen ? ' open' : ''}`}>
+        <div className="sidebar-header">
+          <h2>Notes</h2>
+          <button
+            className="new-note-btn"
+            onClick={createNewNote}
+            title="Create new note"
+          >
+            +
+          </button>
+        </div>
+        <div className="notes-list">
+          {loading ? (
+            <div className="loading">Loading notes...</div>
+          ) : notes.length === 0 ? (
+            <div className="no-notes">
+              <p>No notes yet</p>
+              <button onClick={createNewNote}>Create your first note</button>
+            </div>
+          ) : (
+            notes.map(note => (
+              <div
+                key={note.id || note.title}
+                className={`note-item ${selectedNoteId === note.id ? 'selected' : ''}`}
+                onClick={() => selectNote(note)}
+              >
+                <span className="note-title">{note.title}</span>
+                <button
+                  className="delete-note-btn"
+                  onClick={e => deleteNote(note, e)}
+                  title="Delete note"
                 >
-                  <span className="note-title">{note.title}</span>
-                  <button
-                    className="delete-note-btn"
-                    onClick={e => deleteNote(note, e)}
-                    title="Delete note"
-                  >
-                    ×
-                  </button>
-                </div>
-              ))
-            )}
-          </div>
+                  ×
+                </button>
+              </div>
+            ))
+          )}
         </div>
       </div>
 
-      {/* Editor Area */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <div className="obsidian-topbar">
+      {/* Main Editor Area */}
+      <div className="docs-main">
+        {/* Toolbar */}
+        <div className="docs-toolbar">
+          <div className="toolbar-group">
+            <button 
+              className="toolbar-btn"
+              onClick={() => editor?.commands.toggleBold()}
+              title="Bold (Ctrl+B)"
+            >
+              <strong>B</strong>
+            </button>
+            <button 
+              className="toolbar-btn"
+              onClick={() => editor?.commands.toggleItalic()}
+              title="Italic (Ctrl+I)"
+            >
+              <em>I</em>
+            </button>
+            <button 
+              className="toolbar-btn"
+              onClick={() => editor?.commands.toggleLink({ href: 'https://example.com' })}
+              title="Link (Ctrl+K)"
+            >
+              🔗
+            </button>
+          </div>
+          <div className="toolbar-group">
+            <button 
+              className="toolbar-btn"
+              onClick={() => setLineNumbers(!lineNumbers)}
+              title="Toggle line numbers"
+            >
+              #
+            </button>
+            <button 
+              className="toolbar-btn"
+              onClick={saveNote}
+              title="Save (Ctrl+S)"
+            >
+              💾
+            </button>
+            <button 
+              className={`toolbar-btn ${mode === 'NORMAL' ? 'active' : ''}`}
+              onClick={() => setMode(mode === 'INSERT' ? 'NORMAL' : 'INSERT')}
+              title={`Switch to ${mode === 'INSERT' ? 'NORMAL' : 'INSERT'} mode (ESC)`}
+            >
+              {mode === 'INSERT' ? '✏️' : '⌨️'}
+            </button>
+          </div>
+        </div>
+
+        {/* Document Title */}
+        <div className="docs-title-container">
           <input
             value={title}
             onChange={e => setTitle(e.target.value)}
-            className="note-title-input"
-            style={{ fontWeight: 'bold', fontSize: '1.1rem', border: 'none', background: 'transparent' }}
+            className="docs-title-input"
+            placeholder="Untitled document"
           />
         </div>
-        <div className={`editor-container ${lineNumbers ? 'with-line-numbers' : ''}`}>
+
+        {/* Editor Container */}
+        <div className={`docs-editor-container ${lineNumbers ? 'with-line-numbers' : ''}`}>
           {lineNumbers && (
             <div className="line-numbers">
               {(() => {
-                // Count actual HTML elements for proper line numbering
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = content;
                 const lineElements = tempDiv.querySelectorAll('p, h1, h2, h3, h4, h5, h6, div, li, blockquote');
@@ -609,156 +664,494 @@ export default function NotesEditor() {
               })()}
             </div>
           )}
-          <EditorContent editor={editor} />
+          <div className="docs-editor">
+            <EditorContent editor={editor} />
+          </div>
         </div>
-        <div id="status-bar" className="status-bar" ref={statusBarRef}>
+
+        {/* Status Bar / Terminal */}
+        <div className="docs-status-bar" ref={statusBarRef}>
           {commandMode ? (
-            <input
-              ref={inputRef}
-              className="command-input"
-              value={commandInput}
-              onChange={e => setCommandInput(e.target.value)}
-              style={{ width: '100%', background: 'transparent', border: 'none', color: '#444', fontFamily: 'Fira Mono, Consolas, Menlo, monospace', fontSize: '1rem' }}
-            />
-          ) : status}
+            <div className="terminal-prompt">
+              <span className="prompt-symbol" style={{ color: '#00ff00', fontWeight: 'bold' }}>$</span>
+              <input
+                ref={inputRef}
+                className="command-input"
+                value={commandInput}
+                onChange={e => setCommandInput(e.target.value)}
+                placeholder="Enter command..."
+                style={{
+                  color: '#00ff00',
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  outline: 'none',
+                  fontFamily: 'Fira Mono, Consolas, Menlo, monospace',
+                  fontSize: '0.85rem',
+                  width: '100%',
+                  padding: '0',
+                  margin: '0',
+                  caretColor: '#00ff00'
+                }}
+              />
+            </div>
+          ) : (
+            <div className="terminal-status">
+              <span className="status-text" style={{ color: '#00ff00' }}>{status}</span>
+              <span className="terminal-hint" style={{ color: '#aaa' }}>Press ESC for NORMAL mode, : for commands</span>
+            </div>
+          )}
         </div>
       </div>
 
       <style>{`
-        .obsidian-topbar {
-          margin-bottom: 0.5rem;
-          padding: 1.2rem 1.5rem 0.5rem 1.5rem;
-        }
-        .note-title-input {
-          margin-left: 2rem;
+        /* Main Container */
+        .docs-container {
+          display: flex;
+          height: 100vh;
           width: 100%;
-          background: #f8f2e4;
+          background: #f9f9f9;
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        /* Sidebar */
+        .docs-sidebar {
+          width: 280px;
+          background: #f6f8fa;
+          border-right: 1px solid #d0d7de;
+          display: flex;
+          flex-direction: column;
+          height: calc(100vh - var(--header-height, 3em));
+          position: fixed;
+          left: 0;
+          top: var(--header-height, 3em);
+          z-index: 50;
+          transform: translateX(0);
+          transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .docs-sidebar.open {
+          transform: translateX(0);
+        }
+
+        .sidebar-header {
+          padding: 1rem 1.5rem;
+          border-bottom: 1px solid #d0d7de;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          background: #f6f8fa;
+        }
+
+        .sidebar-header h2 {
+          font-size: 1rem;
+          font-weight: 600;
+          color: #1a1a1a;
+          margin: 0;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+
+        .new-note-btn {
+          background: none;
+          border: 1px solid #d0d7de;
+          color: #444;
+          font-size: 1.2rem;
+          cursor: pointer;
+          padding: 0.25rem 0.5rem;
+          border-radius: 0;
+          transition: background 0.15s;
+          width: 32px;
+          height: 32px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .new-note-btn:hover {
+          background: #eaeef2;
+          color: #1a1a1a;
+        }
+
+        .notes-list {
+          flex: 1;
+          overflow-y: auto;
+          background: #f6f8fa;
+        }
+
+        .note-item {
+          display: flex;
+          align-items: center;
+          padding: 0.75rem 1.5rem;
+          font-size: 0.9rem;
+          color: #1a1a1a;
+          background: #f6f8fa;
+          border-bottom: 1px solid #e6e1d7;
+          cursor: pointer;
+          transition: background 0.15s;
+        }
+
+        .note-item.selected {
+          background: #eaeef2;
+          font-weight: 500;
+          color: #2b6cb0;
+        }
+
+        .note-item:hover {
+          background: #eaeef2;
+        }
+
+        .note-title {
+          flex: 1;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .delete-note-btn {
+          background: none;
+          border: none;
+          color: #b91c1c;
+          font-size: 1rem;
+          cursor: pointer;
+          opacity: 0;
+          transition: opacity 0.15s;
+          margin-left: 0.5rem;
+          padding: 0.25rem;
+        }
+
+        .note-item:hover .delete-note-btn {
+          opacity: 1;
+        }
+
+        .delete-note-btn:hover {
+          color: #991b1b;
+        }
+
+        .loading, .no-notes {
+          padding: 2rem 1.5rem;
+          text-align: center;
+          color: #666;
+          font-size: 0.9rem;
+        }
+
+        .no-notes button {
+          background: #f6f8fa;
+          border: 1px solid #d0d7de;
+          padding: 0.5rem 1rem;
+          border-radius: 0;
+          cursor: pointer;
+          color: #444;
+          font-weight: 500;
+          transition: background 0.15s;
+          margin-top: 1rem;
+        }
+
+        .no-notes button:hover {
+          background: #eaeef2;
+          color: #1a1a1a;
+        }
+
+        /* Main Editor Area */
+        .docs-main {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          background: #f9f9f9;
+          margin-left: 280px;
+          height: calc(100vh - var(--header-height, 3em));
+          margin-top: var(--header-height, 3em);
+        }
+
+        /* Toolbar */
+        .docs-toolbar {
+          background: #fff;
+          border-bottom: 1px solid #d0d7de;
+          padding: 0.5rem 1.5rem;
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .toolbar-group {
+          display: flex;
+          gap: 0.25rem;
+        }
+
+        .toolbar-btn {
+          background: none;
+          border: 1px solid #d0d7de;
+          color: #444;
+          font-size: 0.9rem;
+          cursor: pointer;
+          padding: 0.5rem 0.75rem;
+          border-radius: 0;
+          transition: background 0.15s;
+          min-width: 36px;
+          height: 36px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .toolbar-btn:hover {
+          background: #eaeef2;
+          color: #1a1a1a;
+        }
+
+        .toolbar-btn.active {
+          background: #2b6cb0;
+          color: #fff;
+          border-color: #2b6cb0;
+        }
+
+        .toolbar-btn.active:hover {
+          background: #2563eb;
+        }
+
+        /* Document Title */
+        .docs-title-container {
+          background: #fff;
+          border-bottom: 1px solid #d0d7de;
+          padding: 1rem 1.5rem;
+        }
+
+        .docs-title-input {
+          width: 100%;
+          background: transparent;
           border: none;
           outline: none;
           font-family: 'Inter', sans-serif;
           font-size: 1.5rem;
-          font-weight: 700;
-          color: #3a2e1a;
-          padding: 0.2rem 0.5rem;
-          border-radius: 0;
+          font-weight: 400;
+          color: #1a1a1a;
+          padding: 0;
         }
-        .note-title-input:focus {
+
+        .docs-title-input:focus {
           outline: none;
-          border: none;
-          box-shadow: none;
         }
-        .tiptap {
-          min-height: 340px;
-          max-height: calc(100vh - 200px);
-          background: #f8f2e4;
-          font-size: 1.08rem;
-          outline: none;
-          border: none;
-          box-shadow: none;
-          border-radius: 10px;
-          padding: 1.2rem 1.5rem;
-          margin: 0 1.5rem;
-          transition: background 0.2s;
-          color: #2d261a;
-          font-family: 'Inter', sans-serif;
-          position: relative;
+
+        .docs-title-input::placeholder {
+          color: #666;
+        }
+
+        /* Editor Container */
+        .docs-editor-container {
           flex: 1;
-          overflow-y: auto;
-        }
-        .tiptap:focus {
-          outline: none;
-          border: none;
-          box-shadow: none;
-        }
-        /* Line numbering styles */
-        .editor-container {
           display: flex;
-          position: relative;
-          min-height: 0;
+          background: #fff;
+          margin: 0 1.5rem;
+          border-radius: 0;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          overflow: hidden;
         }
-        .editor-container.with-line-numbers {
+
+        .docs-editor-container.with-line-numbers {
           display: flex;
         }
+
         .line-numbers {
-          background: #e6e1d7;
-          margin-top: 0.65rem;
-          margin-bottom: 1.2rem;
-          border-right: 1px solid #d4cfc5;
-          padding: 1.2rem 0.5rem;
+          background: #f6f8fa;
+          border-right: 1px solid #d0d7de;
+          padding: 1.5rem 0.75rem;
           font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace;
-          font-size: 0.9rem;
+          font-size: 0.8rem;
           color: #666;
           text-align: right;
           min-width: 3rem;
           user-select: none;
         }
+
         .line-number {
-          line-height: 2.5;
-          padding: 0.4rem 0.3rem;
+          line-height: 1.6;
+          padding: 0.1rem 0;
           height: 1.6rem;
           display: flex;
           align-items: center;
           justify-content: flex-end;
         }
-        .editor-container.with-line-numbers .tiptap {
-          margin-left: 0;
-          border-radius: 0 10px 10px 0;
+
+        .docs-editor {
           flex: 1;
+          padding: 1.5rem;
+          background: #fff;
         }
-        /* Style for note links */
-        .tiptap {
-          color: #2d261a;
-        }
-        /* Simple green styling for note links */
-        .note-link-text {
-          color: #456650 !important;
-          background: rgba(69, 102, 80, 0.1) !important;
-          padding: 0.1rem 0.2rem !important;
-          border-radius: 2px !important;
-          font-weight: 500 !important;
-          cursor: pointer !important;
-        }
-        .note-link-text:hover {
-          background: rgba(69, 102, 80, 0.2) !important;
-        }
-        .status-bar {
-          width: 100%;
-          background: #f8f2e4;
-          color: #666;
-          font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace;
-          font-size: 1rem;
-          padding: 0.2rem 1rem 0.2rem 1rem;
-          border-radius: 0;
-          border-top: 1px solid #e6e1d7;
-          display: flex;
-          align-items: center;
-          justify-content: flex-start;
-          letter-spacing: 0.03em;
-          box-sizing: border-box;
-          margin-top: 0;
-        }
-        .command-input {
+
+        .docs-editor .tiptap {
+          min-height: calc(100vh - 200px);
           background: transparent;
-          border: none;
-          outline: none;
-          color: #444;
-          font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace;
           font-size: 1rem;
-          width: 100%;
-          letter-spacing: 0.03em;
+          line-height: 1.6;
+          outline: none;
+          border: none;
+          color: #1a1a1a;
+          font-family: 'Georgia', serif;
           padding: 0;
           margin: 0;
         }
-        .command-input::placeholder {
-          color: #666;
+
+        .docs-editor .tiptap:focus {
+          outline: none;
         }
+
+        .docs-editor .tiptap h1 {
+          font-size: 1.5rem;
+          font-weight: 600;
+          color: #1a1a1a;
+          margin: 0 0 1rem 0;
+          font-family: 'Inter', sans-serif;
+        }
+
+        .docs-editor .tiptap h2 {
+          font-size: 1.25rem;
+          font-weight: 600;
+          color: #1a1a1a;
+          margin: 1.5rem 0 0.75rem 0;
+          font-family: 'Inter', sans-serif;
+        }
+
+        .docs-editor .tiptap h3 {
+          font-size: 1.1rem;
+          font-weight: 600;
+          color: #1a1a1a;
+          margin: 1.25rem 0 0.5rem 0;
+          font-family: 'Inter', sans-serif;
+        }
+
+        .docs-editor .tiptap p {
+          margin: 0 0 1rem 0;
+          color: #1a1a1a;
+        }
+
+        .docs-editor .tiptap strong {
+          font-weight: 600;
+        }
+
+        .docs-editor .tiptap em {
+          font-style: italic;
+        }
+
+        .docs-editor .tiptap a {
+          color: #2b6cb0;
+          text-decoration: underline;
+        }
+
+        .docs-editor .tiptap a:hover {
+          color: #1a1a1a;
+        }
+
+        /* Note Links */
+        .note-link-text {
+          color: #2b6cb0 !important;
+          background: rgba(43, 108, 176, 0.1) !important;
+          padding: 0.1rem 0.25rem !important;
+          border-radius: 0 !important;
+          font-weight: 500 !important;
+          cursor: pointer !important;
+          text-decoration: underline !important;
+        }
+
+        .note-link-text:hover {
+          background: rgba(43, 108, 176, 0.2) !important;
+        }
+
+        /* Status Bar / Terminal */
+        .docs-status-bar {
+          background: #1a1a1a;
+          border-top: 1px solid #333;
+          padding: 0.75rem 1.5rem;
+          color: #00ff00;
+          font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace;
+          font-size: 0.85rem;
+          display: flex;
+          align-items: center;
+          min-height: 2.5rem;
+          box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .terminal-prompt {
+          display: flex;
+          align-items: center;
+          width: 100%;
+        }
+
+        .terminal-status {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          width: 100%;
+        }
+
+        /* Mobile Styles */
         @media (max-width: 800px) {
-          .tiptap {
-            margin-left: 0.5rem;
-            font-size: 2rem;
-            margin-right: 0.5rem;
-            padding-left: 0.5rem;
-            padding-right: 0.5rem;
+          .docs-sidebar {
+            width: 80vw;
+            max-width: 320px;
+            transform: translateX(-100%);
+            top: var(--header-height, 3em);
+            height: calc(100vh - var(--header-height, 3em));
+          }
+
+          .docs-sidebar.open {
+            transform: translateX(0);
+          }
+
+          .docs-main {
+            margin-left: 0;
+            margin-top: var(--header-height, 3em);
+          }
+
+          .docs-toolbar {
+            padding: 0.5rem 1rem;
+            gap: 0.5rem;
+          }
+
+          .docs-title-container {
+            padding: 1rem;
+          }
+
+          .docs-title-input {
+            font-size: 1.25rem;
+          }
+
+          .docs-editor-container {
+            margin: 0 1rem;
+          }
+
+          .docs-editor {
+            padding: 1rem;
+          }
+
+          .docs-editor .tiptap {
+            font-size: 1.1rem;
+            line-height: 1.7;
+          }
+
+          .docs-status-bar {
+            padding: 0.5rem 1rem;
+            min-height: 2rem;
+          }
+
+          .terminal-hint {
+            display: none;
+          }
+        }
+
+        @media (max-width: 430px) {
+          .docs-sidebar {
+            width: 85vw;
+            max-width: 300px;
+            top: var(--header-height, 3em);
+            height: calc(100vh - var(--header-height, 3em));
+          }
+
+          .docs-editor .tiptap {
+            font-size: 1.2rem;
+            line-height: 1.8;
+          }
+
+          .docs-title-input {
+            font-size: 1.1rem;
           }
         }
       `}</style>
@@ -766,137 +1159,80 @@ export default function NotesEditor() {
         .mobile-header-bar {
           display: none;
         }
+        
         @media (max-width: 800px) {
           .mobile-header-bar {
             display: flex;
             align-items: center;
-            height: 3.2rem;
-            background: #f8f2e4;
-            border-bottom: 1px solid #e6e1d7;
+            height: 3.5rem;
+            background: #fff;
+            border-bottom: 1px solid #d0d7de;
             padding: 0 1rem;
             z-index: 101;
             position: sticky;
             top: 0;
           }
+          
           .sidebar-toggle-btn {
             background: none;
-            border: none;
-            font-size: 2rem;
-            color: #232323;
+            border: 1px solid #d0d7de;
+            font-size: 1.2rem;
+            color: #444;
             margin-right: 1rem;
             cursor: pointer;
-            padding: 0.2rem 0.5rem;
+            padding: 0.5rem;
+            border-radius: 0;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
           }
+          
+          .sidebar-toggle-btn:hover {
+            background: #eaeef2;
+          }
+          
           .mobile-title {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 600;
-            color: #232323;
+            color: #1a1a1a;
             font-family: 'Inter', sans-serif;
           }
+          
           .mobile-sidebar-overlay {
             display: none;
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.32);
+            background: rgba(0,0,0,0.3);
             z-index: 100;
             transition: opacity 0.2s;
             opacity: 0;
             pointer-events: none;
           }
+          
           .mobile-sidebar-overlay.open {
             display: block;
             opacity: 1;
             pointer-events: all;
           }
-          .mobile-sidebar {
-            display: block;
-            position: fixed;
-            top: 0; left: 0; bottom: 0;
-            width: 80vw;
-            max-width: 340px;
-            background: #f6f8fa;
-            box-shadow: 2px 0 16px rgba(0,0,0,0.13);
-            z-index: 101;
-            transform: translateX(-100%);
-            transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
-            overflow-y: auto;
-          }
-          .mobile-sidebar.open {
-            transform: translateX(0);
-          }
         }
+        
         @media (max-width: 430px) {
           .mobile-header-bar {
-            display: flex;
-            align-items: center;
             height: 3.2rem;
-            background: #f8f2e4;
-            border-bottom: 1px solid #e6e1d7;
-            padding: 0 1rem;
-            z-index: 101;
-            position: sticky;
-            top: 0;
+            padding: 0 0.75rem;
           }
+          
           .sidebar-toggle-btn {
-            background: none;
-            border: none;
-            font-size: 2.4rem;
-            color: #232323;
-            margin-right: 1rem;
-            cursor: pointer;
-            padding: 0.2rem 0.5rem;
+            font-size: 1.1rem;
+            width: 36px;
+            height: 36px;
+            margin-right: 0.75rem;
           }
+          
           .mobile-title {
-            font-size: 1.6rem;
-            font-weight: 600;
-            color: #232323;
-            font-family: 'Inter', sans-serif;
-          }
-          .mobile-sidebar-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.32);
-            z-index: 100;
-            transition: opacity 0.2s;
-            opacity: 0;
-            pointer-events: none;
-          }
-          .mobile-sidebar-overlay.open {
-            display: block;
-            opacity: 1;
-            pointer-events: all;
-          }
-          .mobile-sidebar {
-            display: block;
-            position: fixed;
-            top: 0; left: 0; bottom: 0;
-            width: 85vw;
-            max-width: 320px;
-            background: #f6f8fa;
-            box-shadow: 2px 0 16px rgba(0,0,0,0.13);
-            z-index: 101;
-            transform: translateX(-100%);
-            transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
-            overflow-y: auto;
-          }
-          .mobile-sidebar.open {
-            transform: translateX(0);
-          }
-        }
-      `}</style>
-      <style jsx>{`
-        @media (max-width: 800px) {
-          .obsidian-status-bar, .obsidian-terminal {
-            min-height: 0 !important;
-            height: 1.5rem !important;
-            font-size: 1.5rem !important;
-            padding: 0.1rem 0.5rem !important;
-            line-height: 1.2;
-            background: #f8f2e4;
-            border-top: 1px solid #e6e1d7;
-            box-shadow: none;
-            overflow: hidden;
+            font-size: 1rem;
           }
         }
       `}</style>
