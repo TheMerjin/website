@@ -15,266 +15,53 @@ import SpeedInsights from '@vercel/speed-insights/astro';
 />
 <Header/>
 <div class="notes-root">
-  <main class="obsidian-main">
-    <NotesEditor client:load />
-  </main>
+  <NotesEditor client:load />
 </div>
 </div>
 </body>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap');
-@import '../styles/SidebarElement.css';
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Georgia:wght@400;700&display=swap');
 
 .notes-page-wrapper {
   min-height: 100vh;
-  background: #f6f8fa;
+  background: #f9f9f9;
   padding: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
+
 .notes-root {
-  display: flex;
   height: calc(100vh - var(--header-height, 3em));
   width: 100vw;
-  background: #f8f2e4;
-  background-color: #f8f2e4;
+  background: #f9f9f9;
   position: relative;
   top: 0;
-  justify-content: center;
-}
-.obsidian-main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  background: #f8f2e4;
-  height: 100%;
-}
-.obsidian-topbar {
-  height: 48px;
-  background: #f8f2e4;
-  border-bottom: 1px solid rgb(var(--gray));
-  display: flex;
-  align-items: center;
-  padding: 0.8rem 1.5rem 3rem 1.5rem;
-  font-size: 2rem;
-  font-weight: 700;
-  letter-spacing: 1px;
-  color: rgb(var(--black));
-  font-family: 'Inter', sans-serif;
+  overflow: hidden;
 }
 
-.obsidian-editor {
-  flex: 1;
-  padding: 2rem 2.5rem;
-  background: #fff;
-  color: #232323;
-  font-size: 1.15rem;
-  border: none;
-  outline: none;
-  resize: none;
-  width: 100%;
-  height: 100%;
-  border-radius: 12px;
-  box-sizing: border-box;
-  font-family: 'Atkinson Hyperlegible', Arial, sans-serif;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-  margin-bottom: 1.5rem;
-  transition: box-shadow 0.2s;
-}
-.obsidian-editor:focus {
-  box-shadow: 0 4px 24px rgba(59,130,246,0.13);
-}
-
-/* Floating action button for new note (mobile) */
-.fab-new-note {
-  display: none;
-  position: fixed;
-  right: 24px;
-  bottom: 24px;
-  width: 56px;
-  height: 56px;
-  background: #3b82f6;
-  color: #fff;
-  border-radius: 50%;
-  box-shadow: 0 4px 16px rgba(59,130,246,0.18);
-  font-size: 2.2rem;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-  border: none;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.fab-new-note:active {
-  background: #2563eb;
-}
-
+/* Mobile responsive adjustments */
 @media (max-width: 800px) {
   .notes-root {
-    padding: 0;
-    height: auto;
-    min-height: 100vh;
-    background: #f6f8fa;
+    height: calc(100vh - var(--header-height, 3em));
+    background: #f9f9f9;
   }
-  .obsidian-main {
-    max-width: 100vw;
-    margin: 0;
-    border-radius: 0;
-    box-shadow: none;
-    padding: 0;
-    min-height: 100vh;
-  }
-  .obsidian-editor {
-    padding: 1.1rem 0.7rem;
-    font-size: 1.08rem;
-    border-radius: 10px;
-    margin-bottom: 1.2rem;
-    min-height: 220px;
-  }
-  .fab-new-note {
-    display: flex;
-  }
-}
-
-/* Increase text size significantly on mobile */
-@media (max-width: 800px) {
-  .obsidian-editor {
-    font-size: 1.4rem !important;
-    line-height: 1.6 !important;
-    padding: 1.5rem 1rem !important;
-  }
-  .obsidian-editor h1 {
-    font-size: 2.2rem !important;
-    margin-bottom: 1.5rem !important;
-  }
-  .obsidian-editor h2 {
-    font-size: 1.8rem !important;
-    margin-bottom: 1.2rem !important;
-  }
-  .obsidian-editor h3 {
-    font-size: 1.6rem !important;
-    margin-bottom: 1rem !important;
-  }
-  .obsidian-editor p {
-    font-size: 1.4rem !important;
-    margin-bottom: 1.2rem !important;
-  }
-  .obsidian-editor li {
-    font-size: 1.4rem !important;
-    margin-bottom: 0.8rem !important;
-  }
-  .obsidian-editor blockquote {
-    font-size: 1.3rem !important;
-    padding: 1rem 1.5rem !important;
-    margin: 1.5rem 0 !important;
-  }
-  .obsidian-editor code {
-    font-size: 1.2rem !important;
-    padding: 0.3rem 0.6rem !important;
-  }
-  .obsidian-editor pre {
-    font-size: 1.2rem !important;
-    padding: 1rem !important;
-    margin: 1.5rem 0 !important;
-  }
-  .mobile-title {
-    font-size: 1.6rem !important;
-  }
-  .sidebar-toggle-btn {
-    font-size: 2.4rem !important;
-  }
-}
-
-/* Sticky header for mobile */
-@media (max-width: 800px) {
+  
   .notes-page-wrapper Header {
     position: sticky;
     top: 0;
     z-index: 10;
-    background: #f6f8fa;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    background: #f9f9f9;
+    border-bottom: 1px solid #d0d7de;
   }
 }
 
-/* Add support for 430px mobile devices */
 @media (max-width: 430px) {
   .notes-root {
-    padding: 0;
-    height: auto;
-    min-height: 100vh;
-    background: #f6f8fa;
-  }
-  .obsidian-main {
-    max-width: 100vw;
-    margin: 0;
-    border-radius: 0;
-    box-shadow: none;
-    padding: 0;
-    min-height: 100vh;
-  }
-  .obsidian-editor {
-    padding: 1.1rem 0.7rem;
-    font-size: 1.08rem;
-    border-radius: 10px;
-    margin-bottom: 1.2rem;
-    min-height: 220px;
-  }
-  .fab-new-note {
-    display: flex;
-  }
-}
-
-/* Increase text size significantly on mobile (including 430px) */
-@media (max-width: 430px) {
-  .obsidian-editor {
-    font-size: 1.4rem !important;
-    line-height: 1.6 !important;
-    padding: 1.5rem 1rem !important;
-  }
-  .obsidian-editor h1 {
-    font-size: 2.2rem !important;
-    margin-bottom: 1.5rem !important;
-  }
-  .obsidian-editor h2 {
-    font-size: 1.8rem !important;
-    margin-bottom: 1.2rem !important;
-  }
-  .obsidian-editor h3 {
-    font-size: 1.6rem !important;
-    margin-bottom: 1rem !important;
-  }
-  .obsidian-editor p {
-    font-size: 1.4rem !important;
-    margin-bottom: 1.2rem !important;
-  }
-  .obsidian-editor li {
-    font-size: 1.4rem !important;
-    margin-bottom: 0.8rem !important;
-  }
-  .obsidian-editor blockquote {
-    font-size: 1.3rem !important;
-    padding: 1rem 1.5rem !important;
-    margin: 1.5rem 0 !important;
-  }
-  .obsidian-editor code {
-    font-size: 1.2rem !important;
-    padding: 0.3rem 0.6rem !important;
-  }
-  .obsidian-editor pre {
-    font-size: 1.2rem !important;
-    padding: 1rem !important;
-    margin: 1.5rem 0 !important;
-  }
-  .mobile-title {
-    font-size: 1.6rem !important;
-  }
-  .sidebar-toggle-btn {
-    font-size: 2.4rem !important;
+    height: calc(100vh - var(--header-height, 3em));
   }
 }
 </style>
-
-<!-- Floating action button for new note (mobile only) -->
-<button class="fab-new-note" title="New Note" onclick="window.dispatchEvent(new CustomEvent('new-note'))">+</button>
 
 <Analytics />
 <SpeedInsights />

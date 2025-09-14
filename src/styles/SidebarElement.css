@@ -1,22 +1,24 @@
+/* LessWrong-inspired sidebar styling following design principles */
+
 .obsidian-sidebar {
-  width: 15.5rem;
+  width: 280px;
   background: #f6f8fa;
   border-right: 1px solid #d0d7de;
   display: flex;
   flex-direction: column;
   padding: 0;
   height: 100%;
-  font-family: 'Segoe UI', 'Fira Mono', 'Menlo', 'Consolas', monospace, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .obsidian-sidebar-header {
-  padding: 0.75rem 1rem;
-  font-size: 0.85rem;
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
   font-weight: 600;
   text-transform: uppercase;
-  color: #57606a;
+  color: #1a1a1a;
   background: #f6f8fa;
-  border-bottom: 1px solid #e6e1d7;
+  border-bottom: 1px solid #d0d7de;
   letter-spacing: 0.05em;
   display: flex;
   align-items: center;
@@ -25,17 +27,15 @@
 
 .new-note-btn {
   background: none;
-  border: none;
-  color: #57606a;
+  border: 1px solid #d0d7de;
+  color: #444;
   font-size: 1.2rem;
   cursor: pointer;
-  padding: 0 0.25rem;
-  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0;
   transition: background 0.15s;
-  float: none;
-  width: auto;
-  height: auto;
-  margin-top: 0;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -43,20 +43,22 @@
 
 .new-note-btn:hover {
   background: #eaeef2;
-  color: #24292f;
+  color: #1a1a1a;
 }
 
 .loading {
-  padding: 1rem;
+  padding: 2rem 1.5rem;
   text-align: center;
   color: #666;
+  font-size: 0.9rem;
   font-style: normal;
 }
 
 .no-notes {
-  padding: 2rem 1rem;
+  padding: 2rem 1.5rem;
   text-align: center;
   color: #666;
+  font-size: 0.9rem;
 }
 
 .no-notes p {
@@ -66,18 +68,19 @@
 
 .no-notes button {
   background: #f6f8fa;
-  border: 1px solid #e6e1d7;
+  border: 1px solid #d0d7de;
   padding: 0.5rem 1rem;
-  border-radius: 6px;
+  border-radius: 0;
   cursor: pointer;
-  color: #57606a;
+  color: #444;
   font-weight: 500;
   transition: background 0.15s;
+  margin-top: 1rem;
 }
 
 .no-notes button:hover {
   background: #eaeef2;
-  color: #24292f;
+  color: #1a1a1a;
 }
 
 .obsidian-notes-list {
@@ -89,9 +92,9 @@
 .obsidian-note-item {
   display: flex;
   align-items: center;
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
-  color: #24292f;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.9rem;
+  color: #1a1a1a;
   background: #f6f8fa;
   border-bottom: 1px solid #e6e1d7;
   cursor: pointer;
@@ -100,8 +103,8 @@
 
 .obsidian-note-item.selected {
   background: #eaeef2;
-  font-weight: 600;
-  color: #0969da;
+  font-weight: 500;
+  color: #2b6cb0;
 }
 
 .obsidian-note-item:hover {
@@ -118,12 +121,13 @@
 .delete-note-btn {
   background: none;
   border: none;
-  color: #d1242f;
+  color: #b91c1c;
   font-size: 1rem;
   cursor: pointer;
   opacity: 0;
   transition: opacity 0.15s;
   margin-left: 0.5rem;
+  padding: 0.25rem;
 }
 
 .obsidian-note-item:hover .delete-note-btn {
@@ -131,5 +135,5 @@
 }
 
 .delete-note-btn:hover {
-  color: #a40e26;
+  color: #991b1b;
 } 
