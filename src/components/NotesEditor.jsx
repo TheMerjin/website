@@ -59,7 +59,11 @@ export default function NotesEditor() {
     if (note) {
       selectNote(note);
     } else {
-      alert(`Note "${noteName}" not found. You can create it with :new {${noteName}}`);
+      console.log(note?.name);
+
+      alert(`Note "${noteName}" not found. You can create it with :new {${noteName}}
+        Available notes: ${notes.map(n => n.title).join(', ')}`);
+      console.log(notes.map(n=> n.title).join(", "));
     }
   }, [notes]);
 
@@ -107,6 +111,7 @@ export default function NotesEditor() {
           const noteName = match[1].trim();
           e.preventDefault();
           e.stopPropagation();
+          console.log(noteName);
           handleNoteLinkClick(noteName);
           return;
         }
@@ -161,6 +166,12 @@ export default function NotesEditor() {
 
   // Select a note and update editor
   const selectNote = (note) => {
+    console.log(`selected note ${note}`)
+    let obj = note;
+    console.dir(obj);
+
+// Pretty print JSON
+    console.log(JSON.stringify(obj, null, 2)); 
     setSelectedNoteId(note.id);
     setTitle(note.title || 'Untitled');
     const processedContent = processContentWithNoteLinks(note.content || '');
@@ -670,37 +681,26 @@ export default function NotesEditor() {
         </div>
 
         {/* Status Bar / Terminal */}
-        <div className="docs-status-bar" ref={statusBarRef}>
-          {commandMode ? (
-            <div className="terminal-prompt">
-              <span className="prompt-symbol" style={{ color: '#00ff00', fontWeight: 'bold' }}>$</span>
-              <input
-                ref={inputRef}
-                className="command-input"
-                value={commandInput}
-                onChange={e => setCommandInput(e.target.value)}
-                placeholder="Enter command..."
-                style={{
-                  color: '#00ff00',
-                  backgroundColor: 'transparent',
-                  border: 'none',
-                  outline: 'none',
-                  fontFamily: 'Fira Mono, Consolas, Menlo, monospace',
-                  fontSize: '0.85rem',
-                  width: '100%',
-                  padding: '0',
-                  margin: '0',
-                  caretColor: '#00ff00'
-                }}
-              />
-            </div>
-          ) : (
-            <div className="terminal-status">
-              <span className="status-text" style={{ color: '#00ff00' }}>{status}</span>
-              <span className="terminal-hint" style={{ color: '#aaa' }}>Press ESC for NORMAL mode, : for commands</span>
-            </div>
-          )}
-        </div>
+        <div className="terminal-prompt">
+  <span className="prompt-symbol">$</span>
+  <input
+    ref={inputRef}
+    className="command-input"
+    value={commandInput}
+    onChange={e => setCommandInput(e.target.value)}
+    style={{
+      color: '#00ff00',
+      backgroundColor: 'black',
+      border: 'none',
+      outline: 'none',
+      fontFamily: 'Fira Mono, Consolas, Menlo, monospace',
+      fontSize: '0.85rem',
+      width: '100%',
+      caretColor: '#00ff00'
+    }}
+  />
+</div>
+
       </div>
 
       <style>{`
