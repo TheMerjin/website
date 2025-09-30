@@ -1,0 +1,85 @@
+---
+import Layout from '../../../layouts/WebsiteLayout.astro';
+import TopicPage from '../../../components/debate/TopicPage.jsx';
+import { supabase } from '../../../lib/supabase';
+
+const { id } = Astro.params;
+
+// Fetch topic data directly from Supabase
+let topic = null;
+let error = null;
+
+try {
+  console.log('Fetching topic with ID:', id);
+  
+  const { data: topicData, error: topicError } = await supabase
+    .from('topics')
+    .select(`
+      *,
+      nodes(
+        id,
+        type,
+        content,
+        weight,
+        created_at,
+        created_by,
+        evidence(
+          id,
+          description,
+          credibility,
+          created_at
+        )
+      )
+    `)
+    .eq('id', id)
+    .single();
+
+  if (topicError) {
+    console.error('Error fetching topic:', topicError);
+    error = 'Topic not found';
+  } else {
+    topic = topicData;
+    
+    // Fetch edges for this topic
+    let edges = [];
+    if (topic.nodes && topic.nodes.length > 0) {
+      const nodeIds = topic.nodes.map(n => n.id);
+      const { data: edgesData, error: edgesError } = await supabase
+        .from('edges')
+        .select(`
+          *,
+          parent_node:nodes!edges_parent_node_fkey(id, content, type),
+          child_node:nodes!edges_child_node_fkey(id, content, type)
+        `)
+        .in('parent_node', nodeIds)
+        .in('child_node', nodeIds);
+      
+      if (edgesError) {
+        console.error('Error fetching edges:', edgesError);
+      } else {
+        edges = edgesData || [];
+      }
+    }
+    
+    topic.edges = edges;
+    console.log('Topic data loaded:', topic);
+  }
+} catch (err) {
+  console.error('Database error:', err);
+  error = 'Failed to load topic';
+}
+
+if (error || !topic) {
+  console.log('Redirecting to 404, error:', error, 'topic:', topic);
+  return Astro.redirect('/404');
+}
+---
+
+<Layout title={`${topic.title} - Agora Debate`}>
+  <TopicPage 
+    client:load 
+    topic={topic}
+    nodes={topic.nodes || []}
+    edges={topic.edges || []}
+  />
+</Layout>
