@@ -1,0 +1,142 @@
+---
+import WebsiteLayout from '../../../layouts/WebsiteLayout.astro';
+import { supabase } from '../../../lib/supabase.js';
+
+export const prerender = false;
+
+let games = [];
+let error = null;
+
+try {
+  const { data, error: fetchError } = await supabase
+    .from('sreekgames')
+    .select('id, "White", "Black"')
+    .order('id', { ascending: false });
+  if (fetchError) {
+    error = fetchError.message;
+  } else {
+    games = data || [];
+  }
+} catch (e) {
+  error = e.message;
+}
+---
+
+<WebsiteLayout>
+  <h1>Chess Games</h1>
+  <div style="display:flex; gap:0.75rem; align-items:center; margin: 0.5rem 0 1rem 0;">
+    <input id="game-filter" placeholder="Filter by player name..." style="flex:1; padding:0.5rem; border:1px solid #e6e1d7;" />
+    <select id="game-sort" style="padding:0.5rem; border:1px solid #e6e1d7;">
+      <option value="new">Newest</option>
+      <option value="old">Oldest</option>
+      <option value="white">White A–Z</option>
+      <option value="black">Black A–Z</option>
+    </select>
+  </div>
+  <div style="margin: 1rem 0; padding: 1rem; background: #fff4ec; border: 1px solid #e6e1d7; border-radius: 0;">
+    <details>
+      <summary style="cursor: pointer; font-weight: 700; color: #333;">Add a new PGN</summary>
+      <form id="add-game-form" style="display: grid; gap: 0.75rem; margin-top: 0.75rem;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+          <div>
+            <label for="white" style="display:block; font-weight:600; color:#333; margin-bottom:0.25rem;">White</label>
+            <input id="white" name="white" type="text" placeholder="White player" style="width:100%; padding:0.5rem; border:1px solid #e6e1d7;" required />
+          </div>
+          <div>
+            <label for="black" style="display:block; font-weight:600; color:#333; margin-bottom:0.25rem;">Black</label>
+            <input id="black" name="black" type="text" placeholder="Black player" style="width:100%; padding:0.5rem; border:1px solid #e6e1d7;" required />
+          </div>
+        </div>
+        <div>
+          <label for="pgn" style="display:block; font-weight:600; color:#333; margin-bottom:0.25rem;">PGN</label>
+          <textarea id="pgn" name="pgn" rows="8" placeholder="Paste PGN with annotations here" style="width:100%; padding:0.5rem; border:1px solid #e6e1d7; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;" required></textarea>
+        </div>
+        <div style="display:flex; gap:0.5rem;">
+          <button type="submit" style="background:#456650; color:#fff4ec; border:1px solid #456650; padding:0.6rem 1rem; font-weight:600; cursor:pointer;">Insert</button>
+          <button type="reset" style="background:#f8f4f0; color:#333; border:1px solid #e6e1d7; padding:0.6rem 1rem; font-weight:600; cursor:pointer;">Clear</button>
+        </div>
+        <div id="add-game-error" style="color:#b00020; display:none;"></div>
+      </form>
+    </details>
+  </div>
+  {error ? (
+    <div style="color: #b00020">{error}</div>
+  ) : (
+    <ul id="games-list" style="list-style: none; padding: 0; margin: 1rem 0; display: grid; gap: 0.75rem;">
+      {games.length === 0 && (
+        <li style="color: #666">No games found.</li>
+      )}
+      {games.map((g) => (
+        <li data-id={g.id} data-white={g.White} data-black={g.Black}>
+          <a href={`/chess/sreekgames/${g.id}`} style="text-decoration: none;">
+            <div style="padding: 0.75rem 1rem; border: 1px solid #ddd; border-radius: 8px; background: #fff;">
+              <strong>{g.White}</strong> vs <strong>{g.Black}</strong>
+              <span style="color: #999; margin-left: 0.5rem">#{g.id}</span>
+            </div>
+          </a>
+        </li>
+      ))}
+    </ul>
+  )}
+</WebsiteLayout>
+
+<script type="module">
+  const form = document.getElementById('add-game-form');
+  const errorEl = document.getElementById('add-game-error');
+  const list = document.getElementById('games-list');
+  const filter = document.getElementById('game-filter');
+  const sort = document.getElementById('game-sort');
+  function applyFilterAndSort() {
+    const q = (filter?.value || '').toLowerCase();
+    const items = Array.from(list.querySelectorAll('li[data-id]'));
+    items.forEach((li) => {
+      const w = (li.getAttribute('data-white') || '').toLowerCase();
+      const b = (li.getAttribute('data-black') || '').toLowerCase();
+      li.style.display = w.includes(q) || b.includes(q) ? '' : 'none';
+    });
+    const visible = items.filter((li) => li.style.display !== 'none');
+    const mode = sort?.value || 'new';
+    visible.sort((a, b) => {
+      if (mode === 'new') return Number(b.getAttribute('data-id')) - Number(a.getAttribute('data-id'));
+      if (mode === 'old') return Number(a.getAttribute('data-id')) - Number(b.getAttribute('data-id'));
+      if (mode === 'white') return (a.getAttribute('data-white') || '').localeCompare(b.getAttribute('data-white') || '');
+      if (mode === 'black') return (a.getAttribute('data-black') || '').localeCompare(b.getAttribute('data-black') || '');
+      return 0;
+    });
+    visible.forEach((li) => list.appendChild(li));
+  }
+  filter?.addEventListener('input', applyFilterAndSort);
+  sort?.addEventListener('change', applyFilterAndSort);
+  applyFilterAndSort();
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorEl.style.display = 'none';
+      const white = /** @type {HTMLInputElement} */ (document.getElementById('white')).value.trim();
+      const black = /** @type {HTMLInputElement} */ (document.getElementById('black')).value.trim();
+      const pgn = /** @type {HTMLTextAreaElement} */ (document.getElementById('pgn')).value.trim();
+
+      try {
+        const res = await fetch('/api/sreekgames', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ White: white, Black: black, pgn })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || 'Failed to insert');
+        }
+        if (data.id) {
+          window.location.href = `/chess/sreekgames/${data.id}`;
+        } else {
+          window.location.reload();
+        }
+      } catch (err) {
+        errorEl.textContent = err?.message || 'Something went wrong';
+        errorEl.style.display = 'block';
+      }
+    });
+  }
+</script>
+
+

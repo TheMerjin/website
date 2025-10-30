@@ -1,0 +1,43 @@
+---
+import WebsiteLayout from '../../../layouts/WebsiteLayout.astro';
+import PgnPlayer from '../../../components/PgnPlayer.jsx';
+import { supabase } from '../../../lib/supabase.js';
+
+export const prerender = false;
+
+const { id } = Astro.params;
+
+let game = null;
+let error = null;
+
+try {
+  const { data, error: fetchError } = await supabase
+    .from('sreekgames')
+    .select('id, pgn, "White", "Black"')
+    .eq('id', id)
+    .single();
+  if (fetchError) {
+    error = fetchError.message || 'Game not found';
+  } else {
+    game = data;
+  }
+} catch (e) {
+  error = e.message;
+}
+
+if (error || !game) {
+  return Astro.redirect('/404');
+}
+---
+
+<WebsiteLayout>
+  <div style="display: flex; flex-direction: column; gap: 1rem;">
+    <a href="/chess/sreekgames" style="text-decoration: none; color: #0070f3">← Back to games</a>
+    <h1>{game.White} vs {game.Black}</h1>
+    <div style="margin-top: 1rem;">
+      <PgnPlayer client:load pgn={game.pgn} gameId={game.id} />
+    </div>
+  </div>
+</WebsiteLayout>
+
+
