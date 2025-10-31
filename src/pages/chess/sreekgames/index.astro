@@ -24,7 +24,7 @@ try {
 
 <WebsiteLayout>
   <h1>Chess Games</h1>
-  <div style="display:flex; gap:0.75rem; align-items:center; margin: 0.5rem 0 1rem 0;">
+  <div style="display:flex; gap:0.75rem; align-items:center; margin: 0.5rem 0 1rem 0; flex-wrap: wrap;">
     <input id="game-filter" placeholder="Filter by player name..." style="flex:1; padding:0.5rem; border:1px solid #e6e1d7;" />
     <select id="game-sort" style="padding:0.5rem; border:1px solid #e6e1d7;">
       <option value="new">Newest</option>
@@ -37,7 +37,7 @@ try {
     <details>
       <summary style="cursor: pointer; font-weight: 700; color: #333;">Add a new PGN</summary>
       <form id="add-game-form" style="display: grid; gap: 0.75rem; margin-top: 0.75rem;">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem;">
           <div>
             <label for="white" style="display:block; font-weight:600; color:#333; margin-bottom:0.25rem;">White</label>
             <input id="white" name="white" type="text" placeholder="White player" style="width:100%; padding:0.5rem; border:1px solid #e6e1d7;" required />

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Chess } from 'chess.js';
 import { Chessboard } from 'react-chessboard';
 
@@ -58,6 +58,10 @@ export default function PgnPlayer({ pgn, gameId }) {
   const [guessMode, setGuessMode] = useState(false);
   const [guessFeedback, setGuessFeedback] = useState('');
   const [transientFen, setTransientFen] = useState(null);
+  const wrapperRef = useRef(null);
+  const [containerWidth, setContainerWidth] = useState(500);
+  const effectiveBoard = Math.max(280, Math.min(520, Math.floor(containerWidth - 24)));
+  const isNarrow = containerWidth < 860;
 
   useEffect(() => {
     const game = new Chess();
@@ -74,6 +78,18 @@ export default function PgnPlayer({ pgn, gameId }) {
       setFen(game.fen());
     }
   }, [ply, moves, transientFen]);
+
+  useEffect(() => {
+    if (!wrapperRef.current) return;
+    const ro = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const w = entry.contentRect.width;
+        setContainerWidth(w);
+      }
+    });
+    ro.observe(wrapperRef.current);
+    return () => ro.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!isAuto) return;
@@ -192,12 +208,12 @@ export default function PgnPlayer({ pgn, gameId }) {
   };
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(320px, 500px) 1fr', gap: '1.25rem' }}>
+    <div ref={wrapperRef} style={{ display: 'grid', gridTemplateColumns: isNarrow ? '1fr' : 'minmax(320px, 520px) 1fr', gap: '1.25rem' }}>
       <div>
         <div style={{ ...panelStyle, padding: '0.75rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
             <div style={{ color: '#456650', fontWeight: 600 }}>{headers.Result || ''} {headers.ECO ? `• ${headers.ECO}` : ''} {headers.Opening ? `• ${headers.Opening}` : ''}</div>
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
               <button style={btnStyle} onClick={() => setOrientation((o) => (o === 'white' ? 'black' : 'white'))}>Flip</button>
               <button
                 style={{ ...btnStyle, background: guessMode ? '#e6e1d7' : btnStyle.background }}
@@ -229,7 +245,7 @@ export default function PgnPlayer({ pgn, gameId }) {
           </div>
           <Chessboard
             position={transientFen ?? fen}
-            boardWidth={460}
+            boardWidth={effectiveBoard}
             boardOrientation={orientation}
             animationDuration={350}
             onPieceDrop={(sourceSquare, targetSquare) => {
@@ -270,7 +286,7 @@ export default function PgnPlayer({ pgn, gameId }) {
               {guessFeedback}
             </div>
           )}
-          <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
             <button style={btnStyle} onClick={goFirst}>First</button>
             <button style={btnStyle} onClick={goPrev}>Prev</button>
             <button style={btnStyle} onClick={() => setIsAuto((v) => !v)}>{isAuto ? 'Pause' : 'Play'}</button>
@@ -280,7 +296,7 @@ export default function PgnPlayer({ pgn, gameId }) {
               {Math.ceil(ply / 2)} / {Math.ceil(moves.length / 2)}
             </div>
           </div>
-          <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
             <div style={{ color: '#666' }}>Speed</div>
             <input
               type="range"
@@ -289,7 +305,7 @@ export default function PgnPlayer({ pgn, gameId }) {
               step="100"
               value={speedMs}
               onChange={(e) => setSpeedMs(parseInt(e.target.value, 10))}
-              style={{ flex: 1 }}
+              style={{ flex: 1, minWidth: 160 }}
             />
             <div style={{ width: 46, textAlign: 'right', color: '#666' }}>{Math.round(speedMs / 1000)}s</div>
           </div>
@@ -323,7 +339,7 @@ export default function PgnPlayer({ pgn, gameId }) {
           </div>
           <div style={{ color: '#666', marginTop: 4 }}>{headers.Site || ''} {headers.Date ? `• ${headers.Date}` : ''}</div>
         </div>
-        <div style={{ ...panelStyle, padding: '0.75rem 1rem', maxHeight: 420, overflowY: 'auto' }}>
+        <div style={{ ...panelStyle, padding: '0.75rem 1rem', maxHeight: isNarrow ? 300 : 420, overflowY: 'auto' }}>
           {moves.length === 0 ? (
             <div style={{ color: '#777' }}>No moves parsed.</div>
           ) : (
