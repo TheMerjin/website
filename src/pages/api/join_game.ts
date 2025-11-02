@@ -22,15 +22,17 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    // Check if this is a guest game
-    if (game.is_guest_game && !blackPlayer && !guestName) {
+    // Infer if this is a guest game: black is null but black_username exists, or is_guest_game flag
+    const isGuestGame = game.is_guest_game || (!game.black && game.black_username);
+    
+    if (isGuestGame && !blackPlayer && !guestName) {
       return new Response(JSON.stringify({ error: 'Guest name required for guest games.' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' },
       });
     }
 
-    if (game.status !== 'waiting' && !game.is_guest_game) {
+    if (game.status !== 'waiting' && !isGuestGame) {
       return new Response(JSON.stringify({ error: 'Game is not available to join.' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' },
