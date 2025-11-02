@@ -47,34 +47,78 @@ function stripHeaders(pgn: string): string {
 
 function getFinalPosition(pgn: string): string {
   try {
-    const body = stripHeaders(pgn || '')
-      .replace(/\r?\n/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim()
-      .replace(/\([^)]*\)/g, ' ')
-      .replace(/\$\d+/g, '')
-      .replace(/\s*(1-0|0-1|1\/2-1\/2|\*)\s*$/, '')
+    // Remove headers first
+    let body = stripHeaders(pgn || '');
+    
+    // Clean up the body: remove variations, comments, NAGs, newlines
+    body = body
+      .replace(/\([^)]*\)/g, '') // Remove variations
+      .replace(/\{[^}]*\}/g, '') // Remove comments
+      .replace(/\$\d+/g, '') // Remove NAGs
+      .replace(/\r?\n/g, ' ') // Remove newlines
+      .replace(/\s+/g, ' ') // Normalize whitespace
+      .replace(/\s*(1-0|0-1|1\/2-1\/2|\*)\s*$/, '') // Remove result
       .trim();
     
-    const moveRegex = /(\d+)\.(?:\s*\.\.)?\s*([^\s{]+)(?:\s*\{[^}]*\})?(?:\s+([^\s{]+)(?:\s*\{[^}]*\})?)?/g;
+    // Extract all moves more carefully
     const moves: string[] = [];
-    let m: RegExpExecArray | null;
-    while ((m = moveRegex.exec(body)) !== null) {
-      if (m[2]) moves.push(m[2]);
-      if (m[4]) moves.push(m[4]);
+    // Match move numbers and moves (more permissive pattern)
+    const tokens = body.split(/\s+/);
+    
+    for (let i = 0; i < tokens.length; i++) {
+      const token = tokens[i].trim();
+      if (!token) continue;
+      
+      // Skip move numbers like "1." or "1..."
+      if (/^\d+\.(\.\.)?$/.test(token)) {
+        continue;
+      }
+      
+      // Skip result markers
+      if (/^(1-0|0-1|1\/2-1\/2|\*)$/.test(token)) {
+        break;
+      }
+      
+      // This should be a move - extract SAN (everything before any non-alphanumeric ending)
+      // Handle moves like "e4!", "e4?", "Nf3+", "Qxf7#", "O-O", "O-O-O"
+      const moveMatch = token.match(/^([a-zA-Z0-9+\-x#=!?]+)/);
+      if (moveMatch && moveMatch[1]) {
+        const san = moveMatch[1].replace(/[!?]+$/, ''); // Remove annotation marks
+        if (san && san.length > 0 && san !== '1-0' && san !== '0-1' && san !== '1/2-1/2') {
+          moves.push(san);
+        }
+      }
     }
     
+    // Play through all moves
     const chess = new Chess();
     chess.reset();
+    
     for (const san of moves) {
       try {
-        chess.move(san, { strict: false } as any);
-      } catch {
+        // Try making the move
+        const move = chess.move(san, { strict: false } as any);
+        if (!move) {
+          // If move fails, try with sloppy mode via different options
+          try {
+            chess.move(san);
+          } catch {
+            // If still fails, log but continue
+            console.warn(`Failed to parse move: ${san}`);
+            break;
+          }
+        }
+      } catch (e) {
+        // If move completely fails, we've likely reached an invalid position
+        // Return the last valid position
+        console.warn(`Error playing move ${san}:`, e);
         break;
       }
     }
+    
     return chess.fen();
-  } catch {
+  } catch (e) {
+    console.error('Error in getFinalPosition:', e);
     return 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
   }
 }
@@ -86,10 +130,10 @@ const result = headers['Result'] || '';
 const date = headers['Date'] || '';
 const site = headers['Site'] || '';
 const gameTitle = `${game.White} vs ${game.Black}${result ? ` (${result})` : ''}`;
-const gameDescription = `${event}${date ? ` • ${date}` : ''}${site ? ` • ${site}` : ''}`;
+const gameDescription = `${event}${date ? ` • ${date}` : ''}${site ? ` • ${site}` : ''}` || `Chess game between ${game.White} and ${game.Black}`;
 
-// Use chess.com's board image API for the preview
-const boardImageUrl = `https://www.chess.com/dynboard?fen=${encodeURIComponent(finalFen)}&size=2&coordinates=1`;
+// Use our own API endpoint to serve board images (better for Discord embeds)
+const boardImageUrl = new URL(`/api/chess-board-image?fen=${encodeURIComponent(finalFen)}`, Astro.url.origin).href;
 const pageUrl = new URL(Astro.url.pathname, Astro.url.origin).href;
 const baseUrl = Astro.url.origin;
 ---
@@ -101,21 +145,25 @@ const baseUrl = Astro.url.origin;
     <meta name="title" content={gameTitle} />
     <meta name="description" content={gameDescription} />
     
-    <!-- Open Graph / Facebook -->
+    <!-- Open Graph / Facebook / Discord -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content={pageUrl} />
     <meta property="og:title" content={gameTitle} />
     <meta property="og:description" content={gameDescription} />
     <meta property="og:image" content={boardImageUrl} />
+    <meta property="og:image:secure_url" content={boardImageUrl} />
+    <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="400" />
     <meta property="og:image:height" content="400" />
+    <meta property="og:site_name" content="Agora Chess" />
     
-    <!-- Twitter -->
+    <!-- Twitter / Discord -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:url" content={pageUrl} />
     <meta name="twitter:title" content={gameTitle} />
     <meta name="twitter:description" content={gameDescription} />
     <meta name="twitter:image" content={boardImageUrl} />
+    <meta name="twitter:image:src" content={boardImageUrl} />
   </Fragment>
   
   <div style="display: flex; flex-direction: column; gap: 1rem;">

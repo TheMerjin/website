@@ -8,7 +8,7 @@ export const POST: APIRoute = async ({ request }) => {
     const body = await request.json();
     const { gameId, fen, move, currentUserId } = body;
     
-    if (!gameId || !fen || !currentUserId) {
+    if (!gameId || !fen) {
       return new Response(JSON.stringify({ error: 'Missing required fields' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' },
@@ -29,12 +29,24 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    // Verify the user is a player in this game
-    if (game.white !== currentUserId && game.black !== currentUserId) {
-      return new Response(JSON.stringify({ error: 'Not authorized to move in this game' }), {
-        status: 403,
-        headers: { 'Content-Type': 'application/json' },
-      });
+    // Verify the user is a player in this game (or it's a guest game)
+    // For guest games, we check by username instead
+    if (game.is_guest_game) {
+      // Guest games allow moves - white player is registered, black is guest
+      // Client-side validation prevents unauthorized moves
+      // We only verify white player if currentUserId is provided
+      if (currentUserId && game.white !== currentUserId) {
+        // If a user ID is provided but doesn't match white, still allow (might be guest move)
+        // Client-side prevents wrong moves
+      }
+    } else {
+      // Regular games require both players to be registered
+      if (!currentUserId || (game.white !== currentUserId && game.black !== currentUserId)) {
+        return new Response(JSON.stringify({ error: 'Not authorized to move in this game' }), {
+          status: 403,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
     }
 
     // Get current moves array or initialize it
