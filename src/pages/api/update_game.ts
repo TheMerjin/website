@@ -29,9 +29,12 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
+    // Infer if this is a guest game: black is null but black_username exists, or is_guest_game flag
+    const isGuestGame = game.is_guest_game || (!game.black && game.black_username);
+    
     // Verify the user is a player in this game (or it's a guest game)
     // For guest games, we check by username instead
-    if (game.is_guest_game) {
+    if (isGuestGame) {
       // Guest games allow moves - white player is registered, black is guest
       // Client-side validation prevents unauthorized moves
       // We only verify white player if currentUserId is provided

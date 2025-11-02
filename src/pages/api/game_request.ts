@@ -20,7 +20,7 @@ export const POST: APIRoute = async ({ request }) => {
         .select('id')
         .eq('white', white.id)
         .eq('status', 'waiting')
-        .is('is_guest_game', false)
+        .not('black', 'is', null) // Regular games should have black set
         .maybeSingle();
 
       if (existing) {
@@ -41,18 +41,21 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     // For guest games, set black_username immediately if provided
+    // We'll infer guest games by checking if black is null but black_username exists
+    // Don't set is_guest_game column - we'll infer it from black being null + black_username existing
     const gameData: any = {
       white: white.id,
       fen: fen || 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
       status: status,
       white_username: username,
-      is_guest_game: is_guest_game || false,
+      // black stays null for guest games (this is how we identify them)
     };
 
     if (is_guest_game && guest_opponent_name) {
       gameData.black_username = guest_opponent_name;
       // For guest games, set status to in_progress immediately so it can be played
       gameData.status = 'in_progress';
+      // Leave black as null - this identifies it as a guest game
     }
 
     const {data: game, error: insertError } = await supabase
