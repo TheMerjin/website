@@ -57,11 +57,14 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
       return;
     }
 
+    // Capture isGuestGame value at the time of effect
+    const guestGameFlag = isGuestGame || false;
+
     // If currentUserId is not provided, fetch user data from client side
     const fetchUserData = async () => {
       try {
         // For guest games, check localStorage for guest identity first
-        if (isGuestGame) {
+        if (guestGameFlag) {
           const guestInfo = localStorage.getItem(`chess_guest_${gameId}`);
           if (guestInfo) {
             try {
@@ -89,7 +92,7 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
         if (!user) {
           console.log('No user data available - user not logged in');
           // For guest games, still allow viewing
-          if (isGuestGame) {
+          if (guestGameFlag) {
             setCurrentPlayer(null); // Viewer mode
           }
           return;
