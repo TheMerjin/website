@@ -59,18 +59,28 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
 
     // Capture isGuestGame value at the time of effect
     const guestGameFlag = isGuestGame || false;
+    
+    console.log('GameBoard fetchUserData - isGuestGame:', isGuestGame, 'guestGameFlag:', guestGameFlag);
+    console.log('GameBoard - blackUsername:', blackUsername, 'whiteUsername:', whiteUsername);
 
     // If currentUserId is not provided, fetch user data from client side
     const fetchUserData = async () => {
       try {
         // Try to get logged-in user first
-        const res = await fetch('/api/auth/user-data');
-        const data = await res.json();
-        const user = data.user;
+        let user = null;
+        try {
+          const res = await fetch('/api/auth/user-data');
+          const data = await res.json();
+          user = data.user;
+        } catch (authError) {
+          // 401 is expected for unlogged-in users, just continue
+          console.log('Auth check failed (expected for guests):', authError);
+        }
         
         console.log('User data received:', user);
         console.log('White username:', whiteUsername, 'type:', typeof whiteUsername);
         console.log('Black username:', blackUsername, 'type:', typeof blackUsername);
+        console.log('Is guest game?', guestGameFlag);
         
         // For guest games: if user is not logged in, automatically assign them as the guest player
         if (!user && guestGameFlag) {
@@ -78,6 +88,8 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
           
           // Check if guest info already exists in localStorage
           let guestInfo = localStorage.getItem(`chess_guest_${gameId}`);
+          console.log('Guest info from localStorage:', guestInfo);
+          
           if (!guestInfo) {
             // Auto-generate guest identity if black username exists (meaning guest should be black)
             // Otherwise, they're viewing a game where black hasn't joined yet
@@ -88,11 +100,11 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
               setCurrentPlayer('black');
               const currentTurn = game.turn();
               setIsMyTurn(currentTurn === 'b');
-              console.log('Auto-assigned as black guest player');
+              console.log('✅ Auto-assigned as black guest player, turn is:', currentTurn, 'myTurn:', currentTurn === 'b');
             } else {
               // Black hasn't joined yet, can't play
               setCurrentPlayer(null);
-              console.log('Waiting for black player to join');
+              console.log('⏳ Waiting for black player to join');
             }
           } else {
             // Use existing guest info
@@ -101,14 +113,17 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
               setCurrentPlayer(color);
               const currentTurn = game.turn();
               setIsMyTurn((color === 'white' && currentTurn === 'w') || (color === 'black' && currentTurn === 'b'));
-              console.log('Using existing guest identity:', color);
+              console.log('✅ Using existing guest identity:', color, 'turn:', currentTurn, 'myTurn:', (color === 'white' && currentTurn === 'w') || (color === 'black' && currentTurn === 'b'));
             } catch (e) {
               console.error('Error parsing guest info:', e);
               // Fallback: assign as black if black username exists
               if (blackUsername) {
+                const guestData = { name: blackUsername, color: 'black' };
+                localStorage.setItem(`chess_guest_${gameId}`, JSON.stringify(guestData));
                 setCurrentPlayer('black');
                 const currentTurn = game.turn();
                 setIsMyTurn(currentTurn === 'b');
+                console.log('✅ Fallback: assigned as black guest player');
               }
             }
           }
@@ -119,6 +134,7 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
           console.log('No user data available - user not logged in');
           // Not a guest game and not logged in = viewer only
           setCurrentPlayer(null);
+          console.log('⚠️ Not a guest game or guest flag is false');
           return;
         }
 
