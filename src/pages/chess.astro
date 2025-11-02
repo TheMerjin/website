@@ -32,7 +32,7 @@ import ChallengesRealtime from '../components/ChallengesRealtime';
       <a href="/leaderboard" class="side-btn leaderboard-btn">
         Leaderboard
       </a>
-      <button class="side-btn primary">Create Game</button>
+      <button class="side-btn primary" id="create-guest-game-btn">Create Guest Game</button>
       <div class="stats">
         <div>Online: 1,234</div>
         <div>Games: 567</div>
@@ -63,6 +63,52 @@ import ChallengesRealtime from '../components/ChallengesRealtime';
     if (correspondenceButton) {
       correspondenceButton.addEventListener("click", gameRequest); 
     }
+    const createGuestBtn = document.getElementById("create-guest-game-btn");
+    if (createGuestBtn) {
+      createGuestBtn.addEventListener("click", createGuestGame);
+    }
+    }
+    async function createGuestGame() {
+      const guestName = prompt("Enter the name of your guest opponent:");
+      if (!guestName || !guestName.trim()) {
+        return;
+      }
+      try {
+        const res = await fetch('/api/auth/user-data');
+        const data = await res.json();
+        const user = data.user;
+        if (!user || !user.id) {
+          alert('Please log in to create a game');
+          return;
+        }
+        const gameRequestRes = await fetch('/api/game_request', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            white: user,
+            fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+            status: 'waiting',
+            guest_opponent_name: guestName.trim(),
+            is_guest_game: true,
+          }),
+        });
+        const body = await gameRequestRes.json();
+        if (!gameRequestRes.ok || !body.success) {
+          alert(body.error || 'Failed to create game');
+          return;
+        }
+        const game = body.game[0];
+        const gameUrl = `${window.location.origin}/chess/games/${game.id}`;
+        try {
+          await navigator.clipboard.writeText(gameUrl);
+          alert(`Game created! Link copied to clipboard:\n${gameUrl}\n\nShare this link with ${guestName} - no account needed!`);
+        } catch (e) {
+          alert(`Game created! Share this link with ${guestName}:\n${gameUrl}`);
+        }
+      } catch (err) {
+        console.error('Error creating guest game:', err);
+        alert('Something went wrong');
+      }
     }
     async function gameRequest() {
   try {
