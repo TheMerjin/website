@@ -44,14 +44,7 @@ const isGuestGame = correctPost.is_guest_game || (!correctPost.black && correctP
     </div>
     
     <div class="game-main">
-      {isGuestGame && !correctPost.black_username && (
-        <div id="guest-setup" class="guest-setup">
-          <h3>Join as Guest</h3>
-          <p>Enter your name to join this game. No account required!</p>
-          <input type="text" id="guest-name-input" placeholder="Your name" />
-          <button id="guest-join-btn">Join Game</button>
-        </div>
-      )}
+      {/* Guest join form removed - unlogged-in users can now play automatically */}
       
       {(correctPost.status === 'in_progress' || correctPost.status === "completed") && (
         <GameBoard
@@ -72,50 +65,8 @@ const isGuestGame = correctPost.is_guest_game || (!correctPost.black && correctP
 </ChessWebsiteLayout>
 
 <script is:inline>
-  // Handle guest game joining
-  const guestSetup = document.getElementById('guest-setup');
-  const guestJoinBtn = document.getElementById('guest-join-btn');
-  const guestNameInput = document.getElementById('guest-name-input');
-  const gameIdElement = document.querySelector('[data-game-id]');
-  const gameId = gameIdElement ? gameIdElement.getAttribute('data-game-id') : null;
-  
-  if (guestJoinBtn && guestNameInput) {
-    guestJoinBtn.addEventListener('click', async () => {
-      const guestName = guestNameInput.value.trim();
-      if (!guestName) {
-        alert('Please enter your name');
-        return;
-      }
-      
-      try {
-        const response = await fetch('/api/join_game', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ gameId, guestName }),
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          // Store guest info in localStorage
-          localStorage.setItem(`chess_guest_${gameId}`, JSON.stringify({ name: guestName, color: 'black' }));
-          // Reload to show the board
-          window.location.reload();
-        } else {
-          const error = await response.json();
-          alert(error.error || 'Failed to join game');
-        }
-      } catch (error) {
-        alert('Error joining game');
-        console.error(error);
-      }
-    });
-    
-    guestNameInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        guestJoinBtn.click();
-      }
-    });
-  }
+  // Guest games now work automatically for unlogged-in users
+  // No join form needed - the GameBoard component handles guest identification
 </script>
 
 <style>
