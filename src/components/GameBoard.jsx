@@ -60,12 +60,32 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
     // If currentUserId is not provided, fetch user data from client side
     const fetchUserData = async () => {
       try {
+        // For guest games, check localStorage first
+        if (isGuestGame) {
+          const guestInfo = localStorage.getItem(`chess_guest_${gameId}`);
+          if (guestInfo) {
+            try {
+              const { name, color } = JSON.parse(guestInfo);
+              setCurrentPlayer(color);
+              setIsMyTurn((color === 'white' && game.turn() === 'w') || (color === 'black' && game.turn() === 'b'));
+              // For guests, we'll allow moves based on turn only
+              return;
+            } catch (e) {
+              console.error('Error parsing guest info:', e);
+            }
+          }
+        }
+
         const res = await fetch('/api/auth/user-data');
         const data = await res.json();
         const user = data.user;
         
         if (!user) {
           console.log('No user data available - user not logged in');
+          // For guest games, still allow viewing
+          if (isGuestGame) {
+            setCurrentPlayer(null); // Viewer mode
+          }
           return;
         }
 
@@ -82,16 +102,6 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
         console.log('Is white:', isWhite);
         console.log('Is black:', isBlack);
         console.log('User username:', user.user_metadata?.username);
-        
-        if (!isWhite && !isBlack) {
-          console.log('User is not a player in this game');
-          return;
-        }
-
-        // Set the current player
-        const playerColor = isWhite ? 'white' : 'black';
-        setCurrentPlayer(playerColor);
-        console.log('Set current player to:', playerColor);
 
         // Check whose turn it is based on FEN
         const currentTurn = game.turn(); // 'w' for white, 'b' for black
@@ -242,9 +252,25 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
   }, [game.fen(), gameId, userData?.id]);
 
   function makeMove(sourceSquare, targetSquare) {
+    // For guest games, check if it's the guest's turn
+    if (isGuestGame && !userData) {
+      const guestInfo = localStorage.getItem(`chess_guest_${gameId}`);
+      if (guestInfo) {
+        const { color } = JSON.parse(guestInfo);
+        const currentTurn = game.turn();
+        const guestTurn = (color === 'white' && currentTurn === 'w') || (color === 'black' && currentTurn === 'b');
+        if (!guestTurn) {
+          console.log("It's not your turn!");
+          return false;
+        }
+      } else {
+        console.log("Guest info not found");
+        return false;
+      }
+    }
 
     // Prevent moves if it's not the user's turn
-    if (!isMyTurn) {
+    if (!isMyTurn && !isGuestGame) {
       console.log("It's not your turn!");
       return false;
     }
@@ -275,6 +301,9 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
   async function updateGameInBackend(game,newFen, move) {
     
     try {
+      // For guest games, we might not have userData
+      const userId = userData?.id || null;
+      
       const response = await fetch('/api/update_game', {
         method: 'POST',
         headers: {
@@ -284,7 +313,7 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
           gameId,
           fen: newFen,
           move: move.san, // Standard Algebraic Notation
-          currentUserId: userData?.id
+          currentUserId: userId
         }),
       });
       const body = await response.json();

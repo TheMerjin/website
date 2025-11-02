@@ -6,8 +6,8 @@ export const prerender = false;
 export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
-    const { gameId, blackPlayer } = body;
-    const username = blackPlayer?.user_metadata?.username
+    const { gameId, blackPlayer, guestName } = body;
+    
     // Fetch the game
     const { data: game, error: fetchError } = await supabase
       .from('games')
@@ -22,7 +22,15 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    if (game.status !== 'waiting') {
+    // Check if this is a guest game
+    if (game.is_guest_game && !blackPlayer && !guestName) {
+      return new Response(JSON.stringify({ error: 'Guest name required for guest games.' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (game.status !== 'waiting' && !game.is_guest_game) {
       return new Response(JSON.stringify({ error: 'Game is not available to join.' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' },
@@ -30,9 +38,23 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     // Update the game: set black player and status to active
+    const updateData: any = {
+      status: 'in_progress'
+    };
+
+    if (blackPlayer && blackPlayer.id) {
+      // Registered user joining
+      updateData.black = blackPlayer.id;
+      updateData.black_username = blackPlayer?.user_metadata?.username;
+    } else if (guestName) {
+      // Guest joining
+      updateData.black_username = guestName;
+      // black stays null for guests
+    }
+
     const { data: updated, error: updateError } = await supabase
       .from('games')
-      .update({ black: blackPlayer.id, status: 'in_progress', black_username : username })
+      .update(updateData)
       .eq('id', gameId)
       .select()
       .maybeSingle();

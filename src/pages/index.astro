@@ -1,6 +1,7 @@
 ---
 import WebsiteLayout from '../layouts/WebsiteLayout.astro';
 import Postcard from '../components/PostCard.astro';
+import CreateGuestGame from '../components/CreateGuestGame.jsx';
 
 const res = await fetch(`${import.meta.env.PUBLIC_API_URL}api/auth/get_posts`);
 const { posts } = await res.json();
@@ -15,6 +16,7 @@ const { posts } = await res.json();
 			<p>Welcome to my corner of the internet. This is where I share my thoughts and engage in meaningful discussions. I've built this space to explore ideas, share knowledge, and connect with others who are curious about the world. No moderation say whatever you want just no spamming please</p>
 			<p>Feel free to join the conversation through posting your own things, commenting on posts, or learning more about me in the sidebar. Posts are organized by topic and can be filtered by tags to help you find what interests you most.</p>
 		</div>
+		<CreateGuestGame client:load />
 		<div class="navigation-hints">
 			<div class="hint">
 				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
