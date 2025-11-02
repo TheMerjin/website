@@ -63,24 +63,7 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
     // If currentUserId is not provided, fetch user data from client side
     const fetchUserData = async () => {
       try {
-        // For guest games, check localStorage for guest identity first
-        if (guestGameFlag) {
-          const guestInfo = localStorage.getItem(`chess_guest_${gameId}`);
-          if (guestInfo) {
-            try {
-              const { name, color } = JSON.parse(guestInfo);
-              setCurrentPlayer(color);
-              const currentTurn = game.turn();
-              setIsMyTurn((color === 'white' && currentTurn === 'w') || (color === 'black' && currentTurn === 'b'));
-              // For guests, we'll allow moves based on turn only
-              return;
-            } catch (e) {
-              console.error('Error parsing guest info:', e);
-            }
-          }
-        }
-
-        // Try to get logged-in user
+        // Try to get logged-in user first
         const res = await fetch('/api/auth/user-data');
         const data = await res.json();
         const user = data.user;
@@ -89,12 +72,53 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
         console.log('White username:', whiteUsername, 'type:', typeof whiteUsername);
         console.log('Black username:', blackUsername, 'type:', typeof blackUsername);
         
+        // For guest games: if user is not logged in, automatically assign them as the guest player
+        if (!user && guestGameFlag) {
+          console.log('Guest game - user not logged in, assigning as guest player');
+          
+          // Check if guest info already exists in localStorage
+          let guestInfo = localStorage.getItem(`chess_guest_${gameId}`);
+          if (!guestInfo) {
+            // Auto-generate guest identity if black username exists (meaning guest should be black)
+            // Otherwise, they're viewing a game where black hasn't joined yet
+            if (blackUsername) {
+              // Guest is black player
+              const guestData = { name: blackUsername, color: 'black' };
+              localStorage.setItem(`chess_guest_${gameId}`, JSON.stringify(guestData));
+              setCurrentPlayer('black');
+              const currentTurn = game.turn();
+              setIsMyTurn(currentTurn === 'b');
+              console.log('Auto-assigned as black guest player');
+            } else {
+              // Black hasn't joined yet, can't play
+              setCurrentPlayer(null);
+              console.log('Waiting for black player to join');
+            }
+          } else {
+            // Use existing guest info
+            try {
+              const { name, color } = JSON.parse(guestInfo);
+              setCurrentPlayer(color);
+              const currentTurn = game.turn();
+              setIsMyTurn((color === 'white' && currentTurn === 'w') || (color === 'black' && currentTurn === 'b'));
+              console.log('Using existing guest identity:', color);
+            } catch (e) {
+              console.error('Error parsing guest info:', e);
+              // Fallback: assign as black if black username exists
+              if (blackUsername) {
+                setCurrentPlayer('black');
+                const currentTurn = game.turn();
+                setIsMyTurn(currentTurn === 'b');
+              }
+            }
+          }
+          return; // Don't check for logged-in user if we're handling as guest
+        }
+        
         if (!user) {
           console.log('No user data available - user not logged in');
-          // For guest games, still allow viewing
-          if (guestGameFlag) {
-            setCurrentPlayer(null); // Viewer mode
-          }
+          // Not a guest game and not logged in = viewer only
+          setCurrentPlayer(null);
           return;
         }
 
@@ -186,9 +210,9 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
     setIsMyTurn(myTurn);
   }, [game.fen(), currentPlayer]);
 
-  // Subscribe to game updates
+  // Subscribe to game updates (works for both logged-in users and guests)
   useEffect(() => {
-    if (!gameId || (!userData && !isGuestGame)) return;
+    if (!gameId) return;
 
     const channel = supabase
       .channel(`game:${gameId}`)
@@ -239,7 +263,7 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [gameId, userData?.id]); // Only depend on gameId and userData.id
+  }, [gameId, currentPlayer, isGuestGame]); // Subscribe for both logged-in users and guests
 
   // Winner detection effect
   useEffect(() => {
@@ -293,33 +317,19 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
   }, [game.fen(), gameId, userData?.id]);
 
   function makeMove(sourceSquare, targetSquare) {
-    // For guest games, check if it's the guest's turn
-    if (isGuestGame && !userData) {
-      const guestInfo = localStorage.getItem(`chess_guest_${gameId}`);
-      if (guestInfo) {
-        const { color } = JSON.parse(guestInfo);
-        const currentTurn = game.turn();
-        const guestTurn = (color === 'white' && currentTurn === 'w') || (color === 'black' && currentTurn === 'b');
-        if (!guestTurn) {
-          console.log("It's not your turn!");
-          return false;
-        }
-      } else {
-        console.log("Guest info not found");
-        return false;
-      }
-    } else {
-      // For regular games, check if it's the user's turn
-      if (!isMyTurn) {
-        console.log("It's not your turn!");
-        return false;
-      }
-      
-      // Also check if user is actually a player
-      if (!currentPlayer) {
-        console.log("You are not a player in this game");
-        return false;
-      }
+    // Check if user can move
+    if (!currentPlayer) {
+      console.log("You are not a player in this game");
+      return false;
+    }
+
+    // Check if it's the player's turn
+    const currentTurn = game.turn();
+    const playerTurn = (currentPlayer === 'white' && currentTurn === 'w') || (currentPlayer === 'black' && currentTurn === 'b');
+    
+    if (!playerTurn) {
+      console.log("It's not your turn!");
+      return false;
     }
 
     const move = game.move({
