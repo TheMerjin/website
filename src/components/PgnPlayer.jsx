@@ -200,35 +200,36 @@ export default function PgnPlayer({ pgn, gameId }) {
     background: '#f8f4f0',
     color: '#333',
     border: '1px solid #e6e1d7',
-    fontSize: '0.95rem',
+    fontSize: isNarrow ? '0.85rem' : '0.95rem',
     fontFamily: 'Inter, sans-serif',
     fontWeight: 600,
-    padding: '0.5rem 0.75rem',
+    padding: isNarrow ? '0.4rem 0.5rem' : '0.5rem 0.75rem',
     cursor: 'pointer',
+    whiteSpace: 'nowrap',
   };
 
   return (
     <div ref={wrapperRef} style={{ display: 'grid', gridTemplateColumns: isNarrow ? '1fr' : 'minmax(320px, 520px) 1fr', gap: '1.25rem' }}>
       <div>
-        <div style={{ ...panelStyle, padding: '0.75rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-            <div style={{ color: '#456650', fontWeight: 600 }}>{headers.Result || ''} {headers.ECO ? `• ${headers.ECO}` : ''} {headers.Opening ? `• ${headers.Opening}` : ''}</div>
-            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-              <button style={btnStyle} onClick={() => setOrientation((o) => (o === 'white' ? 'black' : 'white'))}>Flip</button>
+        <div style={{ ...panelStyle, padding: isNarrow ? '0.5rem' : '0.75rem' }}>
+          <div style={{ display: 'flex', flexDirection: isNarrow ? 'column' : 'row', justifyContent: 'space-between', alignItems: isNarrow ? 'stretch' : 'center', marginBottom: '0.5rem', gap: isNarrow ? '0.5rem' : '0' }}>
+            <div style={{ color: '#456650', fontWeight: 600, fontSize: isNarrow ? '0.85rem' : '1rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{headers.Result || ''} {headers.ECO ? `• ${headers.ECO}` : ''} {headers.Opening ? `• ${headers.Opening}` : ''}</div>
+            <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'nowrap', justifyContent: 'flex-end', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+              <button style={{ ...btnStyle, fontSize: isNarrow ? '0.75rem' : btnStyle.fontSize, padding: isNarrow ? '0.35rem 0.4rem' : btnStyle.padding }} onClick={() => setOrientation((o) => (o === 'white' ? 'black' : 'white'))}>Flip</button>
               <button
-                style={{ ...btnStyle, background: guessMode ? '#e6e1d7' : btnStyle.background }}
+                style={{ ...btnStyle, background: guessMode ? '#e6e1d7' : btnStyle.background, fontSize: isNarrow ? '0.75rem' : btnStyle.fontSize, padding: isNarrow ? '0.35rem 0.4rem' : btnStyle.padding }}
                 onClick={() => { setGuessMode((m) => { const next = !m; if (next) setIsAuto(false); return next; }); setGuessFeedback(''); }}
               >Guess</button>
               <button
-                style={btnStyle}
+                style={{ ...btnStyle, fontSize: isNarrow ? '0.75rem' : btnStyle.fontSize, padding: isNarrow ? '0.35rem 0.4rem' : btnStyle.padding }}
                 onClick={() => {
                   try {
                     navigator.clipboard.writeText(pgn || '');
                   } catch {}
                 }}
-              >Copy PGN</button>
+              >Copy</button>
               <button
-                style={btnStyle}
+                style={{ ...btnStyle, fontSize: isNarrow ? '0.75rem' : btnStyle.fontSize, padding: isNarrow ? '0.35rem 0.4rem' : btnStyle.padding }}
                 onClick={() => {
                   const blob = new Blob([pgn || ''], { type: 'text/plain' });
                   const url = URL.createObjectURL(blob);
@@ -240,7 +241,7 @@ export default function PgnPlayer({ pgn, gameId }) {
                   a.remove();
                   URL.revokeObjectURL(url);
                 }}
-              >Download</button>
+              >DL</button>
             </div>
           </div>
           <Chessboard
@@ -286,18 +287,18 @@ export default function PgnPlayer({ pgn, gameId }) {
               {guessFeedback}
             </div>
           )}
-          <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
-            <button style={btnStyle} onClick={goFirst}>First</button>
-            <button style={btnStyle} onClick={goPrev}>Prev</button>
-            <button style={btnStyle} onClick={() => setIsAuto((v) => !v)}>{isAuto ? 'Pause' : 'Play'}</button>
-            <button style={btnStyle} onClick={goNext}>Next</button>
-            <button style={btnStyle} onClick={goLast}>Last</button>
-            <div style={{ marginLeft: 'auto', color: '#456650', fontWeight: 600 }}>
+          <div style={{ display: 'flex', gap: isNarrow ? '0.3rem' : '0.5rem', marginTop: '0.75rem', alignItems: 'center', flexWrap: 'nowrap', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+            <button style={{ ...btnStyle, padding: isNarrow ? '0.4rem 0.5rem' : btnStyle.padding, minWidth: isNarrow ? '2.2rem' : 'auto' }} onClick={goFirst}>&lt;&lt;</button>
+            <button style={{ ...btnStyle, padding: isNarrow ? '0.4rem 0.5rem' : btnStyle.padding, minWidth: isNarrow ? '2rem' : 'auto' }} onClick={goPrev}>&lt;</button>
+            <button style={{ ...btnStyle, padding: isNarrow ? '0.4rem 0.5rem' : btnStyle.padding, minWidth: isNarrow ? '3rem' : 'auto' }} onClick={() => setIsAuto((v) => !v)}>{isAuto ? 'Pause' : 'Play'}</button>
+            <button style={{ ...btnStyle, padding: isNarrow ? '0.4rem 0.5rem' : btnStyle.padding, minWidth: isNarrow ? '2rem' : 'auto' }} onClick={goNext}>&gt;</button>
+            <button style={{ ...btnStyle, padding: isNarrow ? '0.4rem 0.5rem' : btnStyle.padding, minWidth: isNarrow ? '2.2rem' : 'auto' }} onClick={goLast}>&gt;&gt;</button>
+            <div style={{ marginLeft: 'auto', color: '#456650', fontWeight: 600, fontSize: isNarrow ? '0.85rem' : '1rem', whiteSpace: 'nowrap', paddingLeft: '0.5rem' }}>
               {Math.ceil(ply / 2)} / {Math.ceil(moves.length / 2)}
             </div>
           </div>
-          <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
-            <div style={{ color: '#666' }}>Speed</div>
+          <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem', alignItems: 'center', flexWrap: 'nowrap' }}>
+            <div style={{ color: '#666', fontSize: isNarrow ? '0.85rem' : '1rem', whiteSpace: 'nowrap' }}>Speed</div>
             <input
               type="range"
               min="300"
@@ -305,16 +306,16 @@ export default function PgnPlayer({ pgn, gameId }) {
               step="100"
               value={speedMs}
               onChange={(e) => setSpeedMs(parseInt(e.target.value, 10))}
-              style={{ flex: 1, minWidth: 160 }}
+              style={{ flex: 1, minWidth: isNarrow ? '120px' : '160px' }}
             />
-            <div style={{ width: 46, textAlign: 'right', color: '#666' }}>{Math.round(speedMs / 1000)}s</div>
+            <div style={{ width: isNarrow ? '36px' : '46px', textAlign: 'right', color: '#666', fontSize: isNarrow ? '0.85rem' : '1rem', whiteSpace: 'nowrap' }}>{Math.round(speedMs / 1000)}s</div>
           </div>
         </div>
-        <div style={{ ...headerStyle, padding: '0.75rem 1rem', marginTop: '0.75rem' }}>
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-            <div style={{ fontWeight: 700, color: '#333' }}>Annotation</div>
+        <div style={{ ...headerStyle, padding: isNarrow ? '0.6rem 0.75rem' : '0.75rem 1rem', marginTop: '0.75rem' }}>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap: 'nowrap', gap: '0.5rem' }}>
+            <div style={{ fontWeight: 700, color: '#333', fontSize: isNarrow ? '0.9rem' : '1rem' }}>Annotation</div>
             <button
-              style={{ background: '#456650', color: '#fff4ec', border: '1px solid #456650', padding: '0.35rem 0.7rem', fontWeight: 600, cursor: 'pointer' }}
+              style={{ background: '#456650', color: '#fff4ec', border: '1px solid #456650', padding: isNarrow ? '0.3rem 0.5rem' : '0.35rem 0.7rem', fontWeight: 600, cursor: 'pointer', fontSize: isNarrow ? '0.8rem' : '0.9rem', whiteSpace: 'nowrap' }}
               onClick={() => {
                 const input = window.prompt('Edit annotation for this move:', currentComment || '');
                 if (input !== null) {
@@ -324,29 +325,29 @@ export default function PgnPlayer({ pgn, gameId }) {
             >Edit</button>
           </div>
           {currentComment ? (
-            <div style={{ color: '#333', lineHeight: 1.5, marginTop: 6 }}>{currentComment}</div>
+            <div style={{ color: '#333', lineHeight: 1.5, marginTop: 6, fontSize: isNarrow ? '0.9rem' : '1rem', wordBreak: 'break-word' }}>{currentComment}</div>
           ) : (
-            <div style={{ color: '#888', fontStyle: 'italic', marginTop: 6 }}>No annotation for this move.</div>
+            <div style={{ color: '#888', fontStyle: 'italic', marginTop: 6, fontSize: isNarrow ? '0.85rem' : '1rem' }}>No annotation for this move.</div>
           )}
         </div>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-        <div style={{ ...headerStyle, padding: '0.75rem 1rem' }}>
-          <div style={{ fontWeight: 700, color: '#333', marginBottom: 6 }}>{headers.Event || 'Game'}</div>
-          <div style={{ color: '#456650', fontWeight: 600 }}>
+        <div style={{ ...headerStyle, padding: isNarrow ? '0.6rem 0.75rem' : '0.75rem 1rem' }}>
+          <div style={{ fontWeight: 700, color: '#333', marginBottom: 6, fontSize: isNarrow ? '0.9rem' : '1rem' }}>{headers.Event || 'Game'}</div>
+          <div style={{ color: '#456650', fontWeight: 600, fontSize: isNarrow ? '0.85rem' : '1rem', wordBreak: 'break-word' }}>
             {headers.White || 'White'} vs {headers.Black || 'Black'}
           </div>
-          <div style={{ color: '#666', marginTop: 4 }}>{headers.Site || ''} {headers.Date ? `• ${headers.Date}` : ''}</div>
+          <div style={{ color: '#666', marginTop: 4, fontSize: isNarrow ? '0.8rem' : '0.9rem', wordBreak: 'break-word' }}>{headers.Site || ''} {headers.Date ? `• ${headers.Date}` : ''}</div>
         </div>
-        <div style={{ ...panelStyle, padding: '0.75rem 1rem', maxHeight: isNarrow ? 300 : 420, overflowY: 'auto' }}>
+        <div style={{ ...panelStyle, padding: isNarrow ? '0.6rem 0.75rem' : '0.75rem 1rem', maxHeight: isNarrow ? 300 : 420, overflowY: 'auto' }}>
           {moves.length === 0 ? (
-            <div style={{ color: '#777' }}>No moves parsed.</div>
+            <div style={{ color: '#777', fontSize: isNarrow ? '0.85rem' : '1rem' }}>No moves parsed.</div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: '40px 1fr 1fr', gap: '0.35rem 0.5rem', alignItems: 'center' }}>
-              <div style={{ color: '#666', fontSize: '0.9rem' }}>#</div>
-              <div style={{ color: '#666', fontSize: '0.9rem' }}>White</div>
-              <div style={{ color: '#666', fontSize: '0.9rem' }}>Black</div>
+            <div style={{ display: 'grid', gridTemplateColumns: isNarrow ? '32px 1fr 1fr' : '40px 1fr 1fr', gap: isNarrow ? '0.3rem 0.4rem' : '0.35rem 0.5rem', alignItems: 'center' }}>
+              <div style={{ color: '#666', fontSize: isNarrow ? '0.8rem' : '0.9rem' }}>#</div>
+              <div style={{ color: '#666', fontSize: isNarrow ? '0.8rem' : '0.9rem' }}>White</div>
+              <div style={{ color: '#666', fontSize: isNarrow ? '0.8rem' : '0.9rem' }}>Black</div>
               {Array.from({ length: Math.ceil(moves.length / 2) }).map((_, idx) => {
                 const w = moves[idx * 2];
                 const b = moves[idx * 2 + 1];

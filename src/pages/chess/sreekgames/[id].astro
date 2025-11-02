@@ -2,6 +2,7 @@
 import WebsiteLayout from '../../../layouts/WebsiteLayout.astro';
 import PgnPlayer from '../../../components/PgnPlayer.jsx';
 import { supabase } from '../../../lib/supabase.js';
+import { Chess } from 'chess.js';
 
 export const prerender = false;
 
@@ -21,16 +22,102 @@ try {
   } else {
     game = data;
   }
-} catch (e) {
-  error = e.message;
+} catch (e: any) {
+  error = e?.message || 'Unknown error';
 }
 
 if (error || !game) {
   return Astro.redirect('/404');
 }
+
+// Parse PGN to extract game info for embeds
+function parseHeaders(pgn: string): Record<string, string> {
+  const headers: Record<string, string> = {};
+  const headerRegex = /^\[(\w+)\s+"([^"]*)"\]$/gm;
+  let m: RegExpExecArray | null;
+  while ((m = headerRegex.exec(pgn)) !== null) {
+    headers[m[1]] = m[2];
+  }
+  return headers;
+}
+
+function stripHeaders(pgn: string): string {
+  return pgn.replace(/^\[[^\]]*\]\s*$/gm, '').trim();
+}
+
+function getFinalPosition(pgn: string): string {
+  try {
+    const body = stripHeaders(pgn || '')
+      .replace(/\r?\n/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/\([^)]*\)/g, ' ')
+      .replace(/\$\d+/g, '')
+      .replace(/\s*(1-0|0-1|1\/2-1\/2|\*)\s*$/, '')
+      .trim();
+    
+    const moveRegex = /(\d+)\.(?:\s*\.\.)?\s*([^\s{]+)(?:\s*\{[^}]*\})?(?:\s+([^\s{]+)(?:\s*\{[^}]*\})?)?/g;
+    const moves: string[] = [];
+    let m: RegExpExecArray | null;
+    while ((m = moveRegex.exec(body)) !== null) {
+      if (m[2]) moves.push(m[2]);
+      if (m[4]) moves.push(m[4]);
+    }
+    
+    const chess = new Chess();
+    chess.reset();
+    for (const san of moves) {
+      try {
+        chess.move(san, { strict: false } as any);
+      } catch {
+        break;
+      }
+    }
+    return chess.fen();
+  } catch {
+    return 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+  }
+}
+
+const headers = parseHeaders(game.pgn || '');
+const finalFen = getFinalPosition(game.pgn || '');
+const event = headers['Event'] || 'Chess Game';
+const result = headers['Result'] || '';
+const date = headers['Date'] || '';
+const site = headers['Site'] || '';
+const gameTitle = `${game.White} vs ${game.Black}${result ? ` (${result})` : ''}`;
+const gameDescription = `${event}${date ? ` • ${date}` : ''}${site ? ` • ${site}` : ''}`;
+
+// Use chess.com's board image API for the preview
+const boardImageUrl = `https://www.chess.com/dynboard?fen=${encodeURIComponent(finalFen)}&size=2&coordinates=1`;
+const pageUrl = new URL(Astro.url.pathname, Astro.url.origin).href;
+const baseUrl = Astro.url.origin;
 ---
 
 <WebsiteLayout>
+  <Fragment slot="head">
+    <!-- Primary Meta Tags -->
+    <title>{gameTitle} - Annotated Chess Game</title>
+    <meta name="title" content={gameTitle} />
+    <meta name="description" content={gameDescription} />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:title" content={gameTitle} />
+    <meta property="og:description" content={gameDescription} />
+    <meta property="og:image" content={boardImageUrl} />
+    <meta property="og:image:width" content="400" />
+    <meta property="og:image:height" content="400" />
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={pageUrl} />
+    <meta name="twitter:title" content={gameTitle} />
+    <meta name="twitter:description" content={gameDescription} />
+    <meta name="twitter:image" content={boardImageUrl} />
+  </Fragment>
+  
   <div style="display: flex; flex-direction: column; gap: 1rem;">
     <a href="/chess/sreekgames" style="text-decoration: none; color: #0070f3">← Back to games</a>
     <h1>{game.White} vs {game.Black}</h1>
