@@ -3,7 +3,7 @@ import { Chessboard } from 'react-chessboard';
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/client-supabase.js';
 
-export default function GameBoard({ initialFen, onMove, gameId, currentUserId, whiteUsername, blackUsername }) {
+export default function GameBoard({ initialFen, onMove, gameId, currentUserId, whiteUsername, blackUsername, isGuestGame = false }) {
   const [moves, setMoves] = useState([]);
   const [whiteProfile, setWhiteProfile] = useState(null);
   const [blackProfile, setBlackProfile] = useState(null);
@@ -60,14 +60,15 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
     // If currentUserId is not provided, fetch user data from client side
     const fetchUserData = async () => {
       try {
-        // For guest games, check localStorage first
+        // For guest games, check localStorage for guest identity first
         if (isGuestGame) {
           const guestInfo = localStorage.getItem(`chess_guest_${gameId}`);
           if (guestInfo) {
             try {
               const { name, color } = JSON.parse(guestInfo);
               setCurrentPlayer(color);
-              setIsMyTurn((color === 'white' && game.turn() === 'w') || (color === 'black' && game.turn() === 'b'));
+              const currentTurn = game.turn();
+              setIsMyTurn((color === 'white' && currentTurn === 'w') || (color === 'black' && currentTurn === 'b'));
               // For guests, we'll allow moves based on turn only
               return;
             } catch (e) {
@@ -76,9 +77,14 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
           }
         }
 
+        // Try to get logged-in user
         const res = await fetch('/api/auth/user-data');
         const data = await res.json();
         const user = data.user;
+        
+        console.log('User data received:', user);
+        console.log('White username:', whiteUsername, 'type:', typeof whiteUsername);
+        console.log('Black username:', blackUsername, 'type:', typeof blackUsername);
         
         if (!user) {
           console.log('No user data available - user not logged in');
@@ -89,19 +95,21 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
           return;
         }
 
-        console.log('User data received:', user);
-        console.log('White username:', whiteUsername);
-        console.log('Black username:', blackUsername);
+        console.log('User username:', user.user_metadata?.username, 'type:', typeof user.user_metadata?.username);
+        console.log('Raw user object:', JSON.stringify(user.user_metadata));
         
         setUserData(user);
 
-        // Determine if user is white or black
-        const isWhite = user.user_metadata?.username === whiteUsername;
-        const isBlack = user.user_metadata?.username === blackUsername;
+        // Determine if user is white or black - use trim and case-insensitive comparison
+        const userUsername = (user.user_metadata?.username || '').trim();
+        const whiteUser = (whiteUsername || '').trim();
+        const blackUser = (blackUsername || '').trim();
         
-        console.log('Is white:', isWhite);
-        console.log('Is black:', isBlack);
-        console.log('User username:', user.user_metadata?.username);
+        const isWhite = userUsername.toLowerCase() === whiteUser.toLowerCase();
+        const isBlack = userUsername.toLowerCase() === blackUser.toLowerCase();
+        
+        console.log('Is white:', isWhite, `(${userUsername} === ${whiteUser})`);
+        console.log('Is black:', isBlack, `(${userUsername} === ${blackUser})`);
         
         if (!isWhite && !isBlack) {
           console.log('User is not a player in this game');
@@ -114,12 +122,13 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
         setCurrentPlayer(playerColor);
         console.log('Set current player to:', playerColor);
 
-        // Check whose turn it is based on FEN
+        // Check whose turn it is based on FEN - refresh game state first
+        const currentGameState = game.fen();
         const currentTurn = game.turn(); // 'w' for white, 'b' for black
         const myTurn = (isWhite && currentTurn === 'w') || (isBlack && currentTurn === 'b');
         
         setIsMyTurn(myTurn);
-        console.log('Set isMyTurn to:', myTurn);
+        console.log('Current turn:', currentTurn, 'My turn?', myTurn);
         
         // Fetch initial game state
         const fetchGameState = async () => {
@@ -164,11 +173,19 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
     };
 
     fetchUserData();
-  }, [gameId, whiteUsername, blackUsername]);
+  }, [gameId, whiteUsername, blackUsername, isGuestGame]);
+
+  // Update turn status when game state changes
+  useEffect(() => {
+    if (!currentPlayer || !game) return;
+    const currentTurn = game.turn();
+    const myTurn = (currentPlayer === 'white' && currentTurn === 'w') || (currentPlayer === 'black' && currentTurn === 'b');
+    setIsMyTurn(myTurn);
+  }, [game.fen(), currentPlayer]);
 
   // Subscribe to game updates
   useEffect(() => {
-    if (!gameId || !userData) return;
+    if (!gameId || (!userData && !isGuestGame)) return;
 
     const channel = supabase
       .channel(`game:${gameId}`)
@@ -194,13 +211,23 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
             // Update moves
             setMoves(newMoves);
             
-            // Update turn status
+            // Update turn status - use currentPlayer instead of recalculating
             const updatedGame = new Chess(newFen);
             const currentTurn = updatedGame.turn();
-            const isWhite = userData.user_metadata?.username === whiteUsername;
-            const isBlack = userData.user_metadata?.username === blackUsername;
-            const myTurn = (isWhite && currentTurn === 'w') || (isBlack && currentTurn === 'b');
-            setIsMyTurn(myTurn);
+            // Use currentPlayer state which is already set correctly
+            if (currentPlayer) {
+              const myTurn = (currentPlayer === 'white' && currentTurn === 'w') || (currentPlayer === 'black' && currentTurn === 'b');
+              setIsMyTurn(myTurn);
+            } else if (userData) {
+              // Fallback: recalculate if currentPlayer not set
+              const userUsername = (userData.user_metadata?.username || '').trim().toLowerCase();
+              const whiteUser = (whiteUsername || '').trim().toLowerCase();
+              const blackUser = (blackUsername || '').trim().toLowerCase();
+              const isWhite = userUsername === whiteUser;
+              const isBlack = userUsername === blackUser;
+              const myTurn = (isWhite && currentTurn === 'w') || (isBlack && currentTurn === 'b');
+              setIsMyTurn(myTurn);
+            }
           }
         }
       )
