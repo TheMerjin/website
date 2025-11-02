@@ -102,6 +102,17 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
         console.log('Is white:', isWhite);
         console.log('Is black:', isBlack);
         console.log('User username:', user.user_metadata?.username);
+        
+        if (!isWhite && !isBlack) {
+          console.log('User is not a player in this game');
+          setCurrentPlayer(null);
+          return;
+        }
+
+        // Set the current player
+        const playerColor = isWhite ? 'white' : 'black';
+        setCurrentPlayer(playerColor);
+        console.log('Set current player to:', playerColor);
 
         // Check whose turn it is based on FEN
         const currentTurn = game.turn(); // 'w' for white, 'b' for black
@@ -267,12 +278,18 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
         console.log("Guest info not found");
         return false;
       }
-    }
-
-    // Prevent moves if it's not the user's turn
-    if (!isMyTurn && !isGuestGame) {
-      console.log("It's not your turn!");
-      return false;
+    } else {
+      // For regular games, check if it's the user's turn
+      if (!isMyTurn) {
+        console.log("It's not your turn!");
+        return false;
+      }
+      
+      // Also check if user is actually a player
+      if (!currentPlayer) {
+        console.log("You are not a player in this game");
+        return false;
+      }
     }
 
     const move = game.move({
