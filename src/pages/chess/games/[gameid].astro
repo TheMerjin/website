@@ -19,7 +19,17 @@ if (!correctPost) {
 // Use the actual FEN from the database or default to starting position
 const gameFen = correctPost.fen || "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 // Infer guest game: black is null but black_username exists (or is_guest_game flag if column exists)
-const isGuestGame = correctPost.is_guest_game || (!correctPost.black && correctPost.black_username);
+// For guest games, black should be null/undefined even if black_username is set
+const isGuestGame = correctPost.is_guest_game === true || (correctPost.black_username && !correctPost.black);
+// Debug logging
+console.log('Game detection:', {
+  id: correctPost.id,
+  is_guest_game: correctPost.is_guest_game,
+  black: correctPost.black,
+  black_username: correctPost.black_username,
+  white_username: correctPost.white_username,
+  isGuestGame: isGuestGame
+});
 ---
 
 <ChessWebsiteLayout>
