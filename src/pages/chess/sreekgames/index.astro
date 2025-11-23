@@ -4,18 +4,39 @@ import { supabase } from '../../../lib/supabase.js';
 
 export const prerender = false;
 
+// Parse PGN headers to extract Event
+function parseEventFromPgn(pgn: string): string {
+  if (!pgn) return 'Unknown Event';
+  const eventMatch = pgn.match(/^\[Event\s+"([^"]*)"\]/m);
+  return eventMatch ? eventMatch[1] : 'Unknown Event';
+}
+
 let games = [];
 let error = null;
+let gamesByEvent: Record<string, typeof games> = {};
 
 try {
   const { data, error: fetchError } = await supabase
     .from('sreekgames')
-    .select('id, "White", "Black"')
+    .select('id, "White", "Black", pgn')
     .order('id', { ascending: false });
   if (fetchError) {
     error = fetchError.message;
   } else {
-    games = data || [];
+    games = (data || []).map((g: any) => ({
+      ...g,
+      event: parseEventFromPgn(g.pgn || '')
+    }));
+    
+    // Group games by event
+    gamesByEvent = games.reduce((acc: Record<string, typeof games>, game: any) => {
+      const event = game.event || 'Unknown Event';
+      if (!acc[event]) {
+        acc[event] = [];
+      }
+      acc[event].push(game);
+      return acc;
+    }, {});
   }
 } catch (e) {
   error = e.message;
@@ -25,7 +46,7 @@ try {
 <WebsiteLayout>
   <h1>Chess Games</h1>
   <div style="display:flex; gap:0.75rem; align-items:center; margin: 0.5rem 0 1rem 0; flex-wrap: wrap;">
-    <input id="game-filter" placeholder="Filter by player name..." style="flex:1; padding:0.5rem; border:1px solid #e6e1d7;" />
+    <input id="game-filter" placeholder="Filter by player name or event..." style="flex:1; padding:0.5rem; border:1px solid #e6e1d7;" />
     <select id="game-sort" style="padding:0.5rem; border:1px solid #e6e1d7;">
       <option value="new">Newest</option>
       <option value="old">Oldest</option>
@@ -62,49 +83,82 @@ try {
   {error ? (
     <div style="color: #b00020">{error}</div>
   ) : (
-    <ul id="games-list" style="list-style: none; padding: 0; margin: 1rem 0; display: grid; gap: 0.75rem;">
-      {games.length === 0 && (
-        <li style="color: #666">No games found.</li>
+    <div id="games-container">
+      {Object.keys(gamesByEvent).length === 0 && (
+        <div style="color: #666">No games found.</div>
       )}
-      {games.map((g) => (
-        <li data-id={g.id} data-white={g.White} data-black={g.Black}>
-          <a href={`/chess/sreekgames/${g.id}`} style="text-decoration: none;">
-            <div style="padding: 0.75rem 1rem; border: 1px solid #ddd; border-radius: 8px; background: #fff;">
-              <strong>{g.White}</strong> vs <strong>{g.Black}</strong>
-              <span style="color: #999; margin-left: 0.5rem">#{g.id}</span>
-            </div>
-          </a>
-        </li>
+      {Object.entries(gamesByEvent).map(([event, eventGames]) => (
+        <div class="event-group" data-event={event}>
+          <h2 style="margin: 1.5rem 0 0.75rem 0; font-size: 1.25rem; font-weight: 600; color: #333; border-bottom: 2px solid #e6e1d7; padding-bottom: 0.5rem;">
+            {event}
+            <span style="color: #999; font-weight: 400; font-size: 0.9rem; margin-left: 0.5rem;">
+              ({eventGames.length} {eventGames.length === 1 ? 'game' : 'games'})
+            </span>
+          </h2>
+          <ul class="games-list" style="list-style: none; padding: 0; margin: 0.5rem 0 1.5rem 0; display: grid; gap: 0.75rem;">
+            {eventGames.map((g: any) => (
+              <li data-id={g.id} data-white={g.White} data-black={g.Black} data-event={event}>
+                <a href={`/chess/sreekgames/${g.id}`} style="text-decoration: none;">
+                  <div style="padding: 0.75rem 1rem; border: 1px solid #ddd; border-radius: 8px; background: #fff;">
+                    <strong>{g.White}</strong> vs <strong>{g.Black}</strong>
+                    <span style="color: #999; margin-left: 0.5rem">#{g.id}</span>
+                  </div>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
       ))}
-    </ul>
+    </div>
   )}
 </WebsiteLayout>
 
 <script type="module">
   const form = document.getElementById('add-game-form');
   const errorEl = document.getElementById('add-game-error');
-  const list = document.getElementById('games-list');
+  const container = document.getElementById('games-container');
   const filter = document.getElementById('game-filter');
   const sort = document.getElementById('game-sort');
+  
   function applyFilterAndSort() {
+    if (!container) return;
+    
     const q = (filter?.value || '').toLowerCase();
-    const items = Array.from(list.querySelectorAll('li[data-id]'));
-    items.forEach((li) => {
-      const w = (li.getAttribute('data-white') || '').toLowerCase();
-      const b = (li.getAttribute('data-black') || '').toLowerCase();
-      li.style.display = w.includes(q) || b.includes(q) ? '' : 'none';
+    const eventGroups = Array.from(container.querySelectorAll('.event-group'));
+    
+    eventGroups.forEach((group) => {
+      const games = Array.from(group.querySelectorAll('li[data-id]'));
+      let hasVisibleGames = false;
+      
+      games.forEach((li) => {
+        const w = (li.getAttribute('data-white') || '').toLowerCase();
+        const b = (li.getAttribute('data-black') || '').toLowerCase();
+        const event = (li.getAttribute('data-event') || '').toLowerCase();
+        const shouldShow = !q || w.includes(q) || b.includes(q) || event.includes(q);
+        li.style.display = shouldShow ? '' : 'none';
+        if (shouldShow) hasVisibleGames = true;
+      });
+      
+      // Hide entire event group if no games are visible
+      group.style.display = hasVisibleGames ? '' : 'none';
+      
+      // Sort games within each event group
+      const visible = games.filter((li) => li.style.display !== 'none');
+      const mode = sort?.value || 'new';
+      const list = group.querySelector('.games-list');
+      if (list) {
+        visible.sort((a, b) => {
+          if (mode === 'new') return Number(b.getAttribute('data-id')) - Number(a.getAttribute('data-id'));
+          if (mode === 'old') return Number(a.getAttribute('data-id')) - Number(b.getAttribute('data-id'));
+          if (mode === 'white') return (a.getAttribute('data-white') || '').localeCompare(b.getAttribute('data-white') || '');
+          if (mode === 'black') return (a.getAttribute('data-black') || '').localeCompare(b.getAttribute('data-black') || '');
+          return 0;
+        });
+        visible.forEach((li) => list.appendChild(li));
+      }
     });
-    const visible = items.filter((li) => li.style.display !== 'none');
-    const mode = sort?.value || 'new';
-    visible.sort((a, b) => {
-      if (mode === 'new') return Number(b.getAttribute('data-id')) - Number(a.getAttribute('data-id'));
-      if (mode === 'old') return Number(a.getAttribute('data-id')) - Number(b.getAttribute('data-id'));
-      if (mode === 'white') return (a.getAttribute('data-white') || '').localeCompare(b.getAttribute('data-white') || '');
-      if (mode === 'black') return (a.getAttribute('data-black') || '').localeCompare(b.getAttribute('data-black') || '');
-      return 0;
-    });
-    visible.forEach((li) => list.appendChild(li));
   }
+  
   filter?.addEventListener('input', applyFilterAndSort);
   sort?.addEventListener('change', applyFilterAndSort);
   applyFilterAndSort();

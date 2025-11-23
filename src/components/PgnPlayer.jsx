@@ -23,25 +23,105 @@ function stripVariationsAndNags(body) {
 }
 
 function parseMovesWithComments(pgn) {
-  const body = stripVariationsAndNags(stripHeaders(pgn))
+  // First, extract comments before stripping them
+  const commentMap = new Map();
+  let commentIndex = 0;
+  const bodyWithComments = stripVariationsAndNags(stripHeaders(pgn))
     .replace(/\r?\n/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
-
-  // Remove game termination markers like 1-0, 0-1, 1/2-1/2, *
-  const cleaned = body.replace(/\s*(1-0|0-1|1\/2-1\/2|\*)\s*$/, '').trim();
-
-  const moveRegex = /(\d+)\.(?:\s*\.\.)?\s*([^\s{]+)(?:\s*\{([^}]*)\})?(?:\s+([^\s{]+)(?:\s*\{([^}]*)\})?)?/g;
-  const moves = [];
-  let m;
-  while ((m = moveRegex.exec(cleaned)) !== null) {
-    const whiteSan = m[2];
-    const whiteComment = (m[3] || '').trim();
-    const blackSan = m[4];
-    const blackComment = (m[5] || '').trim();
-    if (whiteSan) moves.push({ color: 'w', san: whiteSan, comment: whiteComment });
-    if (blackSan) moves.push({ color: 'b', san: blackSan, comment: blackComment });
+  
+  // Extract and replace comments with placeholders
+  let processedBody = bodyWithComments;
+  const commentRegex = /\{([^}]*)\}/g;
+  let commentMatch;
+  while ((commentMatch = commentRegex.exec(bodyWithComments)) !== null) {
+    const placeholder = `__COMMENT_${commentIndex}__`;
+    commentMap.set(placeholder, commentMatch[1].trim());
+    processedBody = processedBody.replace(commentMatch[0], ` ${placeholder} `);
+    commentIndex++;
   }
+  
+  // Remove game termination markers
+  processedBody = processedBody.replace(/\s*(1-0|0-1|1\/2-1\/2|\*)\s*$/, '').trim();
+  
+  // Tokenize
+  const tokens = processedBody.split(/\s+/).filter(t => t.length > 0);
+  const moves = [];
+  let i = 0;
+  let currentComment = '';
+  
+  // Debug: log token count
+  console.log(`Tokenized PGN into ${tokens.length} tokens`);
+  
+  while (i < tokens.length) {
+    const token = tokens[i];
+    
+    // Check if it's a comment placeholder
+    if (token.startsWith('__COMMENT_') && token.endsWith('__')) {
+      currentComment = commentMap.get(token) || '';
+      i++;
+      continue;
+    }
+    
+    // Skip move numbers like "20." or "20..."
+    if (/^\d+\.(\.\.)?$/.test(token)) {
+      i++;
+      continue;
+    }
+    
+    // Skip result markers
+    if (/^(1-0|0-1|1\/2-1\/2|\*)$/.test(token)) {
+      break;
+    }
+    
+    // Extract SAN from token - be permissive but validate it looks like a move
+    // Remove trailing annotation marks (!?) first
+    let cleanToken = token.replace(/[!?]+$/, '');
+    
+    // Skip if it's purely numeric (move numbers are already handled above)
+    if (/^\d+$/.test(cleanToken)) {
+      i++;
+      continue;
+    }
+    
+    // Accept any token that:
+    // 1. Contains at least one letter (chess pieces, files, or castling)
+    // 2. Is not too long (moves are typically 1-7 characters, but allow up to 10 for edge cases)
+    // 3. Contains only valid chess move characters: letters, numbers, x, +, #, =, -
+    if (cleanToken.length > 0 && cleanToken.length <= 10 && /[a-zA-Z]/.test(cleanToken)) {
+      // Check it only contains valid chess notation characters
+      // Allow: letters, numbers, x (capture), + (check), # (mate), = (promotion), - (castling/hyphen)
+      // Note: - at end of character class to avoid being interpreted as range
+      if (/^[a-zA-Z0-9x+#=\-]+$/.test(cleanToken)) {
+        const color = moves.length % 2 === 0 ? 'w' : 'b';
+        moves.push({ 
+          color, 
+          san: cleanToken.trim(), 
+          comment: currentComment 
+        });
+        currentComment = ''; // Reset comment after using it
+        i++;
+        continue;
+      }
+    }
+    
+    // If we get here, the token doesn't look like a move - skip it
+    // Debug: log skipped tokens (but only for first few to avoid spam)
+    if (i < 50 && token.length > 0) {
+      console.log(`Skipping token at index ${i}: "${token}"`);
+    }
+    i++;
+  }
+  
+  // Debug: log parsing results
+  console.log(`Parsed ${moves.length} moves from ${tokens.length} tokens`);
+  if (moves.length > 0) {
+    console.log(`First move: ${moves[0].san} (${moves[0].color}), Last move: ${moves[moves.length - 1].san} (${moves[moves.length - 1].color})`);
+  }
+  
+  // Return all parsed moves - validation happens during playback
+  // This ensures we don't lose moves due to validation errors
   return moves;
 }
 
@@ -68,8 +148,19 @@ export default function PgnPlayer({ pgn, gameId }) {
     game.reset();
     for (let i = 0; i < ply && i < moves.length; i++) {
       try {
-        game.move(moves[i].san, { sloppy: true });
+        const move = game.move(moves[i].san, { sloppy: true });
+        if (!move) {
+          console.warn(`Failed to play move ${i + 1} (${moves[i].color}): ${moves[i].san}`, {
+            fen: game.fen(),
+            availableMoves: game.moves({ verbose: true }).map(m => m.san)
+          });
+          break;
+        }
       } catch (e) {
+        console.error(`Error playing move ${i + 1} (${moves[i].color}): ${moves[i].san}`, e, {
+          fen: game.fen(),
+          availableMoves: game.moves({ verbose: true }).map(m => m.san)
+        });
         break;
       }
     }
