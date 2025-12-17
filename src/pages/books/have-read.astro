@@ -1,0 +1,290 @@
+---
+import Layout from '../../layouts/BlogPost.astro';
+
+const books = [
+	{
+		title: "Don't Sleep, There Are Snakes",
+		author: "Daniel Everett",
+		year: 2008,
+		rating: 5,
+		summary: "A fascinating account of Everett's time living among the Pirahã people of the Amazon rainforest. The book challenges fundamental assumptions about language, culture, and human cognition. Everett's observations about the Pirahã language—which lacks numbers, colors, and recursion—forced him to reconsider Chomsky's theory of universal grammar. Beyond linguistics, it's a deeply human story about cultural immersion, the limits of Western thought, and what we can learn from radically different ways of being."
+	}
+];
+---
+
+<Layout
+	title="Books I've Read"
+	description="A collection of books I've read with reviews, ratings, and reflections"
+	pubDate={new Date('January 15 2025')}
+>
+<div class="books-page">
+	<div class="page-intro">
+		<p>
+			A curated collection of books I've read, complete with star ratings and detailed summaries. 
+			Click on any book to expand its summary and see my thoughts.
+		</p>
+	</div>
+
+	<div class="books-list">
+		{books.map((book) => (
+			<div class="book-card">
+				<div class="book-header">
+					<div class="book-title-author">
+						<h3 class="book-title">{book.title}</h3>
+						<div class="book-author">{book.author}</div>
+						<div class="book-year">{book.year}</div>
+					</div>
+					<div class="book-rating">
+						{Array.from({ length: 5 }).map((_, i) => (
+							<span class={`star ${i < book.rating ? 'filled' : ''}`}>★</span>
+						))}
+						<span class="rating-text">{book.rating}/5</span>
+					</div>
+				</div>
+				
+				<div class="book-summary-container">
+					<button class="summary-toggle" data-book-id={book.title.toLowerCase().replace(/\s+/g, '-')}>
+						<span class="toggle-text">Show Summary</span>
+						<span class="toggle-icon">▼</span>
+					</button>
+					<div class="book-summary" id={`summary-${book.title.toLowerCase().replace(/\s+/g, '-')}`}>
+						<p>{book.summary}</p>
+					</div>
+				</div>
+
+				<div class="my-review">
+					<div class="my-review-label">My review &amp; notes</div>
+					<p class="my-review-placeholder">
+						{/* Write your thoughts here: what worked, what didn&apos;t, favorite passages, connections to other ideas, etc. */}
+					</p>
+				</div>
+			</div>
+		))}
+	</div>
+</div>
+
+<style>
+	.books-page {
+		max-width: 880px;
+		margin: 0 auto;
+		font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+		line-height: 1.6;
+		color: #111827;
+	}
+
+	.page-intro {
+		margin-bottom: 3rem;
+		padding: 1.5rem;
+		background: #f9fafb;
+		border: 1px solid #e5e7eb;
+		border-radius: 6px;
+	}
+
+	.page-intro p {
+		margin: 0;
+		font-size: 1.05rem;
+		color: #333;
+	}
+
+	.books-list {
+		display: flex;
+		flex-direction: column;
+		gap: 2rem;
+	}
+
+	.book-card {
+		border: 1px solid #e5e7eb;
+		border-radius: 6px;
+		padding: 1.75rem 1.5rem;
+		background: #ffffff;
+		transition: border-color 0.15s ease, background-color 0.15s ease;
+	}
+
+	.book-card:hover {
+		border-color: #cbd5e1;
+		background: #f9fafb;
+	}
+
+	.book-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		gap: 2rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.book-title-author {
+		flex: 1;
+	}
+
+	.book-title {
+		font-size: 1.35rem;
+		font-weight: 600;
+		color: #0f172a;
+		margin: 0 0 0.5rem 0;
+	}
+
+	.book-author {
+		font-size: 0.95rem;
+		color: #6b7280;
+		font-style: italic;
+		margin-bottom: 0.25rem;
+	}
+
+	.book-year {
+		font-size: 0.8rem;
+		color: #9ca3af;
+	}
+
+	.book-rating {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		flex-shrink: 0;
+	}
+
+	.star {
+		font-size: 1.25rem;
+		color: #e5e7eb;
+		transition: color 0.15s ease;
+	}
+
+	.star.filled {
+		color: #facc15;
+	}
+
+	.rating-text {
+		font-size: 0.85rem;
+		color: #6b7280;
+		font-weight: 500;
+		margin-left: 0.25rem;
+	}
+
+	.book-summary-container {
+		margin-top: 1rem;
+	}
+
+	.summary-toggle {
+		width: 100%;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0.6rem 0.9rem;
+		background: #f9fafb;
+		border: 1px solid #e5e7eb;
+		border-radius: 4px;
+		cursor: pointer;
+		font-size: 0.9rem;
+		color: #0f172a;
+		font-weight: 500;
+		transition: background-color 0.15s ease, border-color 0.15s ease;
+	}
+
+	.summary-toggle:hover {
+		background: #f3f4f6;
+		border-color: #d1d5db;
+	}
+
+	.toggle-icon {
+		transition: transform 0.3s ease;
+		font-size: 0.8rem;
+	}
+
+	.summary-toggle.active .toggle-icon {
+		transform: rotate(180deg);
+	}
+
+	.book-summary {
+		max-height: 0;
+		overflow: hidden;
+		transition: max-height 0.25s ease, padding 0.25s ease, margin 0.25s ease;
+		padding: 0 0.75rem;
+		margin: 0;
+	}
+
+	.book-summary.expanded {
+		max-height: 900px;
+		padding: 1.1rem 0.75rem 1.1rem 0.75rem;
+		margin-top: 0.9rem;
+		background: #f9fafb;
+		border-radius: 4px;
+		border: 1px solid #e5e7eb;
+	}
+
+	.book-summary p {
+		margin: 0;
+		line-height: 1.7;
+		color: #374151;
+	}
+
+	.my-review {
+		margin-top: 1.4rem;
+		padding: 1rem 0.9rem;
+		border-radius: 4px;
+		border: 1px dashed #d1d5db;
+		background: #fdfdfd;
+	}
+
+	.my-review-label {
+		font-size: 0.8rem;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		color: #9ca3af;
+		margin-bottom: 0.4rem;
+	}
+
+	.my-review-placeholder {
+		margin: 0;
+		font-size: 0.9rem;
+		color: #4b5563;
+		font-style: italic;
+	}
+
+	@media (max-width: 800px) {
+		.books-page {
+			padding: 0 1rem;
+		}
+
+		.book-header {
+			flex-direction: column;
+			gap: 1rem;
+		}
+
+		.book-rating {
+			align-self: flex-start;
+		}
+
+		.book-card {
+			padding: 1.5rem;
+		}
+
+		.book-title {
+			font-size: 1.25rem;
+		}
+	}
+</style>
+
+<script>
+	document.addEventListener('DOMContentLoaded', () => {
+		const toggles = document.querySelectorAll('.summary-toggle');
+		
+		toggles.forEach(toggle => {
+			toggle.addEventListener('click', () => {
+				const bookId = toggle.getAttribute('data-book-id');
+				const summary = document.getElementById(`summary-${bookId}`);
+				const isExpanded = summary.classList.contains('expanded');
+				
+				if (isExpanded) {
+					summary.classList.remove('expanded');
+					toggle.classList.remove('active');
+					toggle.querySelector('.toggle-text').textContent = 'Show Summary';
+				} else {
+					summary.classList.add('expanded');
+					toggle.classList.add('active');
+					toggle.querySelector('.toggle-text').textContent = 'Hide Summary';
+				}
+			});
+		});
+	});
+</script>
+</Layout>
