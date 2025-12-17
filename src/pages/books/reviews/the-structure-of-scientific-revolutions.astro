@@ -1,0 +1,188 @@
+---
+import Layout from '../../../layouts/BlogPost.astro';
+---
+
+<Layout
+	title="The Structure of Scientific Revolutions"
+	description="Review and notes on Thomas S. Kuhn's landmark work on the nature of scientific progress"
+	pubDate={new Date('January 15 2025')}
+	heroImage="/blog-placeholder-about.jpg"
+>
+
+<div class="book-review">
+	<div class="book-meta">
+		<div class="meta-item">
+			<strong>Author:</strong> Thomas S. Kuhn
+		</div>
+		<div class="meta-item">
+			<strong>Published:</strong> 1962
+		</div>
+		<div class="meta-item">
+			<strong>Status:</strong> <span class="status-pending">To Read</span>
+		</div>
+	</div>
+
+	<hr />
+
+	<h2>Overview</h2>
+	<p>
+		<em>The Structure of Scientific Revolutions</em> is one of the most influential works in the philosophy 
+		of science. Kuhn challenges the traditional view of scientific progress as a linear accumulation of 
+		knowledge, instead proposing that science advances through revolutionary paradigm shifts.
+	</p>
+
+	<h2>Key Concepts</h2>
+	
+	<h3>Paradigms</h3>
+	<p>
+		Kuhn introduces the concept of a "paradigm" as a set of shared assumptions, methods, and standards 
+		that define a scientific community. Paradigms provide the framework within which normal science operates.
+	</p>
+
+	<h3>Normal Science</h3>
+	<p>
+		The routine work of scientists operating within an established paradigm, solving puzzles and 
+		extending the paradigm's explanatory power. This is the majority of scientific activity.
+	</p>
+
+	<h3>Paradigm Shifts</h3>
+	<p>
+		Revolutionary periods when anomalies accumulate and the existing paradigm becomes inadequate. 
+		These shifts are not just theoretical changes but represent fundamental transformations in how 
+		scientists view the world.
+	</p>
+
+	<h3>Incommensurability</h3>
+	<p>
+		The idea that competing paradigms may be fundamentally incompatible, making direct comparison 
+		difficult. Scientists operating under different paradigms may literally see different things 
+		when looking at the same data.
+	</p>
+
+	<h2>Why I Want to Read This</h2>
+	<p>
+		As someone interested in the philosophy of science, epistemology, and how knowledge systems 
+		evolve, Kuhn's work seems essential. His ideas about paradigm shifts resonate with how I think 
+		about progress in fields like AI and machine learning, where fundamental assumptions are 
+		constantly being questioned and revised.
+	</p>
+
+	<p>
+		I'm particularly curious about how Kuhn's framework applies to fields outside of the natural 
+		sciences—can we think about philosophy, mathematics, or even software development in terms 
+		of paradigms and revolutions?
+	</p>
+
+	<h2>Notes & Reflections</h2>
+	<p class="placeholder-note">
+		<em>Notes will be added as I read through the book.</em>
+	</p>
+
+	<h2>Related Reading</h2>
+	<ul>
+		<li>Karl Popper's <em>The Logic of Scientific Discovery</em> (contrasting view on scientific progress)</li>
+		<li>Imre Lakatos's work on research programmes (synthesis of Kuhn and Popper)</li>
+		<li>Paul Feyerabend's <em>Against Method</em> (more radical critique of scientific method)</li>
+	</ul>
+</div>
+
+</Layout>
+
+<style>
+	.book-review {
+		font-family: 'Georgia', serif;
+		line-height: 1.6;
+		color: #1a1a1a;
+	}
+
+	.book-meta {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+		gap: 1rem;
+		margin-bottom: 2rem;
+		padding: 1rem;
+		background: #fafafa;
+		border: 1px solid #d0d7de;
+	}
+
+	.meta-item {
+		font-family: 'Inter', sans-serif;
+		font-size: 0.9rem;
+	}
+
+	.meta-item strong {
+		color: #666;
+		font-weight: 600;
+		margin-right: 0.5rem;
+	}
+
+	.status-pending {
+		color: #666;
+		font-weight: 500;
+	}
+
+	.status-reading {
+		color: #2b6cb0;
+		font-weight: 500;
+	}
+
+	.status-completed {
+		color: #28a745;
+		font-weight: 500;
+	}
+
+	.book-review h2 {
+		font-family: 'Inter', sans-serif;
+		font-size: 1.5rem;
+		font-weight: 600;
+		color: #1a1a1a;
+		margin: 2.5rem 0 1rem 0;
+		border-bottom: 1px solid #d0d7de;
+		padding-bottom: 0.5rem;
+	}
+
+	.book-review h3 {
+		font-family: 'Inter', sans-serif;
+		font-size: 1.25rem;
+		font-weight: 600;
+		color: #1a1a1a;
+		margin: 2rem 0 0.75rem 0;
+	}
+
+	.book-review p {
+		margin-bottom: 1.5rem;
+	}
+
+	.book-review ul {
+		margin: 1rem 0 1.5rem 2rem;
+	}
+
+	.book-review li {
+		margin-bottom: 0.5rem;
+	}
+
+	.placeholder-note {
+		color: #666;
+		font-style: italic;
+		padding: 1rem;
+		background: #fafafa;
+		border-left: 3px solid #d0d7de;
+	}
+
+	@media (max-width: 800px) {
+		.book-meta {
+			grid-template-columns: 1fr;
+		}
+
+		.book-review h2 {
+			font-size: 1.25rem;
+		}
+
+		.book-review h3 {
+			font-size: 1.1rem;
+		}
+	}
+</style>
+
+
+

@@ -142,6 +142,16 @@ export default function PgnPlayer({ pgn, gameId }) {
   const [containerWidth, setContainerWidth] = useState(500);
   const effectiveBoard = Math.max(280, Math.min(520, Math.floor(containerWidth - 24)));
   const isNarrow = containerWidth < 860;
+  
+  // Stockfish state
+  const [stockfishEnabled, setStockfishEnabled] = useState(false);
+  const [evaluation, setEvaluation] = useState(null);
+  const [bestLine, setBestLine] = useState([]);
+  const [depth, setDepth] = useState(0);
+  const [stockfishError, setStockfishError] = useState(null);
+  const stockfishRef = useRef(null);
+  const uciOkRef = useRef(false);
+  const readyOkRef = useRef(false);
 
   useEffect(() => {
     const game = new Chess();
@@ -193,6 +203,159 @@ export default function PgnPlayer({ pgn, gameId }) {
   useEffect(() => {
     setPly(0);
   }, [pgn]);
+
+  // Initialize Stockfish when enabled
+  useEffect(() => {
+    if (!stockfishEnabled) {
+      if (stockfishRef.current) {
+        stockfishRef.current.postMessage('quit');
+        stockfishRef.current.terminate();
+        stockfishRef.current = null;
+      }
+      setEvaluation(null);
+      setBestLine([]);
+      setDepth(0);
+      setStockfishError(null);
+      uciOkRef.current = false;
+      readyOkRef.current = false;
+      return;
+    }
+
+    setStockfishError(null);
+    uciOkRef.current = false;
+    readyOkRef.current = false;
+
+    // Check for WebAssembly support
+    const wasmSupported = typeof WebAssembly === 'object' && 
+      WebAssembly.validate(Uint8Array.of(0x0, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00));
+
+    // Initialize Stockfish as a Web Worker
+    // Use unpkg CDN which is more reliable for workers
+    const workerPath = wasmSupported 
+      ? 'https://unpkg.com/stockfish.js@10.0.2/stockfish.wasm.js'
+      : 'https://unpkg.com/stockfish.js@10.0.2/stockfish.js';
+
+    let engine;
+    try {
+      engine = new Worker(workerPath);
+    } catch (error) {
+      console.error('Failed to create Stockfish worker:', error);
+      setStockfishError('Failed to load Stockfish engine');
+      setStockfishEnabled(false);
+      return;
+    }
+
+    stockfishRef.current = engine;
+
+    engine.addEventListener('message', (e) => {
+      const line = e.data;
+      if (typeof line !== 'string') return;
+      
+      // Handle UCI protocol responses
+      if (line.startsWith('id name')) {
+        console.log('Stockfish:', line);
+      }
+      
+      if (line === 'uciok') {
+        uciOkRef.current = true;
+        engine.postMessage('isready');
+      }
+      
+      if (line === 'readyok') {
+        readyOkRef.current = true;
+        // Analyze current position
+        const game = new Chess();
+        game.reset();
+        for (let i = 0; i < ply && i < moves.length; i++) {
+          try {
+            game.move(moves[i].san, { sloppy: true });
+          } catch {}
+        }
+        engine.postMessage(`position fen ${game.fen()}`);
+        engine.postMessage('go depth 15');
+      }
+      
+      // Parse evaluation info
+      if (line.startsWith('info depth')) {
+        const depthMatch = line.match(/depth (\d+)/);
+        if (depthMatch) {
+          setDepth(parseInt(depthMatch[1], 10));
+        }
+        
+        // Check for mate score
+        const mateMatch = line.match(/score mate ([\-\d]+)/);
+        if (mateMatch) {
+          const mateIn = parseInt(mateMatch[1], 10);
+          setEvaluation({ type: 'mate', value: mateIn });
+        } else {
+          // Check for centipawn evaluation
+          const cpMatch = line.match(/score cp ([\-\d]+)/);
+          if (cpMatch) {
+            const cp = parseInt(cpMatch[1], 10);
+            // Convert to pawns (divide by 100) and adjust for side to move
+            const game = new Chess();
+            game.reset();
+            for (let i = 0; i < ply && i < moves.length; i++) {
+              try {
+                game.move(moves[i].san, { sloppy: true });
+              } catch {}
+            }
+            const pawns = (game.turn() === 'w' ? cp : -cp) / 100;
+            setEvaluation({ type: 'cp', value: pawns });
+          }
+        }
+        
+        // Extract best line (pv)
+        const pvMatch = line.match(/pv ([a-h1-8NBRQKOx+#=\- ]+)/);
+        if (pvMatch) {
+          const pvMoves = pvMatch[1].trim().split(/\s+/).filter(m => m.length > 0);
+          setBestLine(pvMoves);
+        }
+      }
+    });
+
+    engine.addEventListener('error', (error) => {
+      console.error('Stockfish worker error:', error);
+      setStockfishError('Stockfish engine error');
+      setStockfishEnabled(false);
+    });
+
+    // Start UCI protocol
+    engine.postMessage('uci');
+
+    return () => {
+      if (engine) {
+        try {
+          engine.postMessage('quit');
+          engine.terminate();
+        } catch (e) {
+          console.error('Error terminating Stockfish:', e);
+        }
+      }
+    };
+  }, [stockfishEnabled, ply, moves]);
+
+  // Re-analyze when position changes and Stockfish is enabled
+  useEffect(() => {
+    if (!stockfishEnabled || !stockfishRef.current || !readyOkRef.current) return;
+    
+    const engine = stockfishRef.current;
+    const game = new Chess();
+    game.reset();
+    for (let i = 0; i < ply && i < moves.length; i++) {
+      try {
+        game.move(moves[i].san, { sloppy: true });
+      } catch {}
+    }
+    
+    try {
+      engine.postMessage('stop');
+      engine.postMessage(`position fen ${game.fen()}`);
+      engine.postMessage('go depth 15');
+    } catch (error) {
+      console.error('Error sending position to Stockfish:', error);
+    }
+  }, [fen, stockfishEnabled, ply, moves]);
 
   const goFirst = () => setPly(0);
   const goPrev = () => setPly((p) => Math.max(0, p - 1));
@@ -312,6 +475,10 @@ export default function PgnPlayer({ pgn, gameId }) {
                 onClick={() => { setGuessMode((m) => { const next = !m; if (next) setIsAuto(false); return next; }); setGuessFeedback(''); }}
               >Guess</button>
               <button
+                style={{ ...btnStyle, background: stockfishEnabled ? '#e6e1d7' : btnStyle.background, fontSize: isNarrow ? '0.75rem' : btnStyle.fontSize, padding: isNarrow ? '0.35rem 0.4rem' : btnStyle.padding }}
+                onClick={() => setStockfishEnabled((e) => !e)}
+              >Engine</button>
+              <button
                 style={{ ...btnStyle, fontSize: isNarrow ? '0.75rem' : btnStyle.fontSize, padding: isNarrow ? '0.35rem 0.4rem' : btnStyle.padding }}
                 onClick={() => {
                   try {
@@ -421,6 +588,42 @@ export default function PgnPlayer({ pgn, gameId }) {
             <div style={{ color: '#888', fontStyle: 'italic', marginTop: 6, fontSize: isNarrow ? '0.85rem' : '1rem' }}>No annotation for this move.</div>
           )}
         </div>
+        {stockfishEnabled && (
+          <div style={{ ...headerStyle, padding: isNarrow ? '0.6rem 0.75rem' : '0.75rem 1rem', marginTop: '0.75rem' }}>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap: 'nowrap', gap: '0.5rem', marginBottom: '0.5rem' }}>
+              <div style={{ fontWeight: 700, color: '#333', fontSize: isNarrow ? '0.9rem' : '1rem' }}>Stockfish Evaluation</div>
+              {depth > 0 && (
+                <div style={{ color: '#666', fontSize: isNarrow ? '0.75rem' : '0.85rem' }}>Depth: {depth}</div>
+              )}
+            </div>
+            {stockfishError ? (
+              <div style={{ color: '#b00020', fontSize: isNarrow ? '0.85rem' : '1rem' }}>{stockfishError}</div>
+            ) : evaluation ? (
+              <div style={{ marginBottom: '0.5rem' }}>
+                {evaluation.type === 'mate' ? (
+                  <div style={{ color: evaluation.value > 0 ? '#2e7d32' : '#b00020', fontWeight: 600, fontSize: isNarrow ? '0.9rem' : '1rem' }}>
+                    {evaluation.value > 0 ? `Mate in ${evaluation.value}` : `Mate in ${Math.abs(evaluation.value)}`}
+                  </div>
+                ) : (
+                  <div style={{ color: evaluation.value > 0 ? '#2e7d32' : evaluation.value < 0 ? '#b00020' : '#666', fontWeight: 600, fontSize: isNarrow ? '0.9rem' : '1rem' }}>
+                    {evaluation.value > 0 ? '+' : ''}{evaluation.value.toFixed(2)}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div style={{ color: '#888', fontStyle: 'italic', fontSize: isNarrow ? '0.85rem' : '1rem' }}>Loading engine...</div>
+            )}
+            {bestLine.length > 0 && (
+              <div style={{ marginTop: '0.5rem' }}>
+                <div style={{ color: '#666', fontSize: isNarrow ? '0.8rem' : '0.9rem', marginBottom: '0.25rem' }}>Best line:</div>
+                <div style={{ color: '#333', fontSize: isNarrow ? '0.85rem' : '0.95rem', fontFamily: 'ui-monospace, monospace', wordBreak: 'break-word' }}>
+                  {bestLine.slice(0, 6).join(' ')}
+                  {bestLine.length > 6 && '...'}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
