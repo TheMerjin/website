@@ -42,10 +42,18 @@ export const POST: APIRoute = async ({ request }) => {
         headers: { 'Content-Type': 'application/json' },
       });
     }
-
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: 'Not authenticated' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+    const userId = user.id;
     const { data, error } = await supabase
       .from('tasks')
       .insert({
+        user_id: userId,
         class: class_name,
         item,
         type: type || null,
