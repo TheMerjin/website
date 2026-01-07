@@ -2,22 +2,76 @@
 import HeaderWhite from '../components/HeaderWhite.astro';
 import Analytics from '@vercel/analytics/astro';
 import SpeedInsights from '@vercel/speed-insights/astro';
+
+let errors: any[] = [];
+
+try {
+  const apiUrl = import.meta.env.PUBLIC_API_URL || '';
+  const res = await fetch(`${apiUrl}/api/errors`);
+  const data = await res.json();
+  errors = data.errors || [];
+} catch (e) {
+  console.error('Error fetching errors:', e);
+  errors = [];
+}
 ---
 <HeaderWhite />
 <main class="lw-main">
   <div class="epistemic-status"><p><em>Epistemic status: This log helps you improve by tracking mistakes and fixes.</em></p></div>
   <h1 class="lw-title">Error Log</h1>
-  <table class="lw-table">
-    <thead>
-      <tr>
-        <th>Date</th><th>What went wrong?</th><th>Why?</th><th>Fix?</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td>2024-06-30</td><td>Missed HW</td><td>Forgot</td><td>Set reminder</td></tr>
-      <tr><td>2024-06-28</td><td>Lost form</td><td>Disorganized</td><td>Use folder</td></tr>
-    </tbody>
-  </table>
+  
+  <button id="add-error-btn" class="lw-btn lw-btn-add">Add Error Entry</button>
+  
+  <form id="error-form" class="lw-error-form" style="display: none;">
+    <div class="lw-form-group">
+      <label>Date</label>
+      <input type="date" name="date" id="error-date" required />
+    </div>
+    <div class="lw-form-group">
+      <label>What went wrong?</label>
+      <input type="text" name="what_went_wrong" id="error-what" required />
+    </div>
+    <div class="lw-form-group">
+      <label>Why?</label>
+      <textarea name="why" id="error-why" rows="2"></textarea>
+    </div>
+    <div class="lw-form-group">
+      <label>Fix?</label>
+      <textarea name="fix" id="error-fix" rows="2"></textarea>
+    </div>
+    <div class="lw-form-actions">
+      <button type="submit" class="lw-btn">Add Entry</button>
+      <button type="button" id="cancel-form-btn" class="lw-btn">Cancel</button>
+    </div>
+  </form>
+
+  <div class="lw-table-scroll">
+    <table class="lw-table">
+      <thead>
+        <tr>
+          <th>Date</th><th>What went wrong?</th><th>Why?</th><th>Fix?</th><th></th>
+        </tr>
+      </thead>
+      <tbody id="errors-tbody">
+        {errors.length === 0 ? (
+          <tr><td colspan="5" style="text-align:center;color:#888;font-style:italic;">No errors logged yet.</td></tr>
+        ) : (
+          errors.map((error) => (
+            <tr data-error-id={error.id}>
+              <td>{new Date(error.date).toLocaleDateString()}</td>
+              <td>{error.what_went_wrong}</td>
+              <td>{error.why || '-'}</td>
+              <td>{error.fix || '-'}</td>
+              <td>
+                <button class="lw-btn-delete" data-error-id={error.id} style="padding: 0.1rem 0.5rem; font-size: 0.85rem;">Delete</button>
+              </td>
+            </tr>
+          ))
+        )}
+      </tbody>
+    </table>
+  </div>
+  
   <a href="/dashboard" class="lw-btn">Back to Dashboard</a>
 </main>
 <style>
@@ -84,12 +138,72 @@ body {
   padding: 0.2rem 1rem;
   border-radius: 0;
   text-decoration: none;
-  margin: 0;
+  margin: 0 0.3rem 0.3rem 0;
   transition: background 0.15s, border-color 0.15s;
+  cursor: pointer;
 }
 .lw-btn:hover {
   background: #e2e2e2;
   border-color: #888;
+}
+.lw-btn-add {
+  border-color: #232323;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+.lw-error-form {
+  background: #f7f7f7;
+  border: 1px solid #ddd;
+  padding: 1.2rem;
+  margin-bottom: 1.5rem;
+  max-width: 600px;
+}
+.lw-form-group {
+  margin-bottom: 1rem;
+}
+.lw-form-group label {
+  display: block;
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.3rem;
+  color: #222;
+}
+.lw-form-group input,
+.lw-form-group textarea {
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 0;
+  padding: 0.4rem 0.5rem;
+  font-family: Georgia, serif;
+  font-size: 0.98rem;
+  background: #fff;
+  color: #222;
+  box-sizing: border-box;
+}
+.lw-form-group textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+.lw-form-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.lw-table-scroll {
+  overflow-x: auto;
+  margin-bottom: 1.2rem;
+}
+.lw-btn-delete {
+  background: #fee;
+  border-color: #fcc;
+  color: #c00;
+  font-size: 0.85rem;
+  padding: 0.1rem 0.5rem;
+}
+.lw-btn-delete:hover {
+  background: #fdd;
+  border-color: #faa;
 }
 @media (max-width: 900px) {
   .lw-layout {
@@ -101,6 +215,93 @@ body {
   }
 }
 </style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const addBtn = document.getElementById('add-error-btn');
+    const form = document.getElementById('error-form');
+    const cancelBtn = document.getElementById('cancel-form-btn');
+    const errorForm = form as HTMLFormElement;
+    const tbody = document.getElementById('errors-tbody');
+
+    addBtn?.addEventListener('click', () => {
+      if (form) {
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        if (form.style.display === 'block') {
+          const today = new Date().toISOString().split('T')[0];
+          (document.getElementById('error-date') as HTMLInputElement).value = today;
+        }
+      }
+    });
+
+    cancelBtn?.addEventListener('click', () => {
+      if (form) {
+        form.style.display = 'none';
+        errorForm.reset();
+      }
+    });
+
+    errorForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(errorForm);
+      const data = {
+        date: formData.get('date'),
+        what_went_wrong: formData.get('what_went_wrong'),
+        why: formData.get('why') || null,
+        fix: formData.get('fix') || null,
+      };
+
+      try {
+        const res = await fetch('/api/errors', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+
+        if (res.ok) {
+          window.location.reload();
+        } else {
+          const error = await res.json();
+          alert('Error: ' + (error.error || 'Failed to add entry'));
+        }
+      } catch (err) {
+        alert('Error: Failed to add entry');
+        console.error(err);
+      }
+    });
+
+    // Delete buttons
+    document.querySelectorAll('.lw-btn-delete').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const button = e.target as HTMLButtonElement;
+        const id = button.getAttribute('data-error-id');
+        if (!id || !confirm('Delete this error entry?')) return;
+
+        try {
+          const res = await fetch(`/api/errors/${id}`, {
+            method: 'DELETE',
+          });
+
+          if (res.ok) {
+            const row = button.closest('tr');
+            if (row) {
+              row.remove();
+              // If no rows left, show message
+              if (tbody && tbody.children.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#888;font-style:italic;">No errors logged yet.</td></tr>';
+              }
+            }
+          } else {
+            alert('Failed to delete entry');
+          }
+        } catch (err) {
+          alert('Error: Failed to delete entry');
+          console.error(err);
+        }
+      });
+    });
+  });
+</script>
 
 <Analytics />
 <SpeedInsights /> 
