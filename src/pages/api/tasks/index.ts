@@ -11,7 +11,13 @@ export const GET: APIRoute = async ({ request }) => {
       .order('due_date', { ascending: true });
 
     if (error) {
-      console.error('Error fetching tasks:', error);
+      console.error('Error fetching tasks:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code,
+        error,
+      });
       return new Response(JSON.stringify({ error: error.message, tasks: [] }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' },
@@ -22,8 +28,14 @@ export const GET: APIRoute = async ({ request }) => {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
-  } catch (error: any) {
-    console.error('Server error:', error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    console.error('Server error fetching tasks:', {
+      message: errorMessage,
+      stack: errorStack,
+      error,
+    });
     return new Response(JSON.stringify({ error: 'Internal Server Error', tasks: [] }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
@@ -44,6 +56,13 @@ export const POST: APIRoute = async ({ request }) => {
     }
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
+      console.error('Authentication error:', {
+        message: authError?.message,
+        details: authError?.details,
+        hint: authError?.hint,
+        code: authError?.code,
+        error: authError,
+      });
       return new Response(JSON.stringify({ error: 'Not authenticated' }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' },
@@ -68,7 +87,13 @@ export const POST: APIRoute = async ({ request }) => {
       .single();
 
     if (error) {
-      console.error('Error creating task:', error);
+      console.error('Error creating task:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code,
+        error,
+      });
       return new Response(JSON.stringify({ error: error.message }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' },
@@ -79,8 +104,14 @@ export const POST: APIRoute = async ({ request }) => {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
-  } catch (error: any) {
-    console.error('Server error:', error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    console.error('Server error creating task:', {
+      message: errorMessage,
+      stack: errorStack,
+      error,
+    });
     return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
