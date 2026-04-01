@@ -1,0 +1,374 @@
+---
+import WebsiteLayout from '../../../layouts/WebsiteLayout.astro';
+
+const title = "Don't Sleep, There Are Snakes";
+const author = "Daniel Everett";
+const pubYear = "2008";
+const rating = 5;
+const slug = "dont-sleep-there-are-snakes";
+---
+
+<WebsiteLayout>
+  <Fragment slot="head">
+    <title>{title} by {author} - Book Review</title>
+    <meta name="description" content={`Review of "${title}" by ${author}. Rating: ${rating}/5 stars.`} />
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content={Astro.url.href} />
+    <meta property="og:title" content={`${title} by ${author}`} />
+    <meta property="og:description" content={`Review of "${title}" by ${author}. Rating: ${rating}/5 stars.`} />
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={Astro.url.href} />
+    <meta name="twitter:title" content={`${title} by ${author}`} />
+    <meta name="twitter:description" content={`Review of "${title}" by ${author}. Rating: ${rating}/5 stars.`} />
+  </Fragment>
+
+  <article class="book-review-content">
+    <div class="book-header">
+      <div class="book-meta">
+        <h1 class="book-title">{title}</h1>
+        <p class="book-author">By {author}</p>
+        <p class="book-year">Published: {pubYear}</p>
+        <div class="book-rating">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <span class={`star ${i < rating ? 'filled' : ''}`}>★</span>
+          ))}
+          <span class="rating-text">{rating}/5</span>
+        </div>
+      </div>
+    </div>
+
+    <section class="book-summary-section">
+      <h2>Summary</h2>
+      <p>
+        A fascinating account of Everett's time living among the Pirahã people of the Amazon rainforest. 
+        The book challenges fundamental assumptions about language, culture, and human cognition. Everett's 
+        observations about the Pirahã language—which lacks numbers, colors, and recursion—forced him to 
+        reconsider Chomsky's theory of universal grammar. Beyond linguistics, it's a deeply human story 
+        about cultural immersion, the limits of Western thought, and what we can learn from radically 
+        different ways of being.
+      </p>
+    </section>
+
+    <section class="review-section">
+      <button class="review-toggle" id="review-toggle">
+        <span class="toggle-text">Show Review</span>
+        <span class="toggle-icon">▼</span>
+      </button>
+      <div class="book-review-collapsible" id="review-content">
+        <h2>My Review</h2>
+        <p>
+          This book completely reshaped how I think about language, culture, and human cognition. Everett's 
+          narrative is both deeply personal and rigorously scientific—he doesn't just report on the Pirahã, 
+          he immerses you in their world.
+        </p>
+        
+        <h3>What Struck Me Most</h3>
+        <p>
+          The Pirahã language challenges so many assumptions we take for granted. No numbers beyond "one," 
+          "two," and "many." No color terms. No recursion—they can't embed clauses within clauses. This 
+          isn't a deficiency; it's a different way of organizing reality. The Pirahã live in the "immediacy 
+          of experience" principle—they only talk about things they've directly witnessed or that someone 
+          they know has witnessed.
+        </p>
+        
+        <p>
+          Everett's journey from missionary linguist to someone questioning his own faith and academic 
+          assumptions is compelling. He went to convert the Pirahã, but they ended up converting him—not 
+          to their religion (they don't have one), but to a deeper understanding of human possibility.
+        </p>
+        
+        <h3>Linguistic Implications</h3>
+        <p>
+          The book ignited a major debate in linguistics. Chomsky's theory of universal grammar posits that 
+          all languages share certain structural features. The Pirahã language, if Everett is correct, 
+          challenges this. But more importantly, it raises questions about whether language shapes thought 
+          or thought shapes language—or if the relationship is more complex than either extreme.
+        </p>
+        
+        <h3>Cultural Insights</h3>
+        <p>
+          Beyond linguistics, the book offers profound insights into how different cultures organize reality. 
+          The Pirahã's focus on immediate experience, their lack of creation myths, their egalitarian 
+          social structure—all of this challenges Western assumptions about what's "natural" or "universal" 
+          in human societies.
+        </p>
+        
+        <h3>Criticisms & Questions</h3>
+        <p>
+          Some linguists have challenged Everett's claims, particularly about recursion. The debate continues, 
+          but even if some of the linguistic claims are disputed, the cultural observations remain powerful. 
+          The book raises important questions about how we study other cultures and whether we can truly 
+          understand ways of being that are radically different from our own.
+        </p>
+        
+        <h3>Final Thoughts</h3>
+        <p>
+          This is one of those books that changes how you see the world. It's not just about linguistics or 
+          anthropology—it's about the limits of our own understanding and the possibility of radically 
+          different ways of being human. Everett writes with humility, respect, and genuine curiosity. 
+          Highly recommended for anyone interested in language, culture, or the nature of human cognition.
+        </p>
+      </div>
+    </section>
+
+    <section class="related-section">
+      <h2>Related Reading</h2>
+      <ul>
+        <li>Noam Chomsky - <em>Syntactic Structures</em> (for contrast with Everett's claims)</li>
+        <li>Jared Diamond - <em>The World Until Yesterday</em> (on traditional societies)</li>
+        <li>Wade Davis - <em>The Wayfinders</em> (on different ways of knowing)</li>
+      </ul>
+    </section>
+
+    <div class="back-link">
+      <a href="/books/have-read">← Back to Books I've Read</a>
+    </div>
+  </article>
+</WebsiteLayout>
+
+<style>
+  .book-review-content {
+    max-width: 800px;
+    margin: 0 auto;
+    font-family: 'Georgia', serif;
+    line-height: 1.7;
+    color: #1a1a1a;
+    padding: 2rem 1rem;
+  }
+
+  .book-header {
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 2px solid #e5e7eb;
+  }
+
+  .book-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .book-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  .book-author {
+    font-size: 1.15rem;
+    font-style: italic;
+    color: #4b5563;
+    margin: 0;
+  }
+
+  .book-year {
+    font-size: 0.95rem;
+    color: #6b7280;
+    margin: 0;
+  }
+
+  .book-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .star {
+    font-size: 1.5rem;
+    color: #e5e7eb;
+    transition: color 0.2s ease;
+  }
+
+  .star.filled {
+    color: #facc15;
+  }
+
+  .rating-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    color: #4b5563;
+    font-weight: 600;
+    margin-left: 0.5rem;
+  }
+
+  .book-review-content section {
+    margin-bottom: 3rem;
+  }
+
+  .book-review-content h2 {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin: 2.5rem 0 1.25rem 0;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 0.5rem;
+  }
+
+  .book-review-content h3 {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 2rem 0 1rem 0;
+  }
+
+  .book-review-content p {
+    margin-bottom: 1.5rem;
+    text-align: left;
+  }
+
+  .book-review-content ul {
+    list-style-type: disc;
+    margin-left: 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .book-review-content li {
+    margin-bottom: 0.75rem;
+    line-height: 1.6;
+  }
+
+  .review-section {
+    margin-bottom: 3rem;
+  }
+
+  .review-toggle {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    background: #f9fafb;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    color: #0f172a;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    margin-bottom: 0;
+  }
+
+  .review-toggle:hover {
+    background: #f3f4f6;
+    border-color: #cbd5e1;
+  }
+
+  .review-toggle.active {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom: none;
+  }
+
+  .toggle-icon {
+    transition: transform 0.3s ease;
+    font-size: 0.9rem;
+    color: #6b7280;
+  }
+
+  .review-toggle.active .toggle-icon {
+    transform: rotate(180deg);
+  }
+
+  .book-review-collapsible {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.4s ease, margin 0.4s ease;
+    padding: 0 1.25rem;
+    margin: 0;
+    background: #f9fafb;
+    border: 2px solid #e5e7eb;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+  }
+
+  .book-review-collapsible.expanded {
+    max-height: 5000px;
+    padding: 2rem 1.25rem;
+    margin-top: 0;
+  }
+
+  .book-review-collapsible h2 {
+    margin-top: 0;
+  }
+
+  .back-link {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .back-link a {
+    color: #2b6cb0;
+    text-decoration: none;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    transition: color 0.2s ease;
+  }
+
+  .back-link a:hover {
+    color: #1e40af;
+    text-decoration: underline;
+  }
+
+  @media (max-width: 800px) {
+    .book-review-content {
+      padding: 1.5rem 1rem;
+    }
+
+    .book-title {
+      font-size: 1.75rem;
+    }
+
+    .book-author {
+      font-size: 1rem;
+    }
+
+    .book-review-content h2 {
+      font-size: 1.5rem;
+    }
+
+    .book-review-content h3 {
+      font-size: 1.2rem;
+    }
+
+    .book-review-collapsible.expanded {
+      padding: 1.5rem 1rem;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const toggle = document.getElementById('review-toggle');
+    const content = document.getElementById('review-content');
+    
+    if (toggle && content) {
+      toggle.addEventListener('click', () => {
+        const isExpanded = content.classList.contains('expanded');
+        
+        if (isExpanded) {
+          content.classList.remove('expanded');
+          toggle.classList.remove('active');
+          toggle.querySelector('.toggle-text').textContent = 'Show Review';
+        } else {
+          content.classList.add('expanded');
+          toggle.classList.add('active');
+          toggle.querySelector('.toggle-text').textContent = 'Hide Review';
+        }
+      });
+    }
+  });
+</script>
+
+
+
+

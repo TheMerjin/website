@@ -59,9 +59,6 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
 
     // Capture isGuestGame value at the time of effect
     const guestGameFlag = isGuestGame || false;
-    
-    console.log('GameBoard fetchUserData - isGuestGame:', isGuestGame, 'guestGameFlag:', guestGameFlag);
-    console.log('GameBoard - blackUsername:', blackUsername, 'whiteUsername:', whiteUsername);
 
     // If currentUserId is not provided, fetch user data from client side
     const fetchUserData = async () => {
@@ -74,21 +71,12 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
           user = data.user;
         } catch (authError) {
           // 401 is expected for unlogged-in users, just continue
-          console.log('Auth check failed (expected for guests):', authError);
         }
-        
-        console.log('User data received:', user);
-        console.log('White username:', whiteUsername, 'type:', typeof whiteUsername);
-        console.log('Black username:', blackUsername, 'type:', typeof blackUsername);
-        console.log('Is guest game?', guestGameFlag);
         
         // For guest games: if user is not logged in, automatically assign them as the guest player
         if (!user && guestGameFlag) {
-          console.log('Guest game - user not logged in, assigning as guest player');
-          
           // Check if guest info already exists in localStorage
           let guestInfo = localStorage.getItem(`chess_guest_${gameId}`);
-          console.log('Guest info from localStorage:', guestInfo);
           
           if (!guestInfo) {
             // Auto-generate guest identity if black username exists (meaning guest should be black)
@@ -100,11 +88,9 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
               setCurrentPlayer('black');
               const currentTurn = game.turn();
               setIsMyTurn(currentTurn === 'b');
-              console.log('✅ Auto-assigned as black guest player, turn is:', currentTurn, 'myTurn:', currentTurn === 'b');
             } else {
               // Black hasn't joined yet, can't play
               setCurrentPlayer(null);
-              console.log('⏳ Waiting for black player to join');
             }
           } else {
             // Use existing guest info
@@ -113,9 +99,7 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
               setCurrentPlayer(color);
               const currentTurn = game.turn();
               setIsMyTurn((color === 'white' && currentTurn === 'w') || (color === 'black' && currentTurn === 'b'));
-              console.log('✅ Using existing guest identity:', color, 'turn:', currentTurn, 'myTurn:', (color === 'white' && currentTurn === 'w') || (color === 'black' && currentTurn === 'b'));
             } catch (e) {
-              console.error('Error parsing guest info:', e);
               // Fallback: assign as black if black username exists
               if (blackUsername) {
                 const guestData = { name: blackUsername, color: 'black' };
@@ -123,7 +107,6 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
                 setCurrentPlayer('black');
                 const currentTurn = game.turn();
                 setIsMyTurn(currentTurn === 'b');
-                console.log('✅ Fallback: assigned as black guest player');
               }
             }
           }
@@ -131,15 +114,10 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
         }
         
         if (!user) {
-          console.log('No user data available - user not logged in');
           // Not a guest game and not logged in = viewer only
           setCurrentPlayer(null);
-          console.log('⚠️ Not a guest game or guest flag is false');
           return;
         }
-
-        console.log('User username:', user.user_metadata?.username, 'type:', typeof user.user_metadata?.username);
-        console.log('Raw user object:', JSON.stringify(user.user_metadata));
         
         setUserData(user);
 
@@ -151,11 +129,7 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
         const isWhite = userUsername.toLowerCase() === whiteUser.toLowerCase();
         const isBlack = userUsername.toLowerCase() === blackUser.toLowerCase();
         
-        console.log('Is white:', isWhite, `(${userUsername} === ${whiteUser})`);
-        console.log('Is black:', isBlack, `(${userUsername} === ${blackUser})`);
-        
         if (!isWhite && !isBlack) {
-          console.log('User is not a player in this game');
           setCurrentPlayer(null);
           return;
         }
@@ -163,7 +137,6 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
         // Set the current player
         const playerColor = isWhite ? 'white' : 'black';
         setCurrentPlayer(playerColor);
-        console.log('Set current player to:', playerColor);
 
         // Check whose turn it is based on FEN - refresh game state first
         const currentGameState = game.fen();
@@ -171,7 +144,6 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
         const myTurn = (isWhite && currentTurn === 'w') || (isBlack && currentTurn === 'b');
         
         setIsMyTurn(myTurn);
-        console.log('Current turn:', currentTurn, 'My turn?', myTurn);
         
         // Fetch initial game state
         const fetchGameState = async () => {
@@ -239,9 +211,8 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
           table: 'games', 
           filter: `id=eq.${gameId}` 
         }, 
-        (payload) => {
-          console.log('Game updated:', payload);
-          const newFen = payload.new.fen;
+                (payload) => {
+                  const newFen = payload.new.fen;
           const newMoves = payload.new.moves || [];
           
           if (newFen) {
@@ -302,9 +273,7 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
         }),
       });
       
-      console.log(response);
-
-      setWinner(winnerColor);
+              setWinner(winnerColor);
           } else if (game.isDraw()) {
         const response = await fetch('/api/game_over', {
         method: 'POST',
@@ -320,9 +289,7 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
 
         }),
               });
-        const body2 = await response.json();
-      console.log(body2);
-      setWinner('Draw');
+              setWinner('Draw');
 
           } else {
         setWinner(null);
@@ -333,20 +300,18 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
   }, [game.fen(), gameId, userData?.id]);
 
   function makeMove(sourceSquare, targetSquare) {
-    // Check if user can move
-    if (!currentPlayer) {
-      console.log("You are not a player in this game");
-      return false;
-    }
+            // Check if user can move
+            if (!currentPlayer) {
+              return false;
+            }
 
-    // Check if it's the player's turn
-    const currentTurn = game.turn();
-    const playerTurn = (currentPlayer === 'white' && currentTurn === 'w') || (currentPlayer === 'black' && currentTurn === 'b');
-    
-    if (!playerTurn) {
-      console.log("It's not your turn!");
-      return false;
-    }
+            // Check if it's the player's turn
+            const currentTurn = game.turn();
+            const playerTurn = (currentPlayer === 'white' && currentTurn === 'w') || (currentPlayer === 'black' && currentTurn === 'b');
+            
+            if (!playerTurn) {
+              return false;
+            }
 
     const move = game.move({
       from: sourceSquare,
@@ -389,15 +354,14 @@ export default function GameBoard({ initialFen, onMove, gameId, currentUserId, w
           currentUserId: userId
         }),
       });
-      const body = await response.json();
-      setMoves(body.moves || []);
-      console.log(body.moves);
-      if (!response.ok) {
-        console.error('Failed to update game');
-      }
-    } catch (error) {
-      console.error('Error updating game:', error);
-    }
+              const body = await response.json();
+              setMoves(body.moves || []);
+              if (!response.ok) {
+                // Failed to update game - handled silently
+              }
+            } catch (error) {
+              // Error updating game - handled silently
+            }
   }
 
   return (
