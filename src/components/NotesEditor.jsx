@@ -1,35 +1,86 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import '../styles/SidebarElement.css';
+import ActPrepBubbling from './ActPrepBubbling.jsx';
+
+const DEFAULT_NOTE_HTML =
+  '<h1>Welcome to Your Notes</h1><p>Start writing here... Try creating a note link with [{Note Name}]</p>';
+
+function withNoteLinkSpans(html) {
+  if (!html) return html;
+  return html.replace(/\[{([^}]+)}\]/g, (match, noteName) => {
+    return `<span class="note-link-text" data-note-name="${noteName.trim()}">${match}</span>`;
+  });
+}
+
+function htmlToPlainText(html) {
+  const div = document.createElement('div');
+  div.innerHTML = html || '';
+  return (div.textContent || '').replace(/\s+/g, ' ').trim();
+}
+
+function countWordsFromHtml(html) {
+  const t = htmlToPlainText(html);
+  if (!t) return 0;
+  return t.split(/\s+/).filter(Boolean).length;
+}
+
+function slugFileBase(raw) {
+  const s = String(raw || 'note')
+    .replace(/[\\/:*?"<>|]+/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 80);
+  return s || 'note';
+}
+
+function downloadBlob(filename, blob) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
 
 export default function NotesEditor() {
   // Process content to add styling to note links
-  const processContentWithNoteLinks = useCallback((content) => {
-    if (!content) return content;
-    
-    const noteLinkRegex = /\[{([^}]+)}\]/g;
-    return content.replace(noteLinkRegex, (match, noteName) => {
-      return `<span class="note-link-text" data-note-name="${noteName.trim()}">${match}</span>`;
-    });
+  const processContentWithNoteLinks = useCallback((c) => {
+    if (!c) return c;
+    return withNoteLinkSpans(c);
   }, []);
 
   const [mode, setMode] = useState('INSERT');
   const [commandMode, setCommandMode] = useState(false);
   const [title, setTitle] = useState('Untitled');
   const [status, setStatus] = useState('');
-  const [content, setContent] = useState(processContentWithNoteLinks('<h1>Welcome to Your Notes</h1><p>Start writing here... Try creating a note link with [{Note Name}]</p>'));
+  const [content, setContent] = useState(() => withNoteLinkSpans(DEFAULT_NOTE_HTML));
   const [commandInput, setCommandInput] = useState(':');
   const [lineNumbers, setLineNumbers] = useState(false);
-  const statusBarRef = useRef(null);
   const inputRef = useRef(null);
+  const executeCommandRef = useRef(() => {});
+  const titleSyncRef = useRef(title);
+  const contentSyncRef = useRef(content);
+
+  useEffect(() => {
+    titleSyncRef.current = title;
+    contentSyncRef.current = content;
+  }, [title, content]);
   
   // Sidebar state
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedNoteId, setSelectedNoteId] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [mainView, setMainView] = useState('notes');
+  const [noteSearch, setNoteSearch] = useState('');
+  /** Last persisted title+content for current note; drives dirty detection and autosave guard */
+  const [savedSignature, setSavedSignature] = useState(() => ({
+    title: 'Untitled',
+    content: withNoteLinkSpans(DEFAULT_NOTE_HTML),
+  }));
+  const [saveMessage, setSaveMessage] = useState('');
 
   const editor = useEditor({
     extensions: [
@@ -145,7 +196,7 @@ export default function NotesEditor() {
     }
   }, [content, editor, processNoteLinks]);
 
-  // Load notes for the logged-in user
+  // Load notes for the logged-in user; returns fresh list for callers (e.g. duplicate)
   const loadNotes = useCallback(async () => {
     setLoading(true);
     try {
@@ -155,27 +206,27 @@ export default function NotesEditor() {
       if (user) {
         const res2 = await fetch(`/api/auth/get_notes?user_id=${user.id}`);
         const notesData = await res2.json();
-        setNotes(notesData.posts || []);
+        const posts = notesData.posts || [];
+        setNotes(posts);
+        return posts;
       }
     } catch (error) {
       console.error('Failed to load notes:', error);
     } finally {
       setLoading(false);
     }
+    return [];
   }, []);
 
   // Select a note and update editor
   const selectNote = (note) => {
-    console.log(`selected note ${note}`)
-    let obj = note;
-    console.dir(obj);
-
-// Pretty print JSON
-    console.log(JSON.stringify(obj, null, 2)); 
-    setSelectedNoteId(note.id);
-    setTitle(note.title || 'Untitled');
+    const nextTitle = note.title || 'Untitled';
     const processedContent = processContentWithNoteLinks(note.content || '');
+    setSelectedNoteId(note.id);
+    setTitle(nextTitle);
     setContent(processedContent);
+    setSavedSignature({ title: nextTitle, content: processedContent });
+    setSaveMessage('');
     if (editor) {
       editor.commands.setContent(processedContent);
     }
@@ -216,29 +267,30 @@ export default function NotesEditor() {
   };
 
   // Delete a note by title
-  const deleteNoteWithTitle = async (title) => {
+  const deleteNoteWithTitle = async (noteTitle) => {
     try {
       const res = await fetch('/api/auth/user-data');
       const data = await res.json();
       const user = data.user;
       if (!user || !user.id) return;
-      
+
       await fetch('/api/auth/deletenotes', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user, title }),
+        body: JSON.stringify({ user, title: noteTitle }),
       });
-      
+
+      const remainingNotes = notes.filter((n) => n.title !== noteTitle);
       await loadNotes();
-      
-      // If we deleted the currently selected note, select the first available note
-      if (title === title) {
-        const remainingNotes = notes.filter(n => n.title !== title);
+
+      if (noteTitle === title) {
         if (remainingNotes.length > 0) {
           selectNote(remainingNotes[0]);
         } else {
+          setSelectedNoteId(null);
           setTitle('Untitled');
           setContent('');
+          setSavedSignature({ title: 'Untitled', content: '' });
           if (editor) editor.commands.setContent('');
         }
       }
@@ -261,79 +313,121 @@ export default function NotesEditor() {
     }
   };
 
-  // Status bar logic
+  const isDirty =
+    title !== savedSignature.title || content !== savedSignature.content;
+
+  const filteredNotes = useMemo(() => {
+    const q = noteSearch.trim().toLowerCase();
+    if (!q) return notes;
+    return notes.filter((n) => (n.title || '').toLowerCase().includes(q));
+  }, [notes, noteSearch]);
+
+  // Status bar: lines, words, links, mode
   useEffect(() => {
     if (!editor) return;
     const html = editor.getHTML();
     const lineCount = (html.match(/<p|<h[1-6]/g) || []).length || 1;
     const noteLinks = extractNoteLinks(content);
-    const linksText = noteLinks.length > 0 ? ` (${noteLinks.length} links)` : '';
-    setStatus(`${title}  ${lineCount} line${lineCount > 1 ? 's' : ''}${linksText}  --${mode}${commandMode ? ' [COMMAND]' : ''}--`);
-  }, [editor, content, title, mode, commandMode, extractNoteLinks]);
+    const linksText = noteLinks.length > 0 ? ` · ${noteLinks.length} link${noteLinks.length === 1 ? '' : 's'}` : '';
+    const words = countWordsFromHtml(content);
+    const dirtyText = isDirty ? ' · unsaved' : '';
+    const saveText = saveMessage ? ` · ${saveMessage}` : '';
+    setStatus(
+      `${lineCount} line${lineCount > 1 ? 's' : ''} · ${words} word${words === 1 ? '' : 's'}${linksText}${dirtyText}${saveText}  — ${mode}${commandMode ? ' [COMMAND]' : ''}`
+    );
+  }, [editor, content, title, mode, commandMode, extractNoteLinks, isDirty, saveMessage]);
 
-  // Keyboard shortcuts and command mode
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (commandMode) {
-        // Command mode input
-        if (event.key === 'Escape') {
-          setCommandMode(false);
-          setCommandInput(':');
-        } else if (event.key === 'Enter') {
-          executeCommand(commandInput.slice(1));
-          setCommandMode(false);
-          setCommandInput(':');
-        } else if (event.key.length === 1 || event.key === 'Backspace') {
-          // Update command input
-          if (event.key === 'Backspace') {
-            setCommandInput((prev) => prev.length > 1 ? prev.slice(0, -1) : ':');
-          } else {
-            setCommandInput((prev) => prev + event.key);
-          }
-        }
-        event.preventDefault();
+  const saveNote = useCallback(async () => {
+    const t = title;
+    const c = content;
+    try {
+      const res1 = await fetch(`/api/auth/user-data`);
+      if (!res1.ok) {
+        setSaveMessage('Could not verify login');
         return;
       }
-      // ESC: Toggle between INSERT and NORMAL mode
-      if (event.key === 'Escape') {
-        setMode((prev) => (prev === 'INSERT' ? 'NORMAL' : 'INSERT'));
-        if (editor) {
-          if (mode === 'INSERT') editor.commands.blur();
-          else editor.commands.focus();
-        }
-        event.preventDefault();
-      }
-      // In NORMAL mode, check for ':' to enter command mode
-      if (mode === 'NORMAL' && event.key === ':') {
-        setCommandMode(true);
-        setCommandInput(':');
-        event.preventDefault();
+      const data = await res1.json();
+      const user = data.user;
+      if (!user || !user.id) {
+        setSaveMessage('Not signed in');
         return;
       }
-      // Shortcuts (Ctrl+S, Ctrl+B, etc.)
-      if (event.ctrlKey && event.key === 's') {
-        event.preventDefault();
-        saveNote();
+      const saveResponse = await fetch('/api/auth/notes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user, title: t, content: c }),
+      });
+      if (!saveResponse.ok) {
+        setSaveMessage('Save failed');
+        return;
       }
-      if (event.ctrlKey && event.key === 'b') {
-        event.preventDefault();
-        if (editor) editor.commands.toggleBold();
+      if (titleSyncRef.current === t && contentSyncRef.current === c) {
+        setSavedSignature({ title: t, content: c });
+        setSaveMessage('Saved');
+        window.setTimeout(() => setSaveMessage((m) => (m === 'Saved' ? '' : m)), 2200);
       }
-      if (event.ctrlKey && event.key === 'i') {
-        event.preventDefault();
-        if (editor) editor.commands.toggleItalic();
-      }
-      if (event.ctrlKey && event.key === 'k') {
-        event.preventDefault();
-        if (editor) editor.commands.toggleLink({ href: 'https://example.com' });
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [editor, mode, commandMode, commandInput]);
+    } catch {
+      setSaveMessage('Save error');
+    }
+  }, [title, content]);
 
-  // Command execution logic
-  function executeCommand(cmd) {
+  const duplicateCurrentNote = useCallback(async () => {
+    try {
+      const res = await fetch('/api/auth/user-data');
+      const data = await res.json();
+      const user = data.user;
+      if (!user?.id) {
+        alert('Sign in to save notes.');
+        return;
+      }
+      let newTitle = `${title} (copy)`;
+      let n = 2;
+      while (notes.some((x) => x.title === newTitle)) {
+        newTitle = `${title} (copy ${n})`;
+        n += 1;
+      }
+      const saveResponse = await fetch('/api/auth/notes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user, title: newTitle, content }),
+      });
+      if (!saveResponse.ok) {
+        alert('Could not duplicate note.');
+        return;
+      }
+      const posts = await loadNotes();
+      const created = posts.find((p) => p.title === newTitle);
+      if (created) selectNote(created);
+    } catch {
+      alert('Could not duplicate note.');
+    }
+  }, [title, content, notes, loadNotes]);
+
+  const exportNoteAs = useCallback(
+    (kind) => {
+      const base = slugFileBase(title);
+      if (kind === 'html') {
+        const esc = (s) =>
+          (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        const blob = new Blob(
+          [
+            `<!DOCTYPE html><meta charset="utf-8"><title>${esc(title)}</title><body>${content}</body>`,
+          ],
+          { type: 'text/html;charset=utf-8' }
+        );
+        downloadBlob(`${base}.html`, blob);
+      } else {
+        const blob = new Blob([`${htmlToPlainText(content)}\n`], {
+          type: 'text/plain;charset=utf-8',
+        });
+        downloadBlob(`${base}.txt`, blob);
+      }
+    },
+    [title, content]
+  );
+
+  // Command execution logic (ref so keyboard handler always runs latest)
+  executeCommandRef.current = (cmd) => {
     const command = cmd.trim().toLowerCase();
     // :new {post} command
     if (command.startsWith('new ')) {
@@ -412,6 +506,15 @@ export default function NotesEditor() {
       }
       return;
     }
+    if (command === 'dup' || command === 'duplicate') {
+      duplicateCurrentNote();
+      return;
+    }
+    if (command === 'export' || command.startsWith('export ')) {
+      const rest = command.replace(/^export\s*/, '').trim();
+      exportNoteAs(rest === 'txt' || rest === 'text' ? 'txt' : 'html');
+      return;
+    }
     if (command === 'q' || command === 'quit') {
       // Placeholder: could close the editor or navigate away
       alert('Quit (not implemented)');
@@ -421,58 +524,94 @@ export default function NotesEditor() {
       saveNote();
       alert('Quit (not implemented)');
     } else if (command === 'help') {
-      alert('Available commands: new {post}, cd {post}, d {post}, x (delete line), ln (line numbers), links, w(rite), q(uit), wq, help');
+      alert(
+        'Commands: new {post}, cd {post}, d {post}, x (delete line), ln, links, dup, export [html|txt], w, wq, q, help'
+      );
     } else {
       alert(`Unknown command: ${command}`);
     }
-  }
+  };
 
-  // Save note logic (calls backend API)
-  async function saveNote() {
-    try {
-      const res1 = await fetch(`/api/auth/user-data`);
-      if (!res1.ok) {
-        alert('Failed to get user data');
-        return;
-      }
-      const data = await res1.json();
-      const user = data.user;
-      if (!user || !user.id) {
-        alert('No user data available');
-        return;
-      }
-      const saveResponse = await fetch('/api/auth/notes', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ user, title, content }),
-      });
-      if (!saveResponse.ok) {
-        alert('Save failed');
-        return;
-      }
-      // Show save indicator in status bar
-      if (statusBarRef.current) {
-        const original = statusBarRef.current.textContent;
-        statusBarRef.current.textContent = original?.replace(/--(INSERT|NORMAL|\[COMMAND\])--/, '--SAVED--') || '--SAVED--';
-        setTimeout(() => {
-          if (statusBarRef.current) statusBarRef.current.textContent = original;
-        }, 1000);
-      }
-    } catch (error) {
-      alert('Error saving note');
-    }
-  }
-
-  // Debounced save effect: save note when content changes
+  // Keyboard shortcuts and command mode
   useEffect(() => {
-    if (!title || !content) return;
-    const timeout = setTimeout(() => {
+    const handleKeyDown = (event) => {
+      if (commandMode) {
+        if (event.key === 'Escape') {
+          setCommandMode(false);
+          setCommandInput(':');
+        } else if (event.key === 'Enter') {
+          executeCommandRef.current(commandInput.slice(1));
+          setCommandMode(false);
+          setCommandInput(':');
+        } else if (event.key.length === 1 || event.key === 'Backspace') {
+          if (event.key === 'Backspace') {
+            setCommandInput((prev) => (prev.length > 1 ? prev.slice(0, -1) : ':'));
+          } else {
+            setCommandInput((prev) => prev + event.key);
+          }
+        }
+        event.preventDefault();
+        return;
+      }
+      if (event.key === 'Escape') {
+        setMode((prev) => (prev === 'INSERT' ? 'NORMAL' : 'INSERT'));
+        if (editor) {
+          if (mode === 'INSERT') editor.commands.blur();
+          else editor.commands.focus();
+        }
+        event.preventDefault();
+      }
+      if (mode === 'NORMAL' && event.key === ':') {
+        setCommandMode(true);
+        setCommandInput(':');
+        event.preventDefault();
+        return;
+      }
+      if (event.ctrlKey && event.key === 's') {
+        event.preventDefault();
+        saveNote();
+      }
+      if (event.ctrlKey && event.shiftKey && event.key.toLowerCase() === 'e') {
+        event.preventDefault();
+        exportNoteAs('html');
+      }
+      if (event.ctrlKey && event.key === 'b') {
+        event.preventDefault();
+        if (editor) editor.commands.toggleBold();
+      }
+      if (event.ctrlKey && event.key === 'i') {
+        event.preventDefault();
+        if (editor) editor.commands.toggleItalic();
+      }
+      if (event.ctrlKey && event.key === 'k') {
+        event.preventDefault();
+        if (editor) editor.commands.toggleLink({ href: 'https://example.com' });
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [editor, mode, commandMode, commandInput, saveNote, exportNoteAs]);
+
+  // Autosave when content differs from last saved snapshot
+  useEffect(() => {
+    if (loading) return;
+    if (title === savedSignature.title && content === savedSignature.content) return;
+    const id = window.setTimeout(() => {
       saveNote();
-    }, 800); // 800ms debounce
-    return () => clearTimeout(timeout);
-  }, [content, title]);
+    }, 1400);
+    return () => window.clearTimeout(id);
+  }, [content, title, loading, savedSignature.title, savedSignature.content, saveNote]);
+
+  // Warn before closing the tab with unsaved edits
+  useEffect(() => {
+    if (!isDirty) return undefined;
+    const onBeforeUnload = (e) => {
+      e.preventDefault();
+      e.returnValue = '';
+    };
+    window.addEventListener('beforeunload', onBeforeUnload);
+    return () => window.removeEventListener('beforeunload', onBeforeUnload);
+  }, [isDirty]);
 
   // Focus command input when entering command mode
   useEffect(() => {
@@ -551,7 +690,9 @@ export default function NotesEditor() {
         <button className="sidebar-toggle-btn" onClick={handleSidebarToggle} aria-label="Open notes sidebar">
           <span className="hamburger-icon">☰</span>
         </button>
-        <span className="mobile-title">Notes</span>
+        <span className="mobile-title">
+          {mainView === 'notes' ? 'Notes' : 'ACT Prep Bubbling'}
+        </span>
       </div>
       
       {/* Mobile Sidebar Overlay */}
@@ -569,6 +710,20 @@ export default function NotesEditor() {
             +
           </button>
         </div>
+        <div className="notes-search-wrap">
+          <label htmlFor="notes-search" className="visually-hidden">
+            Search notes
+          </label>
+          <input
+            id="notes-search"
+            type="search"
+            className="notes-search-input"
+            placeholder="Search titles…"
+            value={noteSearch}
+            onChange={(e) => setNoteSearch(e.target.value)}
+            autoComplete="off"
+          />
+        </div>
         <div className="notes-list">
           {loading ? (
             <div className="loading">Loading notes...</div>
@@ -577,8 +732,10 @@ export default function NotesEditor() {
               <p>No notes yet</p>
               <button onClick={createNewNote}>Create your first note</button>
             </div>
+          ) : filteredNotes.length === 0 ? (
+            <div className="loading">No matches</div>
           ) : (
-            notes.map(note => (
+            filteredNotes.map(note => (
               <div
                 key={note.id || note.title}
                 className={`note-item ${selectedNoteId === note.id ? 'selected' : ''}`}
@@ -600,6 +757,33 @@ export default function NotesEditor() {
 
       {/* Main Editor Area */}
       <div className="docs-main">
+        <div className="notes-view-tabs" role="tablist" aria-label="Notes page mode">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mainView === 'notes'}
+            className={`notes-view-tab${mainView === 'notes' ? ' active' : ''}`}
+            onClick={() => setMainView('notes')}
+          >
+            Notes
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mainView === 'act'}
+            className={`notes-view-tab${mainView === 'act' ? ' active' : ''}`}
+            onClick={() => setMainView('act')}
+          >
+            ACT Prep Bubbling
+          </button>
+        </div>
+
+        {mainView === 'act' ? (
+          <div className="docs-main-act-fill">
+            <ActPrepBubbling />
+          </div>
+        ) : (
+          <>
         {/* Toolbar */}
         <div className="docs-toolbar">
           <div className="toolbar-group">
@@ -639,6 +823,30 @@ export default function NotesEditor() {
               title="Save (Ctrl+S)"
             >
               💾
+            </button>
+            <button
+              type="button"
+              className="toolbar-btn toolbar-btn-text"
+              onClick={duplicateCurrentNote}
+              title="Duplicate this note"
+            >
+              Dup
+            </button>
+            <button
+              type="button"
+              className="toolbar-btn toolbar-btn-text"
+              onClick={() => exportNoteAs('html')}
+              title="Export as HTML (Ctrl+Shift+E)"
+            >
+              HTML
+            </button>
+            <button
+              type="button"
+              className="toolbar-btn toolbar-btn-text"
+              onClick={() => exportNoteAs('txt')}
+              title="Export plain text"
+            >
+              Txt
             </button>
             <button 
               className={`toolbar-btn ${mode === 'NORMAL' ? 'active' : ''}`}
@@ -680,6 +888,11 @@ export default function NotesEditor() {
           </div>
         </div>
 
+        <div className="docs-status-line" aria-live="polite">
+          <span className="docs-status-title">{title}</span>
+          <span className="docs-status-meta">{status}</span>
+        </div>
+
         {/* Status Bar / Terminal */}
         <div className="terminal-prompt">
   <span className="prompt-symbol">$</span>
@@ -700,6 +913,9 @@ export default function NotesEditor() {
     }}
   />
 </div>
+
+          </>
+        )}
 
       </div>
 
@@ -772,6 +988,41 @@ export default function NotesEditor() {
           color: #1a1a1a;
         }
 
+        .visually-hidden {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          padding: 0;
+          margin: -1px;
+          overflow: hidden;
+          clip: rect(0, 0, 0, 0);
+          white-space: nowrap;
+          border: 0;
+        }
+
+        .notes-search-wrap {
+          padding: 0.5rem 1rem 0.35rem;
+          border-bottom: 1px solid #e6e1d7;
+          background: #f6f8fa;
+        }
+
+        .notes-search-input {
+          width: 100%;
+          box-sizing: border-box;
+          font-family: 'Inter', sans-serif;
+          font-size: 0.85rem;
+          padding: 0.35rem 0.5rem;
+          border: 1px solid #d0d7de;
+          border-radius: 0;
+          background: #fff;
+          color: #1a1a1a;
+        }
+
+        .notes-search-input:focus {
+          outline: 2px solid #555;
+          outline-offset: 0;
+        }
+
         .notes-list {
           flex: 1;
           overflow-y: auto;
@@ -792,8 +1043,8 @@ export default function NotesEditor() {
 
         .note-item.selected {
           background: #eaeef2;
-          font-weight: 500;
-          color: #2b6cb0;
+          font-weight: 600;
+          color: #1a1a1a;
         }
 
         .note-item:hover {
@@ -860,6 +1111,46 @@ export default function NotesEditor() {
           margin-left: 280px;
           height: calc(100vh - var(--header-height, 3em));
           margin-top: var(--header-height, 3em);
+          min-height: 0;
+        }
+
+        .notes-view-tabs {
+          display: flex;
+          gap: 0;
+          background: #fff;
+          border-bottom: 1px solid #d0d7de;
+          padding: 0 1rem;
+          flex-shrink: 0;
+        }
+
+        .notes-view-tab {
+          font-family: inherit;
+          font-size: 0.85rem;
+          padding: 0.65rem 1rem;
+          border: none;
+          border-bottom: 2px solid transparent;
+          background: transparent;
+          color: #57606a;
+          cursor: pointer;
+          margin-bottom: -1px;
+        }
+
+        .notes-view-tab:hover {
+          color: #24292f;
+        }
+
+        .notes-view-tab.active {
+          color: #2b6cb0;
+          border-bottom-color: #2b6cb0;
+          font-weight: 600;
+        }
+
+        .docs-main-act-fill {
+          flex: 1;
+          min-height: 0;
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
         }
 
         /* Toolbar */
@@ -908,6 +1199,38 @@ export default function NotesEditor() {
           background: #2563eb;
         }
 
+        .toolbar-btn-text {
+          font-size: 0.8rem;
+          font-weight: 500;
+          padding: 0.5rem 0.55rem;
+          min-width: auto;
+        }
+
+        .docs-status-line {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: baseline;
+          gap: 0.35rem 0.75rem;
+          padding: 0.4rem 1.5rem;
+          background: #f6f8fa;
+          border-bottom: 1px solid #d0d7de;
+          font-family: 'Inter', sans-serif;
+          font-size: 0.8rem;
+          color: #444;
+        }
+
+        .docs-status-title {
+          font-weight: 600;
+          color: #1a1a1a;
+          flex-shrink: 0;
+        }
+
+        .docs-status-meta {
+          font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace;
+          font-size: 0.78rem;
+          color: #666;
+        }
+
         /* Document Title */
         .docs-title-container {
           background: #fff;
@@ -953,7 +1276,8 @@ export default function NotesEditor() {
         .line-numbers {
           background: #f6f8fa;
           border-right: 1px solid #d0d7de;
-          padding: 1.5rem 0.75rem;
+          margin-top : 1.4rem;
+          padding: 0rem 0.75rem;
           font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace;
           font-size: 0.8rem;
           color: #666;
@@ -965,7 +1289,7 @@ export default function NotesEditor() {
         .line-number {
           line-height: 1.6;
           padding: 0.1rem 0;
-          height: 1.6rem;
+          height: 1.2rem;
           display: flex;
           align-items: center;
           justify-content: flex-end;
@@ -1101,9 +1425,22 @@ export default function NotesEditor() {
             margin-top: var(--header-height, 3em);
           }
 
+          .notes-view-tabs {
+            padding: 0 0.75rem;
+            overflow-x: auto;
+          }
+
+          .notes-view-tab {
+            white-space: nowrap;
+          }
+
           .docs-toolbar {
             padding: 0.5rem 1rem;
             gap: 0.5rem;
+          }
+
+          .docs-status-line {
+            padding: 0.35rem 1rem;
           }
 
           .docs-title-container {
