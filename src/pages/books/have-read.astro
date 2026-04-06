@@ -27,36 +27,59 @@ const books = [
     <main>
       <ul id="book-list"></ul>
 
-      <script>
-        const books = [
-          {
-            title: "Don't Sleep, There Are Snakes",
-            author: "Daniel Everett",
-            year: 2008,
-            rating: 10/10,
-            slug: "dont-sleep-there-are-snakes",
-            opinion : "A fascinating account of Everett's time living among the Pirahã people of the Amazon rainforest..."
-          },
-          {
-            title: "Perfume: The Story of a Murderer",
-            author: "Patrick Süskind",
-            year: 1985,
-            rating: 5/10,
-            slug: "perfume",
-            opinion: "A dark and atmospheric novel about Jean-Baptiste Grenouille..."
-          }
-        ];
+      <ul id="book-list"></ul>
 
-        // Get the <ul> element
-        const list = document.getElementById('book-list');
+<script>
+const books = [
+  {
+    title: "Don't Sleep, There Are Snakes",
+    author: "Daniel Everett",
+    year: 2008,
+    rating: 10/10,
+    slug: "dont-sleep-there-are-snakes",
+    opinion: "A fascinating account of Everett's time living among the Pirahã people of the Amazon rainforest..."
+  },
+  {
+    title: "Perfume: The Story of a Murderer",
+    author: "Patrick Süskind",
+    year: 1985,
+    rating: 5/10,
+    slug: "perfume",
+    opinion: "A dark and atmospheric novel about Jean-Baptiste Grenouille..."
+  }
+];
 
-        // Map over books to create <li> elements
-        books.map(book => {
-          const li = document.createElement('li');
-          li.textContent = `${book.title} by ${book.author} and ${book.rating*10} (${book.year})`;
-          list.appendChild(li);
-        });
-      </script>
+const list = document.getElementById('book-list');
+
+books.map(book => {
+  // Create parent <li>
+  const li = document.createElement('li');
+  li.id = `book-${book.slug}`; // unique ID
+
+  // Create <a> linking to Google search
+  const link = document.createElement('a');
+  link.href = `https://www.google.com/search?q=${encodeURIComponent(book.title)}`;
+  link.target = "_blank"; // open in new tab
+  link.textContent = `${book.title} by ${book.author} (${book.year})`;
+
+  // Append link to li
+  li.appendChild(link);
+
+  // Create nested <ul> for opinion
+  const ul = document.createElement('ul');
+  const subLi = document.createElement('li');
+  subLi.textContent = book.opinion;
+  ul.appendChild(subLi);
+	const subLi2 = document.createElement('li');
+	subLi2.textContent = `${book.rating*10}/10`;
+	ul.appendChild(subLi2);
+  // Append nested ul to li
+  li.appendChild(ul);
+
+  // Append parent li to main list
+  list.appendChild(li);
+});
+</script>
     </main>
 	</WebsiteLayout>
   </body>
@@ -65,7 +88,16 @@ const books = [
 		line-height: 10rem;
 	}
 	ul {
-		line-height: 10rem;
+		line-height: 2rem;
 	}
+	a {
+  color: var(--blue);
+  text-decoration: none;
+  text-decoration-skip-ink: auto;
+}
+
+a:hover {
+  text-decoration: underline;
+}
   </style>
 </html>

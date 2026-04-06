@@ -1,13 +1,37 @@
 ---
-import WebsiteLayout from "../layouts/WebsiteLayout.astro"
+import WebsiteLayout from "../layouts/WebsiteLayout.astro"; 
+import WebsiteGraphComponent from "../components/websiteGraphComponent.astro";
+import WebsiteGraph from '../components/WebsiteGraph.jsx';
 ---
 
 <WebsiteLayout>
- <main> 
-	Some things about me. 
-	<li> I like to read books my reading list with reviews <a href= "/books/have-read"> here </a> </li> 
-	<li> my <a href = "/blog">blog</a> is housed on this website as well as a <a href = "/"> public forum</a> where anyone can talk about whatever </li> 
+<main>
+  Some things about me.
+  <ul class="about-links space-y-2">
+    <li>
+      I like to read books my reading list with reviews
+      <a href="/books/have-read">here</a>
+    </li>
+    <li>
+      my <a href="/blog">blog</a> is housed on this website as well as a 
+      <a href="/">public forum</a> where anyone can talk about whatever
+    </li>
+  </ul>
+  <h5> Here's a graph of the whole website and the linkages excluding the header generated using a crawler</h4>
+  <WebsiteGraph client:load/>
+  <div id="graph" style="width:100%; height:600px;"></div>
 
-	
+  <style>
+    main a {
+      color: #000;             /* black text by default */
+      text-decoration: none;   /* no underline initially */
+      transition: color 0.15s, text-decoration 0.15s;
+    }
+
+    main a:hover {
+      color: #6b7280;          /* gray on hover */
+      text-decoration: underline;
+    }
+  </style>
 </main>
 </WebsiteLayout>
