@@ -90,14 +90,18 @@ books.map(book => {
 	ul {
 		line-height: 2rem;
 	}
-	a {
-  color: var(--blue);
-  text-decoration: none;
-  text-decoration-skip-ink: auto;
-}
+  <style>
+    main a {
+      color: #000;             /* black text by default */
+      text-decoration: none;   /* no underline initially */
+      transition: color 0.15s, text-decoration 0.15s;
+    }
 
-a:hover {
-  text-decoration: underline;
-}
+    main a:hover {
+      color: #6b7280;          /* gray on hover */
+      text-decoration: underline;
+    }
+  </style>
+	
   </style>
 </html>
