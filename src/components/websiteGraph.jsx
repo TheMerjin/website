@@ -31,6 +31,7 @@ export default function WebsiteGraphCanvasHover() {
     allNodeIds.add("/books");
 
       let nodes = Array.from(allNodeIds).map(id => ({ id, group: 1 }));
+      console.log(nodes.length);
       nodes = nodes.filter(x => !x.id.includes(".xhtml"));
 
     const width = 1000;
@@ -65,7 +66,7 @@ export default function WebsiteGraphCanvasHover() {
       context.scale(transform.k, transform.k);
 
       // Draw links
-      context.strokeStyle = "#ec5a8b";
+      context.strokeStyle = "#1cb18c";
       context.beginPath();
       links.forEach(d => {
         context.moveTo(d.source.x, d.source.y);
@@ -77,7 +78,7 @@ export default function WebsiteGraphCanvasHover() {
       nodes.forEach(d => {
         context.beginPath();
         context.arc(d.x, d.y, 5, 0, 2 * Math.PI);
-        context.fillStyle = "#ec5a8b";
+        context.fillStyle = "#047248";
         context.fill();
       });
 

@@ -20,7 +20,7 @@ def crawl(url):
         return
     visited.add(url)
     print("Crawling:", url)
-
+    # if books in ur returns
     try:
         r = requests.get(url)
         r.raise_for_status()
