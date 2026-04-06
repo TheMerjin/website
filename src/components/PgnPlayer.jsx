@@ -151,7 +151,7 @@ export default function PgnPlayer({ pgn, gameId }) {
           {
             fen: game.fen(),
             availableMoves: game.moves({ verbose: true }).map(m => m.san)
-          });
+          };
           break;
         }
       } catch (e) {
@@ -159,7 +159,7 @@ export default function PgnPlayer({ pgn, gameId }) {
         {
           fen: game.fen(),
           availableMoves: game.moves({ verbose: true }).map(m => m.san)
-        });
+        };
         break;
       }
     }
