@@ -51,6 +51,9 @@ function parseMovesWithComments(pgn) {
   let i = 0;
   let currentComment = '';
   
+  // Debug: log token count
+  console.log(`Tokenized PGN into ${tokens.length} tokens`);
+  
   while (i < tokens.length) {
     const token = tokens[i];
     
@@ -104,7 +107,17 @@ function parseMovesWithComments(pgn) {
     }
     
     // If we get here, the token doesn't look like a move - skip it
+    // Debug: log skipped tokens (but only for first few to avoid spam)
+    if (i < 50 && token.length > 0) {
+      console.log(`Skipping token at index ${i}: "${token}"`);
+    }
     i++;
+  }
+  
+  // Debug: log parsing results
+  console.log(`Parsed ${moves.length} moves from ${tokens.length} tokens`);
+  if (moves.length > 0) {
+    console.log(`First move: ${moves[0].san} (${moves[0].color}), Last move: ${moves[moves.length - 1].san} (${moves[moves.length - 1].color})`);
   }
   
   // Return all parsed moves - validation happens during playback
@@ -147,19 +160,17 @@ export default function PgnPlayer({ pgn, gameId }) {
       try {
         const move = game.move(moves[i].san, { sloppy: true });
         if (!move) {
-          // Move failed to play - continue to next move
-          {
+          console.warn(`Failed to play move ${i + 1} (${moves[i].color}): ${moves[i].san}`, {
             fen: game.fen(),
             availableMoves: game.moves({ verbose: true }).map(m => m.san)
-          };
+          });
           break;
         }
       } catch (e) {
-        // Error playing move - continue to next move
-        {
+        console.error(`Error playing move ${i + 1} (${moves[i].color}): ${moves[i].san}`, e, {
           fen: game.fen(),
           availableMoves: game.moves({ verbose: true }).map(m => m.san)
-        };
+        });
         break;
       }
     }
@@ -242,7 +253,7 @@ export default function PgnPlayer({ pgn, gameId }) {
       
       // Handle UCI protocol responses
       if (line.startsWith('id name')) {
-        // Stockfish output processed
+        console.log('Stockfish:', line);
       }
       
       if (line === 'uciok') {
