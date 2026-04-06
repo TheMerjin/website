@@ -73,13 +73,9 @@ if (error || !topic) {
   console.log('Redirecting to 404, error:', error, 'topic:', topic);
   return Astro.redirect('/404');
 }
+// <TopicPage  client:load topic={topic}nodes={topic.nodes || []}edges={topic.edges || []}/>
 ---
 
 <Layout title={`${topic.title} - Agora Debate`}>
-  <TopicPage 
-    client:load 
-    topic={topic}
-    nodes={topic.nodes || []}
-    edges={topic.edges || []}
-  />
+ 
 </Layout>
