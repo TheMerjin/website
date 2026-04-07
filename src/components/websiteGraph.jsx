@@ -66,7 +66,7 @@ export default function WebsiteGraphCanvasHover() {
       context.scale(transform.k, transform.k);
 
       // Draw links
-      context.strokeStyle = "#1cb18c";
+      context.strokeStyle = "#d1d5db";
       context.beginPath();
       links.forEach(d => {
         context.moveTo(d.source.x, d.source.y);
@@ -78,7 +78,7 @@ export default function WebsiteGraphCanvasHover() {
       nodes.forEach(d => {
         context.beginPath();
         context.arc(d.x, d.y, 5, 0, 2 * Math.PI);
-        context.fillStyle = "#047247";
+        context.fillStyle = "#3b82f6";
         context.fill();
       });
 
