@@ -78,7 +78,7 @@ export default function WebsiteGraphCanvasHover() {
       nodes.forEach(d => {
         context.beginPath();
         context.arc(d.x, d.y, 5, 0, 2 * Math.PI);
-        context.fillStyle = "#047248";
+        context.fillStyle = "#047247";
         context.fill();
       });
 
