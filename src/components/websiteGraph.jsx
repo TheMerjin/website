@@ -101,7 +101,7 @@ export default function WebsiteGraphCanvasHover() {
       const x = (mx - transform.x) / transform.k;
       const y = (my - transform.y) / transform.k;
 
-      const hovered = nodes.find(n => Math.hypot(n.x - x, n.y - y) < 20);
+      const hovered = nodes.find(n => Math.hypot(n.x - x, n.y - y) < 20 / transform.k);
         hoverNodeRef.current = hovered || null; 
         draw();
     });
