@@ -45,7 +45,7 @@
     "graphology": "^0.26.0",
     "jsdom": "^26.1.0",
     "jstat": "^1.9.6",
-    "katex": "^0.16.22",
+    "katex": "^0.16.45",
     "lodash": "^4.17.21",
     "marked": "^15.0.12",
     "marked-katex-extension": "^5.1.4",
