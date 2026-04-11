@@ -89,8 +89,30 @@ Below is a graph showing:
 
 <p4> Pickard's method is very intresting the idea is that succesive functions converge on the function Let's see that in action for a harder diffrential equation</p4>
 <ul> 
-  <li> Letfor example 
+  <li> Let for example a harder diff eq such as <span set:html={K("y'' = 0.1*y' -y +sin(2t)")}> Normally, to solve you would Muck it finding the homogenous and the particular solutions and summing them.</span>
+    and since we know <span set:html={K("y(0) = 0")}> </span> and <span set:html={K("y'(0) = 1")}></span> then we do a simple substitution <span set:html= {K("v = y'")}> </span> and logically <span set:html= {K("v' = y''")}> </span> 
+    <ul> 
+      <li> 
+        Now we do a substitution <span set:html={K("v' = -0.1*v + y + sin(2t)")}> </span>
+        and we arrive at two equations:
+        <span set:html={K(`
+\\begin{cases}
+y'(t) = v(t) \\\\
+v'(t) = -0.1\\,v(t) - y(t) + \\sin(2t)
+\\end{cases}
+`)}></span>
+
+<span set:html={K(`
+y(0) = 0, \\quad v(0) = 1
+`)}></span>
+      </li>
+
+    </ul>
     </li>
+  <li> Control which iteration of pickard is displayed
+    <div class="slidecontainer">
+  <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+</div></li> <div id="demo"> </div>
 </ul>
 
 <canvas id = "pickardCanvas"> </canvas>
@@ -250,44 +272,38 @@ drawLegend();
 
 </script>
 
-<script type = "module"> 
-
-const canvas = document.getElementById("pickardCanvas");
-const ctx = canvas.getContext("2d");
-canvas.width = window.innerWidth*0.5;
-canvas.height = window.innerHeight*1;
-ctx.fillStyle = "black";
-
-const width = canvas.width;
-const height = canvas.height;
-
-// Define your mathematical range
-const xMin = 0, xMax = 100;
-const yMin = -5, yMax = 100;
-const dx = 0.25, dy = 1;
-
-// Functions to convert math coordinates -> canvas pixels
-function xToCanvas(x) {
-  return ((x - xMin) / (xMax - xMin)) * width;
+<script type = "module">
+const picardCache = new Map();
+function getPicard(iter) {
+    var usedIter = iter;
+    if (!picardCache.has(usedIter)) {
+        picardCache.set(usedIter,
+            picardDampedOscillator(xMin, xMax, dx, usedIter)
+        );
+    }
+    return picardCache.get(usedIter);
 }
+ var slider = document.getElementById("myRange");
+var output = document.getElementById("demo");
+output.innerHTML = slider.value; // Display the default slider value
 
-function yToCanvas(y) {
-  return height - ((y - yMin) / (yMax - yMin)) * height;
-}
-
-// Draw vertical lines
-for (let x = xMin; x <= xMax; x += dx) {
+// Update the current slider value (each time you drag the slider handle)
+slider.oninput = function() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  output.innerHTML = this.value;
+  var pickard_iterations = this.value;
+  for (let x = xMin; x <= xMax; x += 20*dx) {
   ctx.beginPath();
   ctx.moveTo(xToCanvas(x), 0);
   ctx.lineTo(xToCanvas(x), height);
   ctx.strokeStyle = "#ccc";
   ctx.lineWidth = 1;
   ctx.stroke();
-  ctx.fillText(`${x}`, xToCanvas(x),canvas.height/2-0.1);
+  ctx.fillText(`${x}`, xToCanvas(x), yToCanvas(-5));
 }
 
 // Draw horizontal lines
-for (let y = yMin; y <= yMax; y += dy) {
+for (let y = yMin; y <= yMax; y += 2*dy) {
   ctx.beginPath();
   ctx.moveTo(0, yToCanvas(y));
   ctx.lineTo(width, yToCanvas(y));
@@ -298,10 +314,131 @@ for (let y = yMin; y <= yMax; y += dy) {
 
 }
 
+for (let x_diffeq  = xMin; x_diffeq <= xMax; x_diffeq += dx/100){
+    ctx.beginPath();
+    ctx.fillStyle = "#1F77B4";
+    // Final solution parameters
+
+
+    // Function for y(t)
+    
+    let y_diffeq = y(x_diffeq);
+    ctx.moveTo(0, xToCanvas(x_diffeq));
+    const canvasX = xToCanvas(x_diffeq); 
+    const canvasY = yToCanvas(y_diffeq); // if you have a y value
+    ctx.arc(canvasX, canvasY, 2, 0, 2 * Math.PI);
+
+    ctx.fill();
+}
 
 ///add pickard viosual
 
 
+
+drawLegend();
+  
+
+
+const { tValues, allIterations, finalIteration } = getPicard(pickard_iterations);
+
+
+
+const yFinal = finalIteration;
+
+ctx.beginPath();
+ctx.strokeStyle = "red";
+ctx.lineWidth = 1;
+
+for (let i = 0; i < tValues.length; i++) {
+    const canvasX = xToCanvas(tValues[i]);
+    const canvasY = yToCanvas(yFinal[i]);
+
+    if (i === 0) ctx.moveTo(canvasX, canvasY);
+    else ctx.lineTo(canvasX, canvasY);
+}
+
+ctx.stroke();
+} 
+
+
+function picardDampedOscillator(xMin, xMax, dx, iterations) {
+    const tValues = [];
+    for (let t = xMin; t <= xMax; t += dx) tValues.push(t);
+
+    // Initialize y and y' arrays
+    let yPrev = tValues.map(() => 0);  // y0 = 0
+    let yPrevDot = tValues.map(() => 1); // y'(0) = 1
+
+    const allIterations = [ [...yPrev] ];
+
+    for (let n = 0; n < iterations; n++) {
+        const yNext = [];
+        const yDotNext = [];
+        for (let i = 0; i < tValues.length; i++) {
+            const t = tValues[i];
+
+            // Approximate integral using sum over previous points
+            let sumY = 0;
+            let sumYDot = 0;
+            for (let j = 0; j < i; j++) {
+                const dt = dx;
+                const y2 = yPrevDot[j];
+                const y2Dot = -0.1 * yPrevDot[j] - yPrev[j] + Math.sin(2 * tValues[j]);
+                sumY += y2 * dt;
+                sumYDot += y2Dot * dt;
+            }
+
+            yNext.push(yPrev[0] + sumY); // y0 + integral
+            yDotNext.push(yPrevDot[0] + sumYDot); 
+        }
+        yPrev = [...yNext];
+        yPrevDot = [...yDotNext];
+        // because n starts at 0
+    allIterations.push([...yPrev]);
+        
+    }
+
+   return {
+  tValues,
+  allIterations,
+  finalIteration: allIterations[allIterations.length - 1]
+};
+}
+const canvas = document.getElementById("pickardCanvas");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth*0.5;
+canvas.height = window.innerHeight*1;
+ctx.fillStyle = "black";
+
+const width = canvas.width;
+const height = canvas.height;
+
+// Define your mathematical range
+const xMin = 0, xMax = 50;
+const yMin = -5, yMax = 5;
+const dx = 0.25, dy = 1;
+
+// Functions to convert math coordinates -> canvas pixels
+function xToCanvas(x) {
+  return ((x - xMin) / (xMax - xMin)) * width;
+}
+
+function yToCanvas(y) {
+  return height - ((y - yMin) / (yMax - yMin)) * height;
+}
+const C1 = 0.0221;
+const C2 = 1.6641;
+
+// Particular solution coefficients
+const A = -0.0221;
+const B = -0.3315;
+function y(t) {
+        // Homogeneous part
+        const y_h = Math.exp(-0.05 * t) * (C1 * Math.cos(t) + C2 * Math.sin(t));
+        // Particular part
+        const y_p = A * Math.cos(2 * t) + B * Math.sin(2 * t);
+        return y_h + y_p;
+    }
 
 
 function drawLegend() {
@@ -329,7 +466,9 @@ function drawLegend() {
     ctx.fillText(item.label, startX + boxSize + 8, startY + i * spacing + boxSize/2);
   }); 
 };
-drawLegend();
+
+// Draw vertical lines
+
 
 
 </script>
