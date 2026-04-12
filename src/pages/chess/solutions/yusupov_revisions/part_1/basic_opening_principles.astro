@@ -1,0 +1,122 @@
+---
+import WebsiteLayout from "../../../../../layouts/WhiteWebsiteLayout.astro";
+
+import katex from "katex";
+import "katex/dist/katex.min.css";
+
+const K = (latex: string) =>
+  katex.renderToString(latex, { throwOnError: false });
+---
+
+<WebsiteLayout>
+  <main>
+
+    <h1>Opening Principles TODO:redo /h1>
+
+    <section class="section">
+      <h2>Exercise 1 <span class="score">( / )</span></h2>
+      <div class="indent">
+        <p><strong>Thoughts:</strong></p>
+        <p></p>
+        <div class="solution"><strong>Solution:</strong></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Exercise 2 <span class="score">( / )</span></h2>
+      <div class="indent">
+        <p><strong>Thoughts:</strong></p>
+        <p></p>
+        <div class="solution"><strong>Solution:</strong></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Exercise 3 <span class="score">( / )</span></h2>
+      <div class="indent">
+        <p><strong>Thoughts:</strong></p>
+        <p></p>
+        <div class="solution"><strong>Solution:</strong></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Exercise 4 <span class="score">( / )</span></h2>
+      <div class="indent">
+        <p><strong>Thoughts:</strong></p>
+        <p></p>
+        <div class="solution"><strong>Solution:</strong></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Exercise 5 <span class="score">( / )</span></h2>
+      <div class="indent">
+        <p><strong>Thoughts:</strong></p>
+        <p></p>
+        <div class="solution"><strong>Solution:</strong></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Exercise 6 <span class="score">( / )</span></h2>
+      <div class="indent">
+        <p><strong>Thoughts:</strong></p>
+        <p></p>
+        <div class="solution"><strong>Solution:</strong></div>
+      </div>
+    </section>
+
+  </main>
+
+  <style>
+    main {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+      font-family: system-ui, -apple-system, sans-serif;
+      line-height: 1.65;
+      color: #000;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    h2 {
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .score {
+      font-weight: normal;
+      opacity: 0.6;
+    }
+
+    .section {
+      margin-bottom: 2rem;
+    }
+
+    .indent {
+      margin-left: 1rem;
+    }
+
+    .solution {
+      border-left: 3px solid #000;
+      padding-left: 0.8rem;
+      margin-top: 0.6rem;
+    }
+
+    strong {
+      font-weight: 600;
+    }
+
+    .math-block {
+      display: block;
+      margin: 0.4rem 0;
+    }
+  </style>
+
+</WebsiteLayout>

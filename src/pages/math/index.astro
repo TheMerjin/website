@@ -51,14 +51,14 @@ const sections = Array.from(new Set(entries.map((e) => e.section)));
     ) : (
       sections.map((section) => (
         <section class="block">
-          <h2>{section}</h2>
+          <h3>{section}</h3>
           <ul class="list" role="list">
             {entries
               .filter((e) => e.section === section)
               .map((e) => (
                 <li class="item">
                   <a class="item-link" href={e.route}>
-                    <h3 class="item-title">{e.title}</h3>
+                    <h4 class="item-title">{e.title}</h4>
                   </a>
                   <small class="item-meta">
                     <code class="path">{e.route}</code>
@@ -70,12 +70,6 @@ const sections = Array.from(new Set(entries.map((e) => e.section)));
       ))
     )}
 
-    <footer class="foot">
-      <p>
-        Tip: add pages under <code>src/pages/math/…</code> and they’ll appear
-        here automatically.
-      </p>
-    </footer>
   </main>
 </WebsiteLayout>
 
