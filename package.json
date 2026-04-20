@@ -4,6 +4,8 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
+    "prebuild": "node scripts/export-md-posts.mjs",
+    "prepare": "node scripts/ensure-git-hooks.mjs",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"

@@ -1,0 +1,20 @@
+#!/bin/sh
+# Refreshes md_posts/ from Supabase and stages it for this commit.
+# Skip: SKIP_MD_POSTS=1 git commit ...
+
+if [ "$SKIP_MD_POSTS" = "1" ]; then
+  exit 0
+fi
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT" || exit 1
+
+if ! command -v node >/dev/null 2>&1; then
+  echo "pre-commit: node not found; cannot export md_posts" >&2
+  exit 1
+fi
+
+node scripts/export-md-posts.mjs || exit 1
+git add md_posts/
+
+exit 0
