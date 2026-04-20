@@ -1,0 +1,161 @@
+---
+
+import WebsiteLayout from "../../../layouts/WhiteWebsiteLayout.astro";
+
+import katex from "katex";
+import "katex/dist/katex.min.css";
+
+const equation = "y = mx + b";
+const html = katex.renderToString(equation, { throwOnError: false });
+
+const taylor_equation = "f(x) = \\sum_{n=0}^{\\infty} \\frac{f^{(n)}(a)}{n!} (x-a)^n";
+const html_1 = katex.renderToString(taylor_equation, { throwOnError: false });
+
+const first_dy_dx = "\\frac{dy}{dx} = x - y";
+const html_2 = katex.renderToString(first_dy_dx, { throwOnError: false });
+
+const K = (latex: "string") =>
+  katex.renderToString(latex, { throwOnError: false });
+
+---
+<WebsiteLayout>
+<main class="post">
+
+<h1 class="post-title">
+Toricelli's Law of Fluid Flow
+</h1>
+
+<ul class="main-list">
+  <li class="main-item">
+    <p>
+      (a) Show that the standard gravity differential equation 
+      <span set:html={K("\\frac{d^2h}{dt^2} = -g")}></span> 
+      implies that an object dropped from height 
+      <span set:html={K("h(0)")}></span> 
+      lands with velocity 
+      <span set:html={K("-\\sqrt{2gh(0)}")}></span>.
+    </p>
+
+    <ul class="sub-list">
+      <li class="sub-item">
+        <p>
+          We solve this by integrating:
+        </p>
+
+        <div class="math-block">
+          <span set:html={K("\\frac{dh}{dt} = -gt + C_1")}></span>
+        </div>
+
+        <div class="math-block">
+          <span set:html={K("h(t) = -\\frac{1}{2}gt^2 + C_1 t + C_2")}></span>
+        </div>
+
+        <p>
+          Apply the initial condition that the object is dropped:
+        </p>
+
+        <div class="math-block">
+          <span set:html={K("v(0)=0 \\Rightarrow C_1 = 0")}></span>
+        </div>
+
+        <p>
+          So:
+        </p>
+
+        <div class="math-block">
+          <span set:html={K("\\frac{dh}{dt} = -gt")}></span>
+        </div>
+
+        <div class="math-block">
+          <span set:html={K("h(t) = h_0 - \\frac{1}{2}gt^2")}></span>
+        </div>
+
+        <p>
+          Solve for <span set:html={K("t")}></span> and substitute back:
+        </p>
+
+        <div class="math-block">
+          <span set:html={K("v = -\\sqrt{2g(h_0 - h)}")}></span>
+        </div>
+
+      </li>
+    </ul>
+  </li>
+  <li>
+    (b)
+
+
+  </li>
+  <li> 
+    (c) The conical tank has a radius of 20 cm when it's filled to an initial depth of 50cm. A small round hole at the bottom has a diameter of 1cm. Determine A(h) and a then solve the differential equation <span set:html={K("A(h)\\frac{dh}{dt} = -a * \\sqrt{2*g*h}")}> </span>
+    and relate time and the height if the water. 
+      <ul>
+        <div> 
+    <li> 
+        Let's do integration <span set:html={K("\\int{A(h)*dh/dt = \\int{-a*\\sqrt{2*g*h}}}")}></span> and then  </span>
+    </li>
+  </ul>
+  </div> 
+  </li>
+
+</ul>
+
+</main>
+
+<style>
+main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  font-family: system-ui, -apple-system, sans-serif;
+  line-height: 1.65;
+  color: #000;
+}
+
+/* Title */
+h1 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Sections */
+.section {
+  margin-bottom: 2rem;
+}
+
+/* Remove bullets completely */
+ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+li {
+  margin-bottom: 1rem;
+}
+
+/* Indented blocks instead of bullets */
+.indent {
+  margin-left: 1rem;
+}
+
+/* Math spacing */
+.math-block {
+  display: block;
+  margin: 0.4rem 0;
+}
+
+/* Clean solution block */
+.solution {
+  border-left: 3px solid #000;
+  padding-left: 0.8rem;
+  margin-top: 0.6rem;
+}
+
+/* Slight emphasis */
+strong {
+  font-weight: 600;
+}
+</style>
+
+</WebsiteLayout>

@@ -1,0 +1,522 @@
+---
+import ChessWebsiteLayout from '../layouts/ChessWebsiteLayout.astro';
+import { supabase } from '../lib/client-supabase.js';
+import ChallengesRealtime from '../components/ChallengesRealtime';
+---
+
+<ChessWebsiteLayout>
+  <div class="chess-header">
+    <h1>Agora Chess</h1>
+    <div class="chess-tagline">Simple, clean, and focused chess play. <span class="small-text">#only correspondence works for now :). </span> </div>
+  </div>
+  <div class="chess-main">
+    <div class="pairing-grid">
+      <button class="pairing-btn">2+1<br/><span>Bullet</span></button>
+      <button class="pairing-btn">3+0<br/><span>Blitz</span></button>
+      <button class="pairing-btn">3+2<br/><span>Blitz</span></button>
+      <button class="pairing-btn">5+0<br/><span>Blitz</span></button>
+      <button class="pairing-btn">5+3<br/><span>Blitz</span></button>
+      <button class="pairing-btn">10+0<br/><span>Rapid</span></button>
+      <button class="pairing-btn">10+5<br/><span>Rapid</span></button>
+      <button class="pairing-btn">15+10<br/><span>Rapid</span></button>
+      <button class="pairing-btn">30+0<br/><span>Classical</span></button>
+      <button class="pairing-btn">30+20<br/><span>Classical</span></button>
+      <button class="pairing-btn" id= "correspondence-buttton">Correspondence</button>
+      <button class="pairing-btn">Custom</button>
+    </div>
+    <div class="side-panel">
+      <a href="/chess/sreekgames" class="side-btn leaderboard-btn">Annotated Games</a>
+      <button class="side-btn">Play with Computer</button>
+      <button class="side-btn">Tournaments</button>
+      <a href="/chess/puzzles" class="side-btn leaderboard-btn">Puzzles</a>
+      <a href="/leaderboard" class="side-btn leaderboard-btn">
+        Leaderboard
+      </a>
+      <button class="side-btn primary" id="create-guest-game-btn">Create Guest Game</button>
+      <div class="stats">
+        <div>Online: 1,234</div>
+        <div>Games: 567</div>
+      </div>
+    </div>
+    
+    <div class="challenges-panel">
+      <h3>General Challenges</h3>
+      <ChallengesRealtime client:load/>
+    </div>
+  </div>
+  <div class="featured-row">
+    <div class="featured-card">Live Game: FM The_Fawkes vs GM TexasMustang</div>
+    <a href="/chess/puzzles" class="featured-card" style="text-decoration: none; color: inherit;">Puzzle of the Day</a>
+    <div class="featured-card">How NOT to Learn Chess</div>
+    <div class="featured-card">Crazyhouse World Championship</div>
+  </div>
+  <footer class="chess-footer">
+    <a href="#">Donate</a>
+    <a href="#">Store</a>
+    <a href="#">About</a>
+  </footer>
+</ChessWebsiteLayout>
+<script type="module">
+    let pollInterval = 2;
+    if (document){
+    const correspondenceButton = document.getElementById("correspondence-buttton");
+    if (correspondenceButton) {
+      correspondenceButton.addEventListener("click", gameRequest); 
+    }
+    const createGuestBtn = document.getElementById("create-guest-game-btn");
+    if (createGuestBtn) {
+      createGuestBtn.addEventListener("click", createGuestGame);
+    }
+    }
+    async function createGuestGame() {
+      const guestName = prompt("Enter the name of your guest opponent:");
+      if (!guestName || !guestName.trim()) {
+        return;
+      }
+      try {
+        const res = await fetch('/api/auth/user-data');
+        const data = await res.json();
+        const user = data.user;
+        if (!user || !user.id) {
+          alert('Please log in to create a game');
+          return;
+        }
+        const gameRequestRes = await fetch('/api/game_request', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            white: user,
+            fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+            status: 'waiting',
+            guest_opponent_name: guestName.trim(),
+            is_guest_game: true,
+          }),
+        });
+        const body = await gameRequestRes.json();
+        if (!gameRequestRes.ok || !body.success) {
+          alert(body.error || 'Failed to create game');
+          return;
+        }
+        const game = body.game[0];
+        const gameUrl = `${window.location.origin}/chess/games/${game.id}`;
+        try {
+          await navigator.clipboard.writeText(gameUrl);
+          alert(`Game created! Link copied to clipboard:\n${gameUrl}\n\nShare this link with ${guestName} - no account needed!`);
+        } catch (e) {
+          alert(`Game created! Share this link with ${guestName}:\n${gameUrl}`);
+        }
+      } catch (err) {
+        console.error('Error creating guest game:', err);
+        alert('Something went wrong');
+      }
+    }
+    async function gameRequest() {
+  try {
+    const res = await fetch('/api/auth/user-data');
+    const data = await res.json();
+
+    const user = data.user;
+    console.log(user);
+    if (!user || !user.id) {
+      console.error('No user data available');
+      return;
+    }
+    const gameRequestRes = await fetch('/api/game_request', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json', // Tell server we're sending JSON
+    },
+    body: JSON.stringify({
+      white: user,
+      fen : 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+      status : "waiting"
+    }),
+  });
+  const body = await gameRequestRes.json();
+  console.log(body);
+  const game = body.game;
+  const gameId = game[0].id;
+  console.log(game[0].id);
+  if (gameId){
+    pollInterval = setInterval(() => pollGameStatus(gameId), 2000);
+    console.log(pollInterval);
+  }
+
+  } catch (err) {
+    console.error('Something went wrong:', err);
+  }
+}
+
+async function pollGameStatus(gameId) {
+  try {
+    const res = await fetch(`api/get_active_game_requests`);
+    const data = await res.json();
+    const correctPost = data.games.find((game) => game.id == gameId);
+    console.log(data);
+    if (correctPost.status === 'in_progress') {
+      clearInterval(pollInterval);
+      window.location.href = `/chess/games/${gameId}`;
+    }
+  } catch (err) {
+    console.error('Error polling game status:', err);
+  }
+}
+
+
+</script>
+
+<style>
+    .small-text {
+  font-size: 0.8em; /* 80% of parent font size */
+  /* or */
+
+}
+  body {
+    background: #fff4ec;
+  }
+  .chess-header {
+    text-align: left;
+    margin: 0 auto 2rem auto;
+    max-width: 1100px;
+    padding: 2rem 0 0.5rem 0;
+    border-bottom: 1px solid #e6e1d7;
+  }
+  .chess-header h1 {
+    font-size: 2.1rem;
+    font-weight: 700;
+    color: #333;
+    font-family: 'Inter', sans-serif;
+    margin: 0 0 0.2rem 0;
+    letter-spacing: -1px;
+  }
+  .chess-tagline {
+    font-size: 1.05rem;
+    color: #456650;
+    margin-bottom: 0.5rem;
+    font-weight: 400;
+  }
+  .chess-main {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 2.5rem;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 2.5rem 0 0 0;
+    background: #f5f3ef;
+    border-radius: 18px;
+    box-shadow: 0 2px 16px 0 rgba(60,60,60,0.07);
+  }
+  .pairing-grid {
+    order: 1;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.1rem;
+    background: #fff4ec;
+    border: 1px solid #e6e1d7;
+    padding: 1.5rem 1rem;
+    min-width: 440px;
+    max-width: 480px;
+    min-height: 340px;
+    box-sizing: border-box;
+    border-radius: 0;
+  }
+  .side-panel {
+    order: 2;
+    min-width: 200px;
+    max-width: 220px;
+    background: #f8f2e4;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px 0 rgba(60,60,60,0.04);
+    margin: 0 1.2rem;
+  }
+  .challenges-panel {
+    order: 3;
+    min-width: 260px;
+    flex: 1;
+    background: #f6f4ee;
+    border-radius: 0;
+    box-shadow: 0 2px 8px 0 rgba(60,60,60,0.04);
+    margin-left: 0;
+    margin-right: 0;
+    padding-bottom: 1.5rem;
+  }
+  .challenges-panel h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 1rem 0;
+    font-family: 'Inter', sans-serif;
+    border-bottom: 1px solid #e6e1d7;
+    padding-bottom: 0.5rem;
+  }
+  .challenges-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .challenge-row {
+    display: flex;
+    align-items: center;
+    background-color: #f6f4ee !important;
+    border: 1.5px solid #d2cfc7;
+    border-radius: 0;
+    box-shadow: 0 4px 16px 0 rgba(60,60,60,0.10);
+    font-size: 1rem;
+    color: #222;
+    font-family: 'Inter', sans-serif;
+    transition: background 0.15s, background-color 0.15s, box-shadow 0.15s, border-color 0.15s;
+    cursor: pointer;
+    outline: none;
+    min-height: 2.5rem;
+    margin-bottom: 1.1rem;
+    padding: 1.1rem 1.3rem;
+  }
+  .challenge-row:last-child {
+    margin-bottom: 0;
+  }
+  .challenge-row:hover {
+    background-color: #ece7df !important;
+    box-shadow: 0 6px 20px 0 rgba(60,60,60,0.13);
+    border-color: #b8b2a6;
+  }
+  .challenge-row:active, .challenge-row:focus {
+    background-color: #e1dbd8 !important;
+    border-color: #a49c8c;
+  }
+  .challenge-player {
+    font-weight: 600;
+    padding: 0.7rem 0.2rem;
+  }
+  .no-games, .error {
+    padding: 1.5rem 0;
+    text-align: center;
+    color: #888;
+    font-size: 1rem;
+  }
+  .pairing-btn {
+    background: #f8f4f0;
+    color: #333;
+    border: 1px solid #e6e1d7;
+    font-size: 0.95rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    padding: 2.2rem 0.2rem 1.4rem 0.2rem;
+    min-height: 90px;
+    margin: 0 auto;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    outline: none;
+    border-radius: 0;
+    box-shadow: none;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
+    height: 100px;
+    min-width: 100px;
+    min-height: 100px;
+    max-width: 100px;
+    max-height: 100px;
+  }
+  .pairing-btn span {
+    font-size: 0.8rem;
+    color: #456650;
+    font-weight: 400;
+    margin-top: 0.2rem;
+  }
+  .pairing-btn:hover, .pairing-btn:focus {
+    background: #e6e1d7;
+    color: #456650;
+  }
+  .side-btn {
+    width: 100%;
+    padding: 1rem 0;
+    margin-bottom: 0.2rem;
+    background: #f8f4f0;
+    border: 1px solid #e6e1d7;
+    color: #333;
+    font-size: 1.05rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    border-radius: 0;
+    box-shadow: none;
+    text-align: center;
+  }
+  .side-btn.primary {
+    background: #456650;
+    color: #fff4ec;
+    border: 1px solid #456650;
+  }
+  .side-btn:hover, .side-btn:focus {
+    background: #e6e1d7;
+    color: #456650;
+  }
+  .side-btn.primary:hover, .side-btn.primary:focus {
+    background: #333;
+    color: #fff4ec;
+    border: 1px solid #333;
+  }
+  .leaderboard-btn {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .stats {
+    margin-top: 1.2rem;
+    color: #888;
+    font-size: 1rem;
+    text-align: left;
+    border-top: 1px solid #e6e1d7;
+    padding-top: 0.7rem;
+  }
+  .featured-row {
+    display: flex;
+    gap: 1rem;
+    margin: 3rem auto 2rem auto;
+    max-width: 1100px;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+    border-top: 1px solid #e6e1d7;
+    border-bottom: 1px solid #e6e1d7;
+    background: #fff4ec;
+  }
+  .featured-card {
+    min-width: 220px;
+    background: #f8f4f0;
+    border: 1px solid #e6e1d7;
+    padding: 1.1rem 0.7rem 1.1rem 0.7rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.7rem;
+    transition: background 0.15s, color 0.15s;
+    cursor: pointer;
+    border-radius: 0;
+    box-shadow: none;
+    font-size: 1.02rem;
+    color: #333;
+    font-weight: 500;
+  }
+  .featured-card:hover {
+    background: #e6e1d7;
+    color: #456650;
+  }
+  .chess-footer {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    padding: 2rem 0 1rem 0;
+    background: none;
+    color: #456650;
+    font-size: 1.1rem;
+    border-top: 1px solid #e6e1d7;
+    margin-top: 2rem;
+    border-radius: 0;
+  }
+  .chess-footer a {
+    color: #456650;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.15s;
+  }
+  .chess-footer a:hover {
+    color: #333;
+    text-decoration: underline;
+  }
+  @media (max-width: 1100px) {
+    .chess-main {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 2rem;
+    }
+    .pairing-grid {
+      min-width: 0;
+      padding: 1rem 0.2rem;
+    }
+    .side-panel {
+      min-width: 0;
+      padding: 1rem 0.2rem;
+    }
+    .challenges-panel {
+      min-width: 0;
+      padding: 1rem 0.2rem;
+    }
+    .pairing-btn {
+      width: 80px;
+      height: 80px;
+      min-width: 80px;
+      min-height: 80px;
+      max-width: 80px;
+      max-height: 80px;
+    }
+  }
+  @media (max-width: 700px) {
+    .chess-main {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 1rem;
+    }
+    .pairing-grid {
+      min-width: 0;
+      padding: 0.5rem 0.1rem;
+    }
+    .side-panel {
+      min-width: 0;
+      padding: 0.5rem 0.1rem;
+    }
+    .challenges-panel {
+      min-width: 0;
+      padding: 0.5rem 0.1rem;
+    }
+    .featured-row {
+      gap: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+    .featured-card {
+      min-width: 120px;
+      padding: 0.5rem 0.2rem 0.5rem 0.2rem;
+      font-size: 0.95rem;
+    }
+    .pairing-btn {
+      width: 60px;
+      height: 60px;
+      min-width: 60px;
+      min-height: 60px;
+      max-width: 60px;
+      max-height: 60px;
+    }
+  }
+  .chess-challenges {
+    max-width: 1100px;
+    margin: 0 auto 2rem auto;
+    background: #fff4ec;
+    border: 1px solid #e6e1d7;
+    padding: 1.5rem 1rem;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .chess-challenges h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 1rem;
+  }
+  .challenges-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+  .no-challenges {
+    color: #888;
+    font-size: 1rem;
+    padding: 0.7rem 0;
+    text-align: center;
+  }
+</style>

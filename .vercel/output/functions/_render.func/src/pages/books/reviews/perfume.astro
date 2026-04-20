@@ -1,0 +1,386 @@
+---
+import WebsiteLayout from '../../../layouts/WebsiteLayout.astro';
+
+const title = "Perfume: The Story of a Murderer";
+const author = "Patrick Süskind";
+const pubYear = "1985";
+const rating = 4;
+const slug = "perfume";
+---
+
+<WebsiteLayout>
+  <Fragment slot="head">
+    <title>{title} by {author} - Book Review</title>
+    <meta name="description" content={`Review of "${title}" by ${author}. Rating: ${rating}/5 stars.`} />
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content={Astro.url.href} />
+    <meta property="og:title" content={`${title} by ${author}`} />
+    <meta property="og:description" content={`Review of "${title}" by ${author}. Rating: ${rating}/5 stars.`} />
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={Astro.url.href} />
+    <meta name="twitter:title" content={`${title} by ${author}`} />
+    <meta name="twitter:description" content={`Review of "${title}" by ${author}. Rating: ${rating}/5 stars.`} />
+  </Fragment>
+
+  <article class="book-review-content">
+    <div class="book-header">
+      <div class="book-meta">
+        <h1 class="book-title">{title}</h1>
+        <p class="book-author">By {author}</p>
+        <p class="book-year">Published: {pubYear}</p>
+        <div class="book-rating">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <span class={`star ${i < rating ? 'filled' : ''}`}>★</span>
+          ))}
+          <span class="rating-text">{rating}/5</span>
+        </div>
+      </div>
+    </div>
+
+    <section class="book-summary-section">
+      <h2>Summary</h2>
+      <p>
+        A dark and atmospheric novel about Jean-Baptiste Grenouille, a man born with an extraordinary sense 
+        of smell but no personal scent of his own. Set in 18th-century France, the story follows Grenouille's 
+        obsession with capturing the perfect scent, leading him down a path of murder and madness. Süskind's 
+        prose is rich and evocative, creating a world where scent becomes a form of power and identity. The 
+        novel explores themes of alienation, obsession, and the nature of human connection through a unique 
+        and unsettling lens.
+      </p>
+    </section>
+
+    <section class="review-section">
+      <button class="review-toggle" id="review-toggle">
+        <span class="toggle-text">Show Review</span>
+        <span class="toggle-icon">▼</span>
+      </button>
+      <div class="book-review-collapsible" id="review-content">
+        <h2>My Review</h2>
+        <p>
+          <em>Perfume</em> is a masterclass in sensory writing. Süskind creates an entire world through 
+          smell—a feat that seems almost impossible given how difficult it is to describe scents. The novel 
+          is both beautiful and deeply disturbing, a combination that makes it unforgettable.
+        </p>
+        
+        <h3>The Power of Scent</h3>
+        <p>
+          What makes this book remarkable is how Süskind uses scent as a lens to explore human nature. 
+          Grenouille's superhuman olfactory abilities allow him to perceive the world in ways others cannot, 
+          but his lack of personal scent makes him invisible, inhuman. This paradox drives the entire narrative: 
+          he can understand others through their scents, but they cannot understand him because he has none.
+        </p>
+        
+        <p>
+          The descriptions of smells throughout the book are extraordinary. Süskind doesn't just tell you 
+          something smells good or bad—he creates entire olfactory landscapes. The stench of 18th-century 
+          Paris, the delicate fragrances of flowers, the complex scents of human beings—all of it is rendered 
+          with precision and poetry.
+        </p>
+        
+        <h3>Grenouille as Anti-Hero</h3>
+        <p>
+          Grenouille is one of literature's most compelling monsters. He's not evil in the traditional sense—he 
+          lacks empathy, but he also lacks malice. He's driven by a pure, almost aesthetic obsession. His 
+          murders aren't acts of rage or hatred; they're acts of collection, like a butterfly collector 
+          pinning specimens. This makes him more disturbing than a conventional villain.
+        </p>
+        
+        <p>
+          The novel raises uncomfortable questions about art, obsession, and the price of perfection. Grenouille's 
+          quest for the perfect scent leads him to commit atrocities, but the final perfume he creates has 
+          transformative power. Is the art worth the cost? Süskind doesn't provide easy answers.
+        </p>
+        
+        <h3>Atmosphere & Setting</h3>
+        <p>
+          The 18th-century setting is perfectly realized. Süskind captures the filth and beauty of pre-revolutionary 
+          France, the contrast between the opulent world of perfumers and the squalor of the streets. The 
+          historical detail feels authentic without being overwhelming—it serves the story rather than 
+          dominating it.
+        </p>
+        
+        <h3>What Didn't Work</h3>
+        <p>
+          The novel's pacing can be slow at times, particularly in the middle sections. Some readers might 
+          find Grenouille's lack of humanity makes him difficult to connect with, though I think this is 
+          intentional. The ending, while powerful, is also deeply unsettling—it's not for everyone.
+        </p>
+        
+        <h3>Final Thoughts</h3>
+        <p>
+          <em>Perfume</em> is a unique and powerful novel that uses an unusual premise to explore universal 
+          themes. It's beautifully written, thought-provoking, and deeply disturbing. Süskind's ability to 
+          create a world through scent alone is a remarkable achievement. While it's not a book I'd recommend 
+          to everyone (due to its dark themes), it's one that will stay with you long after you finish it.
+        </p>
+        
+        <p>
+          The novel works on multiple levels: as a psychological thriller, as a meditation on art and obsession, 
+          and as a sensory experiment in literature. It's a book that challenges you to think about what makes 
+          us human and what happens when someone exists outside that definition.
+        </p>
+      </div>
+    </section>
+
+    <section class="related-section">
+      <h2>Related Reading</h2>
+      <ul>
+        <li>Umberto Eco - <em>The Name of the Rose</em> (atmospheric historical fiction)</li>
+        <li>Mary Shelley - <em>Frankenstein</em> (themes of creation and monstrosity)</li>
+        <li>Thomas Mann - <em>Death in Venice</em> (obsession and aestheticism)</li>
+      </ul>
+    </section>
+
+    <div class="back-link">
+      <a href="/books/have-read">← Back to Books I've Read</a>
+    </div>
+  </article>
+</WebsiteLayout>
+
+<style>
+  .book-review-content {
+    max-width: 800px;
+    margin: 0 auto;
+    font-family: 'Georgia', serif;
+    line-height: 1.7;
+    color: #1a1a1a;
+    padding: 2rem 1rem;
+  }
+
+  .book-header {
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 2px solid #e5e7eb;
+  }
+
+  .book-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .book-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  .book-author {
+    font-size: 1.15rem;
+    font-style: italic;
+    color: #4b5563;
+    margin: 0;
+  }
+
+  .book-year {
+    font-size: 0.95rem;
+    color: #6b7280;
+    margin: 0;
+  }
+
+  .book-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .star {
+    font-size: 1.5rem;
+    color: #e5e7eb;
+    transition: color 0.2s ease;
+  }
+
+  .star.filled {
+    color: #facc15;
+  }
+
+  .rating-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    color: #4b5563;
+    font-weight: 600;
+    margin-left: 0.5rem;
+  }
+
+  .book-review-content section {
+    margin-bottom: 3rem;
+  }
+
+  .book-review-content h2 {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin: 2.5rem 0 1.25rem 0;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 0.5rem;
+  }
+
+  .book-review-content h3 {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 2rem 0 1rem 0;
+  }
+
+  .book-review-content p {
+    margin-bottom: 1.5rem;
+    text-align: left;
+  }
+
+  .book-review-content ul {
+    list-style-type: disc;
+    margin-left: 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .book-review-content li {
+    margin-bottom: 0.75rem;
+    line-height: 1.6;
+  }
+
+  .review-section {
+    margin-bottom: 3rem;
+  }
+
+  .review-toggle {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    background: #f9fafb;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    color: #0f172a;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    margin-bottom: 0;
+  }
+
+  .review-toggle:hover {
+    background: #f3f4f6;
+    border-color: #cbd5e1;
+  }
+
+  .review-toggle.active {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom: none;
+  }
+
+  .toggle-icon {
+    transition: transform 0.3s ease;
+    font-size: 0.9rem;
+    color: #6b7280;
+  }
+
+  .review-toggle.active .toggle-icon {
+    transform: rotate(180deg);
+  }
+
+  .book-review-collapsible {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.4s ease, margin 0.4s ease;
+    padding: 0 1.25rem;
+    margin: 0;
+    background: #f9fafb;
+    border: 2px solid #e5e7eb;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+  }
+
+  .book-review-collapsible.expanded {
+    max-height: 5000px;
+    padding: 2rem 1.25rem;
+    margin-top: 0;
+  }
+
+  .book-review-collapsible h2 {
+    margin-top: 0;
+  }
+
+  .back-link {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .back-link a {
+    color: #2b6cb0;
+    text-decoration: none;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    transition: color 0.2s ease;
+  }
+
+  .back-link a:hover {
+    color: #1e40af;
+    text-decoration: underline;
+  }
+
+  @media (max-width: 800px) {
+    .book-review-content {
+      padding: 1.5rem 1rem;
+    }
+
+    .book-title {
+      font-size: 1.75rem;
+    }
+
+    .book-author {
+      font-size: 1rem;
+    }
+
+    .book-review-content h2 {
+      font-size: 1.5rem;
+    }
+
+    .book-review-content h3 {
+      font-size: 1.2rem;
+    }
+
+    .book-review-collapsible.expanded {
+      padding: 1.5rem 1rem;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const toggle = document.getElementById('review-toggle');
+    const content = document.getElementById('review-content');
+    
+    if (toggle && content) {
+      toggle.addEventListener('click', () => {
+        const isExpanded = content.classList.contains('expanded');
+        
+        if (isExpanded) {
+          content.classList.remove('expanded');
+          toggle.classList.remove('active');
+          toggle.querySelector('.toggle-text').textContent = 'Show Review';
+        } else {
+          content.classList.add('expanded');
+          toggle.classList.add('active');
+          toggle.querySelector('.toggle-text').textContent = 'Hide Review';
+        }
+      });
+    }
+  });
+</script>
+
+
+
+
+
