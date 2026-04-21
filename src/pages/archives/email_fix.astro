@@ -1,0 +1,35 @@
+---
+import threads from "../../../threads.json";
+import NestedList from "../../components/EmailNode.astro";
+/**
+ * Convert email tree → nested array format
+ */
+function toItems(node) {
+  const label = { label : 
+    `${node.from} ${node.subject ? " — " + node.subject : ""}`, content : `${node.body.split("\n\n")[0]} ` 
+    
+    
+  };
+
+  if (!node.children || node.children.length === 0) {
+    return label;
+  }
+
+  return [
+    label,
+    node.children.map(toItems)
+  ];
+}
+
+const items = threads.map(toItems);
+console.log(items[0][1]);
+---
+
+<html>
+   <meta charset="utf-8">
+  <body>
+    <h1>Email Threads</h1>
+
+    <NestedList items={items} />
+  </body>
+</html>

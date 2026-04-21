@@ -1,0 +1,116 @@
+---
+import threads from "../../../threads.json";
+---
+
+<html>
+  <meta charset="utf-8">
+  <head>
+    <title>Email Threads</title>
+
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 0 16px;
+      }
+
+      details {
+        margin: 10px 0;
+        border-left: 1px solid #ddd;
+        padding-left: 10px;
+      }
+
+      summary {
+        cursor: pointer;
+        font-weight: 600;
+      }
+
+      .preview {
+        color: #777;
+        font-weight: normal;
+        font-size: 0.9em;
+      }
+
+      .reply {
+        margin-left: 20px;
+      }
+
+      .reply2 {
+        margin-left: 40px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Email Threads</h1>
+
+    {threads.map((thread) => (
+      <div>
+        {/* LEVEL 1 */}
+        <details open>
+          <summary>
+            <strong>{thread.from}</strong>
+            {thread.subject ? ` — ${thread.subject}` : ""}
+            <span class="preview"> · {thread.preview}</span>
+          </summary>
+
+          <div>
+            <p>{thread.body}</p>
+
+            {/* LEVEL 2 */}
+            {thread.children?.map((c) => (
+              <div class="reply">
+                <details>
+                  <summary>
+                    <strong>{c.from}</strong>
+                    <span class="preview"> · {c.preview}</span>
+                  </summary>
+
+                  <div>
+                    <p>{c.body}</p>
+
+                    {/* LEVEL 3 */}
+                    {c.children?.map((c2) => (
+                      <div class="reply2">
+                        <details>
+                          <summary>
+                            <strong>{c2.from}</strong>
+                            <span class="preview"> · {c2.preview}</span>
+                          </summary>
+
+                          <div>
+                            <p>{c2.body}</p>
+                          </div>
+                        </details>
+                      </div>
+                      <div> 
+                      <p> {c2.body}</p>
+                        {/* level 4 */}
+                        {c2.children?.map((c3) =>(<div class="reply2">
+                        <details>
+                          <summary>
+                            <strong>{c3.from}</strong>
+                            <span class="preview"> · {c2.preview}</span>
+                          </summary>
+
+                          <div>
+                            <p>{c2.body}</p>
+                          </div>
+                        </details>
+                      </div>) )}
+
+                    </div>
+                    ))}
+
+                    
+                  </div>
+                </details>
+              </div>
+            ))}
+          </div>
+        </details>
+      </div>
+    ))}
+  </body>
+</html>

@@ -1,0 +1,16 @@
+---
+const { items } = Astro.props;
+---
+<ul class="nested-list">
+  {items.map((item) => (
+    <li>
+      {Array.isArray(item) ? (
+        <Astro.self items={item} />
+      ) : (
+        <>
+          <strong>{item.label}</strong>: {item.content}
+        </>
+      )}
+    </li>
+  ))}
+</ul>
