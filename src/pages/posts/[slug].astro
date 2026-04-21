@@ -1,5 +1,5 @@
 ---
-import WebsiteLayout from "../../layouts/WebsiteLayout.astro";
+import WebsiteLayout from "../../layouts/WhiteWebsiteLayout.astro";
 import { marked } from "marked";
 import markedKatex from "marked-katex-extension";
 import createDOMPurify from "dompurify";
@@ -27,9 +27,47 @@ marked.use(markedKatex({
   displayMode: true, // optional, applies to $$...$$
 }));
 
+console.log(correctPost.content);
+function extractFootnotes(text) {
+  const lines = text.split("\n");
+  const footnotes = {};
+
+  let currentId = null;
+  let buffer = [];
+
+  for (const line of lines) {
+    const match = line.match(/^\[\^(\d+)\]:\s*(.*)/);
+
+    if (match) {
+      // save previous
+      if (currentId !== null) {
+        footnotes[currentId] = buffer.join("\n").trim();
+      }
+
+      currentId = match[1];
+      buffer = [match[2]];
+    } else if (currentId !== null && line.trim() !== "") {
+      buffer.push(line);
+    }
+  }
+
+  if (currentId !== null) {
+    footnotes[currentId] = buffer.join("\n").trim();
+  }
+
+  return footnotes;
+}
+const footNotes = extractFootnotes(correctPost.content); 
+const footnotesHTML = Object.entries(footNotes).map(([id, text]) => {
+  return {
+    id : id,
+    html: marked.parse(text)
+  };
+});
 // Convert and sanitize
 const rawHtml = marked.parse(correctPost.content);
 const safeHtml = DOMPurify.sanitize(rawHtml, { ADD_TAGS: ['math', 'mi', 'mo', 'mn', 'mrow', 'annotation'], ADD_ATTR: ['display'] });
+
 
 // Format date
 const date = new Date(correctPost.created_at).toLocaleDateString(undefined, {
@@ -45,88 +83,169 @@ const date = new Date(correctPost.created_at).toLocaleDateString(undefined, {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css">
   </head>
-  <article class="post">
-    <h1 class="title">{correctPost.title}</h1>
-    <div class="byline">By <a href={`/${correctPost.username}`} class="author-link">{correctPost.username}</a> on {date}</div>
-    <div class="content" set:html={safeHtml}></div>
-  </article>
-  <div>
+
+  <div class="page">
+    <article class="post">
+      <h1 class="title">{correctPost.title}</h1>
+
+      <div class="byline">
+        By <a href={`/${correctPost.username}`} class="author-link">
+          {correctPost.username}
+        </a> on {date}
+      </div>
+
+      <div class="content" set:html={safeHtml}></div>
+    </article>
+    <div> 
+      
+      
+   <aside class="sideNotes">
+  {footnotesHTML.map(note => (
+    <div class="sidenote">
+      <span class="sidenote-num">{note.id}</span>
+      <span class="sidenote-body" set:html={note.html}></span>
+    </div>
+  ))}
+</aside>
+    </div>
+  </div>
+
+  <div class="comments">
     <CommentsTree slug={slug} client:load />
   </div>
 </WebsiteLayout>
-
 <style>
+ .page {
+  display: grid;
+  grid-template-columns: 1fr 800px 300px 1fr;
+  align-items: start;
+}
+
+/* MAIN ARTICLE */
+.post {
+  grid-column: 2;
+  background-color: #fcfcfc;
+  padding: 1.8rem 2rem;
+  line-height: 1.7;
+}
+/* SIDENOTES COLUMN */
+.sideNotes {
+  grid-column: 3;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: #444;
+  padding-top: 3rem;
+}
+
+/* EACH NOTE */
+.sidenote {
+  margin-bottom: 1.2rem;
+  padding-left: 0.75rem;
+  border-left: 1px solid #e5e5e5;
+  opacity: 0.9;
+}
+
+/* remove default paragraph spacing inside notes */
+.sidenote p {
+  margin: 0;
+}
+
+/* links inside notes */
+.sidenote a {
+  color: #456650;
+  text-decoration: none;
+}
+
+.sidenote a:hover {
+  text-decoration: underline;
+}
+
+
+/* TYPOGRAPHY */
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  word-break: break-word;
+}
+
+.byline {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.author-link {
+  color: #456650;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.author-link:hover {
+  text-decoration: underline;
+}
+
+/* CONTENT */
+.content pre {
+  background: #f6f6f6;
+  padding: 1rem;
+  overflow-x: auto;
+  border-radius: 6px;
+  margin: 1.5rem 0;
+}
+
+.content h2,
+.content h3 {
+  margin-top: 2rem;
+}
+
+.content p {
+  margin: 1rem 0;
+}
+
+/* COMMENTS */
+.comments {
+  grid-column: 2;
+  margin-top: 3rem;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1100px) {
+  .page {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .sideNotes {
+    display: none; /* fallback: hide sidenotes on small screens */
+  }
+
   .post {
-    max-width: 800px;
-    margin: 0rem auto;
-    margin-left: 0rem;
-    background-color: #fcfcfc;
-    padding: 1.8rem 2rem;
-    line-height: 1.7;
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 800px) {
+  .post {
+    padding: 0 0.5rem;
   }
 
   .title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 1rem;
-    word-break: break-word;
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 500px) {
+  .post {
+    padding: 0 0.25rem;
+  }
+
+  .title {
+    font-size: 1.3rem;
   }
 
   .byline {
-    font-size: 0.9rem;
-    color: #666;
-    margin-bottom: 2rem;
+    font-size: 0.8rem;
   }
-
-  .author-link {
-    color: #456650;
-    text-decoration: none;
-    font-weight: 500;
-  }
-
-  .author-link:hover {
-    text-decoration: underline;
-  }
-
-  /* Markdown content styles */
-  .content pre {
-    background: #f6f6f6;
-    padding: 1rem;
-    overflow-x: auto;
-    border-radius: 6px;
-    margin: 1.5rem 0;
-  }
-
-  .content code {
-  }
-
-  .content h2, .content h3 {
-    margin-top: 2rem;
-  }
-
-  .content p {
-    margin: 1rem 0;
-  }
-
-  @media (max-width: 800px) {
-    .post {
-      max-width: 100vw;
-      padding: 0 0.5rem;
-    }
-    .title {
-      font-size: 2rem;
-    }
-  }
-
-  @media (max-width: 500px) {
-    .post {
-      padding: 0 0.25rem;
-    }
-    .title {
-      font-size: 1.3rem;
-    }
-    .byline {
-      font-size: 0.8rem;
-    }
-  }
+}
 </style>
+
