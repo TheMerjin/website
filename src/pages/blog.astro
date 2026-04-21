@@ -39,10 +39,11 @@ try {
 ---
 
 <WebsiteLayout>
+  <main> 
   <div class="blog-container">
     <div class="blog-header">
-      <h1>Sreek's Blog</h1>
-      <p class="blog-description">Thoughts, ideas, and writings from Sreek</p>
+      <h1><a href = "/about" > Sreek's</a> Blog</h1>
+      <p class="blog-description"></p>
     </div>
 
     {error ? (
@@ -63,13 +64,14 @@ try {
       </div>
     )}
   </div>
+  </main>
 </WebsiteLayout>
 
 <style>
   .blog-container {
     max-width: 800px;
     margin: 0 auto;
-    padding: 2rem 1rem;
+    padding: 0rem 1rem;
     background-color: #f8f2e4;
     min-height: 100vh;
   }
@@ -118,8 +120,31 @@ try {
   .posts-list {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0rem;
   }
+  .about-graph-heading {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 1.5rem 0 0.35rem;
+      color: #1a1a1a;
+    }
+    .about-graph-lead {
+      font-size: 0.95rem;
+      color: #4b5563;
+      margin: 0 0 1rem;
+      line-height: 1.5;
+      max-width: 42rem;
+    }
+    main a {
+      color: #000;             /* black text by default */
+      text-decoration: none;   /* no underline initially */
+      transition: color 0.15s, text-decoration 0.15s;
+    }
+
+    main a:hover {
+      color: #6b7280;          /* gray on hover */
+      text-decoration: underline;
+    }
 
   @media (max-width: 768px) {
     .blog-container {
@@ -134,6 +159,15 @@ try {
       font-size: 1rem;
     }
   }
+  .blog-header h1 a {
+  color: #000;
+  text-decoration: none;
+}
+
+.blog-header h1 a:hover {
+  color: #6b7280;
+  text-decoration: underline;
+}
 
   @media (max-width: 480px) {
     .blog-header h1 {
