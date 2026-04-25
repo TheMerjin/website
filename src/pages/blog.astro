@@ -1,181 +1,257 @@
 ---
-import WebsiteLayout from '../layouts/WebsiteLayout.astro';
-import PostCard from '../components/PostCard.astro';
-import { supabase } from '../lib/supabase.js';
+/**
+ * Gwern-style blog index (standalone document)
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import { supabase } from "../lib/supabase.js";
 
 export const prerender = false;
 
-// Fetch all posts from user "Sreek"
-let sreekPosts = [];
+// -----------------------------
+// Data layer (hidden machinery)
+// -----------------------------
+let posts = [];
 let error = null;
 
 try {
-  // First get the user profile to get the user_id
-  const { data: profileData, error: profileError } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('username', 'Sreek')
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("username", "Sreek")
     .single();
 
-  if (profileError || !profileData) {
-    error = 'User Sreek not found';
+  if (!profile) {
+    error = "User ‘Sreek’ not found in archive index.";
   } else {
-    // Now get the posts for this user
-    const { data: postsData, error: postsError } = await supabase
-      .from('posts')
-      .select('*')
-      .eq('author_id', profileData.id)
-      .order('created_at', { ascending: false });
+    const { data } = await supabase
+      .from("posts")
+      .select("*")
+      .eq("author_id", profile.id)
+      .order("created_at", { ascending: false });
 
-    if (!postsError) {
-      sreekPosts = postsData || [];
-    } else {
-      error = 'Failed to load posts';
-    }
+    posts = data ?? [];
   }
-} catch (err) {
-  error = 'Failed to load blog';
+} catch {
+  error = "Archive subsystem failure (database unreachable).";
 }
 ---
 
-<WebsiteLayout>
-  <main> 
-  <div class="blog-container">
-    <div class="blog-header">
-      <h1><a href = "/about" > Sreek's</a> Blog</h1>
-      <p class="blog-description"></p>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Sreek’s Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <style>
+      /* -----------------------------
+         Gwern-style minimal system
+      ------------------------------ */
+
+      body {
+        margin: 0;
+        padding: 3rem 1.2rem;
+        max-width: 820px;
+        margin-left: auto;
+        margin-right: auto;
+        font-family: serif;
+        background: #fafafa;
+        color: #111;
+        line-height: 1.55;
+      }
+
+      a {
+        color: #000;
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      /* header */
+      .meta {
+        font-family: monospace;
+        font-size: 11px;
+        opacity: 0.6;
+        letter-spacing: 0.05em;
+        margin-bottom: 1rem;
+      }
+
+      h1 {
+        font-size: 2.6rem;
+        font-weight: 600;
+        margin: 0.5rem 0;
+      }
+
+      .subtitle {
+        font-style: italic;
+        opacity: 0.7;
+        margin-bottom: 2rem;
+      }
+
+      /* nav */
+      nav {
+        font-family: monospace;
+        font-size: 12px;
+        margin-bottom: 2rem;
+      }
+
+      nav span {
+        opacity: 0.5;
+      }
+
+      /* post block */
+      article {
+        padding: 2rem 0;
+        border-bottom: 1px solid #e5e5e5;
+      }
+
+      .post-meta {
+        font-family: monospace;
+        font-size: 11px;
+        opacity: 0.5;
+        margin-bottom: 0.5rem;
+        display: flex;
+        gap: 0.8rem;
+      }
+
+      h2 {
+        font-size: 1.4rem;
+        margin: 0.3rem 0 0.7rem;
+      }
+
+      .excerpt {
+        font-style: italic;
+        opacity: 0.75;
+        max-width: 65ch;
+      }
+
+      .expand {
+        font-family: monospace;
+        font-size: 11px;
+        margin-top: 0.8rem;
+      }
+
+      /* side note */
+      aside {
+        margin-top: 4rem;
+        padding-left: 1rem;
+        border-left: 2px solid #ddd;
+        font-style: italic;
+        opacity: 0.8;
+      }
+
+      footer {
+        margin-top: 4rem;
+        font-family: monospace;
+        font-size: 10px;
+        opacity: 0.5;
+        display: flex;
+        justify-content: space-between;
+        border-top: 1px solid #ddd;
+        padding-top: 1rem;
+      }
+
+      @media (max-width: 600px) {
+        h1 {
+          font-size: 2rem;
+        }
+
+        footer {
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+
+    <!-- Title / metadata block -->
+    <div class="meta">
+      C:\archive\sreek\blog\index.astro •
+      {posts.length} entries •
+      status: live index
     </div>
 
-    {error ? (
-      <div class="error-message">
-        <h2>Error Loading Blog</h2>
-        <p>{error}</p>
+    <h1>Sreek’s Blog</h1>
+
+    <div class="subtitle">
+      An incremental archive of essays, notes, and long-form fragments.
+    </div>
+
+    <!-- Navigation -->
+    <nav>
+      <a href="/">index</a> /
+      <a href="/about">about</a> /
+      <span>archives</span>
+    </nav>
+
+    <!-- Body -->
+    <main>
+
+      {error ? (
+        <section>
+          <h2>Archive inaccessible</h2>
+          <p style="font-style: italic; opacity: 0.7;">
+            {error}
+          </p>
+        </section>
+      ) : posts.length === 0 ? (
+        <section>
+          <h2>Empty archive</h2>
+          <p style="font-style: italic; opacity: 0.7;">
+            No entries have yet been committed to this index.
+          </p>
+        </section>
+      ) : (
+        posts.map((post, i) => (
+          <article>
+            <div class="post-meta">
+              <span>{new Date(post.created_at).toLocaleDateString()}</span>
+              <span>§{i + 1}</span>
+              <span>Sreek</span>
+            </div>
+
+            <h2>
+              <a href={`/posts/${post.slug || post.id}`}>
+                {post.title}
+              </a>
+            </h2>
+
+            {post.excerpt && (
+              <div class="excerpt">
+                {post.excerpt}
+              </div>
+            )}
+
+            <div class="expand">
+              <a href={`/posts/${post.slug || post.id}`}>
+                expand →
+              </a>
+            </div>
+          </article>
+        ))
+      )}
+
+    </main>
+
+    <!-- Marginal note (Gwern-style annotation) -->
+    <aside>
+      “A blog is not a product but an accumulation function over time.”
+      <div style="font-size: 10px; opacity: 0.6; margin-top: 0.5rem;">
+        reader may ignore this section safely
       </div>
-    ) : sreekPosts.length === 0 ? (
-      <div class="no-posts">
-        <h2>No Posts Yet</h2>
-        <p>Sreek hasn't published any posts yet.</p>
-      </div>
-    ) : (
-      <div class="posts-list">
-        {sreekPosts.map((post) => (
-          <PostCard post={post} key={post.id} />
-        ))}
-      </div>
-    )}
-  </div>
-  </main>
-</WebsiteLayout>
+    </aside>
 
-<style>
-  .blog-container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 0rem 1rem;
-    background-color: #f8f2e4;
-    min-height: 100vh;
-  }
+    <!-- Footer -->
+    <footer>
+      <span>archive integrity: nominal</span>
+      <span>linkrot protection: partial</span>
+      <span>render: SSR hybrid</span>
+    </footer>
 
-  .blog-header {
-    text-align: center;
-    margin-bottom: 3rem;
-    padding-bottom: 2rem;
-    border-bottom: 1px solid #e6e1d7;
-  }
-
-  .blog-header h1 {
-    font-size: 3rem;
-    font-weight: 700;
-    color: #333;
-    margin-bottom: 1rem;
-    font-family: 'Inter', sans-serif;
-  }
-
-  .blog-description {
-    font-size: 1.2rem;
-    color: #666;
-    margin: 0;
-  }
-
-  .error-message {
-    text-align: center;
-    padding: 4rem 2rem;
-  }
-
-  .error-message h2 {
-    color: #d32f2f;
-    margin-bottom: 1rem;
-  }
-
-  .no-posts {
-    text-align: center;
-    padding: 4rem 2rem;
-  }
-
-  .no-posts h2 {
-    color: #666;
-    margin-bottom: 1rem;
-  }
-
-  .posts-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0rem;
-  }
-  .about-graph-heading {
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin: 1.5rem 0 0.35rem;
-      color: #1a1a1a;
-    }
-    .about-graph-lead {
-      font-size: 0.95rem;
-      color: #4b5563;
-      margin: 0 0 1rem;
-      line-height: 1.5;
-      max-width: 42rem;
-    }
-    main a {
-      color: #000;             /* black text by default */
-      text-decoration: none;   /* no underline initially */
-      transition: color 0.15s, text-decoration 0.15s;
-    }
-
-    main a:hover {
-      color: #6b7280;          /* gray on hover */
-      text-decoration: underline;
-    }
-
-  @media (max-width: 768px) {
-    .blog-container {
-      padding: 1rem 0.5rem;
-    }
-
-    .blog-header h1 {
-      font-size: 2rem;
-    }
-
-    .blog-description {
-      font-size: 1rem;
-    }
-  }
-  .blog-header h1 a {
-  color: #000;
-  text-decoration: none;
-}
-
-.blog-header h1 a:hover {
-  color: #6b7280;
-  text-decoration: underline;
-}
-
-  @media (max-width: 480px) {
-    .blog-header h1 {
-      font-size: 1.5rem;
-    }
-
-    .blog-description {
-      font-size: 0.9rem;
-    }
-  }
-</style> 
+  </body>
+</html>

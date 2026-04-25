@@ -1,0 +1,157 @@
+---
+import WebsiteLayout from "../../layouts/WhiteWebsiteLayout.astro";
+function titleCase(s: string) {
+  return s
+    .split(/[\s_-]+/g)
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+}
+function cleanSegment(seg: string) {
+  try {
+    return decodeURIComponent(seg);
+  } catch {
+    return seg;
+  }
+}
+function titleFromRoute(route: string) {
+  const parts = route.split("/").filter(Boolean).map(cleanSegment);
+  if (parts.length === 0) return "Math";
+  const last = parts[parts.length - 1];
+  return titleCase(last);
+}
+// Discover all math pages (excluding this index).
+const modules = import.meta.glob("./**/*.astro", { eager: true });
+const routes = Object.keys(modules)
+  .map((p) => p.replace(/^\.\/+/, "")) // "differential equations/foo.astro"
+  .filter((p) => p.toLowerCase() !== "index.astro")
+  .map((p) => p.replace(/\.astro$/i, "")); // "differential equations/foo"
+const entries = routes
+  .map((r) => ({
+    route: `/book_reviews/${r.split("/").map(encodeURIComponent).join("/")}`,
+    title: titleFromRoute(r),
+    section: r.includes("/") ? titleCase(cleanSegment(r.split("/")[0])) : "Notes",
+  }))
+  .sort((a, b) => a.route.localeCompare(b.route));
+  const indexString = "index";
+  const cleanedEntries = entries.map((x) => 
+  x.route.endsWith(indexString) 
+    ? { ...x, route: x.route.slice(0, -indexString.length) } 
+    : x
+);
+console.log(cleanedEntries);
+
+const sections = Array.from(new Set(cleanedEntries.map((e) => e.section)));
+---
+
+
+<style>
+  /* Base page styling */
+  .math-index {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    font-family: Georgia, serif; /* classic serif like Gwern */
+    color: #111;
+    line-height: 1.6;
+  }
+
+  .math-head h1 {
+    font-size: 3rem;
+    font-weight: normal;
+    margin-bottom: 0.25rem;
+  }
+
+  .math-head .lead {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+    color: #333;
+  }
+
+  section.block {
+    margin-bottom: 3rem;
+  }
+
+  section.block h3 {
+    font-size: 1.75rem;
+    font-weight: bold;
+    border-bottom: 1px solid #ddd; /* subtle separator */
+    padding-bottom: 0.25rem;
+    margin-bottom: 1rem;
+  }
+
+  ul.list {
+    list-style: none;
+    padding-left: 0;
+  }
+
+  li.item {
+    margin-bottom: 1.5rem;
+  }
+
+  .item-link {
+    text-decoration: none;
+    color: #111;
+  }
+
+  .item-link:hover h4 {
+    text-decoration: underline;
+  }
+
+  .item-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+  }
+
+  .item-meta {
+    font-size: 0.875rem;
+    color: #555;
+    font-family: monospace;
+  }
+
+  code.path {
+    background-color: #f5f5f5;
+    padding: 0.15rem 0.3rem;
+    border-radius: 3px;
+  }
+
+  .empty {
+    text-align: center;
+    font-style: italic;
+    color: #777;
+  }
+</style>
+
+<WebsiteLayout>
+  <main class="math-index">
+    <header class="math-head">
+      <h1>Book Reviews</h1>
+      <p class="lead">From stuff I have read</p>
+    </header>
+
+    {entries.length === 0 ? (
+      <p class="empty">No math pages yet.</p>
+    ) : (
+      sections.map((section) => (
+        <section class="block">
+          <h3>{section}</h3>
+          <ul class="list">
+            {cleanedEntries
+              .filter((e) => e.section === section)
+              .map((e) => (
+                <li class="item">
+                  <a class="item-link" href={e.route}>
+                    <h4 class="item-title">{e.title}</h4>
+                  </a>
+                  <small class="item-meta">
+                    <code class="path">{e.route}</code>
+                  </small>
+                </li>
+              ))}
+          </ul>
+        </section>
+      ))
+    )}
+  </main>
+</WebsiteLayout>
