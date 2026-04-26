@@ -160,10 +160,40 @@ c_2
   </aside>
 </div>
       <div class="exercise">
-        <h2>Exercise 3: Differential Equation</h2>
+        <h2>Exercise 3: Find a general solution to this diffrenetial equationsn</h2>
         <p>Solve the following first-order differential equation:</p>
-        <div class="latex" set:html={K(eq3)}></div>
+        <div class="latex" set:html={K("y^{(4)} +2y''' - 4y'' -2y' + 3y = 0")}></div> as always since it's homogenous assume a solution of the form <div class="latex" set:html={K("y = e^{rt}")}></div> the logically the equation becomes<div class="latex" set:html={K("e^{rt}(r^{4} + 2r^{3} -4r^{2} - 2r + 3 ) = 0")}></div> now we solve for the roots check for linearity and so on 
       </div>
+      <div class="exercise">
+        <h2>Exercise 4: Find the differential operator that annihlates these given functions</h2>
+        <p>Do the following</p>
+        <div class="latex" set:html={K(String.raw`\
+          \text{a.} \quad x^2 - 2x + 5 \\
+          \text{b.} \quad e^{3x} + x + 1 \\
+          \text{c.} \quad x \sin(2x) \\
+          \text{d.} \quad x^2 e^{-2x} \cos(3x) \\
+          \text{e.} \quad x^2 - 2x + x e^{-x} + \sin(2x) - \cos(3x) \
+          `)}></div>
+
+          <div> 
+            a. for the first one it's obvious that  <div class="latex" set:html={K("D^{2}")}></div> should be sufficient solution  
+          </div>
+          <div> 
+            b. for the second one it's obvious that  <div class="latex" set:html={K("D^{3} - 3D")}></div> should be sufficient solution 
+
+          </div>
+          <div> 
+            c. for the third one it's obvious that  <div class="latex" set:html={K("D^{2} +4 ")}></div> should be sufficient solution but this one is harder to intuit obviously sin(2x) is anihlated bu it's second derivative which is -4sin(2x) so thats why we need the + 4 
+            
+          </div>
+          <div> 
+            d. for the third one it's obvious that  <div class="latex" set:html={K("D^{2} +4 ")}></div> should be sufficient solution but this one is harder to intuit obviously sin(2x) is anihlated bu it's second derivative which is -4sin(2x) so thats why we need the + 4 
+            
+          </div>
+          <div> 
+            e. for the fifth one it's obvious that  <div class="latex" set:html={K("D^{2} +4 ")}></div> should be sufficient solution but this one is harder to intuit obviously sin(2x) is anihlated bu it's second derivative which is -4sin(2x) so thats why we need the + 4 
+            
+          </div>
     </main>
 
     <footer>
