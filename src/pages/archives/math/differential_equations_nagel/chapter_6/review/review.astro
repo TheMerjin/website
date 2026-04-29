@@ -1,0 +1,204 @@
+---
+import katex from "katex";
+import "katex/dist/katex.min.css";
+
+
+// Example equations
+const eq1 = "y = mx + b";
+const eq2 = "f(x) = \\sum_{n=0}^{\\infty} \\frac{f^{(n)}(a)}{n!} (x-a)^n";
+const eq3 = "\\frac{dy}{dx} = x - y";
+
+const K = (latex: string) => katex.renderToString(latex, { throwOnError: false });
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Math Exercises</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body {
+        margin: 0;
+        padding: 3rem 1.2rem;
+        max-width: 820px;
+        margin-left: auto;
+        margin-right: auto;
+        font-family: serif;
+        background: #fafafa;
+        color: #111;
+        line-height: 1.55;
+      }
+
+      a {
+        color: #000;
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+
+      h1 {
+        font-size: 2.6rem;
+        font-weight: 600;
+        margin: 0.5rem 0;
+      }
+
+      h2 {
+        font-size: 1.4rem;
+        margin: 0.3rem 0 0.7rem;
+      }
+
+      .meta {
+        font-family: monospace;
+        font-size: 11px;
+        opacity: 0.6;
+        letter-spacing: 0.05em;
+        margin-bottom: 1rem;
+      }
+
+      nav {
+        font-family: monospace;
+        font-size: 12px;
+        margin-bottom: 2rem;
+      }
+
+      nav span {
+        opacity: 0.5;
+      }
+
+      .exercise {
+        padding: 1.5rem 0;
+        border-bottom: 1px solid #e5e5e5;
+      }
+
+      .latex {
+        font-style: italic;
+        opacity: 0.85;
+        margin: 0.5rem 0;
+      }
+
+      footer {
+        margin-top: 4rem;
+        font-family: monospace;
+        font-size: 10px;
+        opacity: 0.5;
+        border-top: 1px solid #ddd;
+        padding-top: 1rem;
+      }
+      .exercise2 {
+  display: grid;
+  grid-template-columns: 1fr 220px; /* main content | sidenote */
+  gap: 1rem;
+  position: relative;
+}
+
+.exercise2 .main-content {
+  /* This is optional, just for clarity */
+}
+
+.exercise2 aside {
+  font-size: 0.85rem;
+  color: #555;
+  border-left: 2px solid #ccc;
+  padding-left: 0.5rem;
+}
+    </style>
+  </head>
+  <body>
+    <div class="meta">
+      C:\archive\math\exercises • 3 exercises
+    </div>
+
+    <h1>Math Exercises</h1>
+    <div class="subtitle">Practice problems with LaTeX rendering</div>
+
+    <nav>
+      <a href="/">index</a> /
+      <a href="/about">about</a> /
+      <span>exercises</span>
+    </nav>
+
+    <main>
+      <div class="exercise">
+        <h2>Exercise 1: Determine the intervals for which Theorem 1 guarantees the existence of a solution in that interval</h2>
+        <p>1.a <span set:html={K("y^4 - ln(x)y'' +xy' +2y = cos(3x)")}> </span> </p>
+        <p> Since  <span set:html={"ln(x)"}> </span> exists only where <span set:html={"x > 0"}> </span> and all other coefficients are continous for all real numbers the existence of a solution is only guaranteed for <span set:html={"x > 0"}> </span>  </p>
+      </div>
+
+      <div class="exercise2">
+  <div class="main-content">
+    <h2>Exercise 2: Determine whether these given functions are linearly independent</h2>
+    <p><span set:html={K("{e^(2x), x^2e^(2x), e^(-x)}")}></span></p>
+    <p>We compute the Wronskian:</p>
+    <div class="latex" set:html={K(`
+W[e^{2x}, x^{2}e^{2x}, e^{-x}] =
+\\begin{vmatrix}
+e^{2x} & x^{2}e^{2x} & e^{-x} \\\\
+2e^{2x} & (2x + 2x^{2})e^{2x} & -e^{-x} \\\\
+4e^{2x} & (2 + 8x + 4x^{2})e^{2x} & e^{-x}
+\\end{vmatrix}
+`)}></div>
+    <p><span set:html={K(String.raw`\neq 0`)}></span> so it's independent</p>
+  </div>
+
+  <aside class="sidenote">
+    <a href = "https://math.libretexts.org/Bookshelves/Analysis/Supplemental_Modules_(Analysis)/Ordinary_Differential_Equations/3%3A_Second_Order_Linear_Differential_Equations/3.6%3A_Linear_Independence_and_the_Wronskian" > Link for proof of Wronskian  </a> but tldr: if two functions are linearly dependent then  <span set:html={K("f(x)c_1 + g(x)c_2 = 0")}>  </span> then diffrentiating this must also be true  <span set:html={K("f'(x)c_1 + g'(x)c_2 = 0")}> </span> then we can construct this matrix equation 
+    <div class="latex" set:html={K(String.raw`
+\begin{pmatrix}
+f(x) & g(x) \\
+f'(x) & g'(x)
+\end{pmatrix}
+\begin{pmatrix}
+c_1  \\
+c_2
+\end{pmatrix} = 0`)}></div> this is only true if <span set:html={K(String.raw`\det \begin{pmatrix} f(x) & g(x) \\f'(x) & g'(x) \end{pmatrix} = 0` )}> </span>
+
+
+
+
+  </aside>
+</div>
+      <div class="exercise">
+        <h2>Exercise 3: Find a general solution to this diffrenetial equationsn</h2>
+        <p>Solve the following first-order differential equation:</p>
+        <div class="latex" set:html={K("y^{(4)} +2y''' - 4y'' -2y' + 3y = 0")}></div> as always since it's homogenous assume a solution of the form <div class="latex" set:html={K("y = e^{rt}")}></div> the logically the equation becomes<div class="latex" set:html={K("e^{rt}(r^{4} + 2r^{3} -4r^{2} - 2r + 3 ) = 0")}></div> now we solve for the roots check for linearity and so on 
+      </div>
+      <div class="exercise">
+        <h2>Exercise 4: Find the differential operator that annihlates these given functions</h2>
+        <p>Do the following</p>
+        <div class="latex" set:html={K(String.raw`\
+          \text{a.} \quad x^2 - 2x + 5 \\
+          \text{b.} \quad e^{3x} + x + 1 \\
+          \text{c.} \quad x \sin(2x) \\
+          \text{d.} \quad x^2 e^{-2x} \cos(3x) \\
+          \text{e.} \quad x^2 - 2x + x e^{-x} + \sin(2x) - \cos(3x) \
+          `)}></div>
+
+          <div> 
+            a. for the first one it's obvious that  <div class="latex" set:html={K("D^{2}")}></div> should be sufficient solution  
+          </div>
+          <div> 
+            b. for the second one it's obvious that  <div class="latex" set:html={K("D^{3} - 3D")}></div> should be sufficient solution 
+
+          </div>
+          <div> 
+            c. for the third one it's obvious that  <div class="latex" set:html={K("D^{2} +4 ")}></div> should be sufficient solution but this one is harder to intuit obviously sin(2x) is anihlated bu it's second derivative which is -4sin(2x) so thats why we need the + 4 
+            
+          </div>
+          <div> 
+            d. for the third one it's obvious that  <div class="latex" set:html={K("D^{2} +4 ")}></div> should be sufficient solution but this one is harder to intuit obviously sin(2x) is anihlated bu it's second derivative which is -4sin(2x) so thats why we need the + 4 
+            
+          </div>
+          <div> 
+            e. for the fifth one it's obvious that  <div class="latex" set:html={K("D^{2} +4 ")}></div> should be sufficient solution but this one is harder to intuit obviously sin(2x) is anihlated bu it's second derivative which is -4sin(2x) so thats why we need the + 4 
+            
+          </div>
+    </main>
+
+    <footer>
+      <span>archive integrity: nominal</span>
+      <span>render: SSR hybrid</span>
+    </footer>
+  </body>
+</html>

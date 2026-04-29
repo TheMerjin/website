@@ -1,0 +1,474 @@
+---
+import WebsiteLayout from "../../../layouts/WhiteWebsiteLayout.astro";
+
+import katex from "katex";
+import "katex/dist/katex.min.css";
+
+const equation = "y = mx + b";
+const html = katex.renderToString(equation, { throwOnError: false });
+
+const taylor_equation = "f(x) = \\sum_{n=0}^{\\infty} \\frac{f^{(n)}(a)}{n!} (x-a)^n";
+const html_1 = katex.renderToString(taylor_equation, { throwOnError: false });
+
+const first_dy_dx = "\\frac{dy}{dx} = x - y";
+const html_2 = katex.renderToString(first_dy_dx, { throwOnError: false });
+
+const K = (latex: "string") =>
+  katex.renderToString(latex, { throwOnError: false });
+---
+
+<main>
+<WebsiteLayout>
+<h1>Taylor Series and Picard Method</h1>
+
+<h4>
+<span set:html={html}></span>  
+As we know, **tangent lines are decent approximations** for small intervals. However, they only work for a limited number of points.  
+To approximate larger functions, we use **Taylor series**: <span set:html={html_1}></span>
+</h4>
+
+<h4>Problem Example:</h4>
+<ul>
+  <li>
+    Compute the **Taylor polynomial of degree 2** for the following initial value problem as well as Picard's Method:  
+    <ul>
+      <li>
+        <span set:html={html_2}></span>  
+        <span set:html={K("y(0) = 1")}></span>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h4>Taylor Polynomial Solution Steps:</h4>
+<ol>
+  <li>
+    The differential equation is:  
+    <span set:html={K("\\frac{dy}{dx} = x - y")}></span>
+  </li>
+  <li>
+    Compute the second derivative for the Taylor polynomial:  
+    <span set:html={K("\\frac{d^2y}{dx^2} = 1 - y' + (-y') * (x - y) = 1 - y' + y * y' - x * y'")}></span>
+  </li>
+  <li>
+    Using the initial condition <span set:html={K("y(0) = 1")}></span>:  
+    <span set:html={K("\\frac{dy}{dx}(0) = 0 - 1 = -1")}></span>  
+    <span set:html={K("\\frac{d^2y}{dx^2}(0) = 1 - (-1) + (1)*(-1) = 1")}></span>
+  </li>
+  <li>
+    Approximate the solution using the degree 2 Taylor polynomial:  
+    <span set:html={K("y(x) \\approx 1 + (-1)*(x - 0) + 1/2*(x - 0)^2 = 1 - x + 0.5 x^2")}></span>
+  </li>
+</ol>
+<h4>Picard's Iteration Method:</h4>
+<p>
+<span set:html={K(`
+y_0(x) = y_0, \\\\
+y_{n+1}(x) = y_0 + \\int_{x_0}^{x} f(t, y_n(t)) \\, dt
+`)}></span>
+</p>
+<p>
+This iterative method approximates the solution of <span set:html={K("dy/dx = f(x,y)")}></span> starting at the initial point <span set:html={K("(x_0, y_0)")}></span>.  
+Each iteration uses the previous function inside the integral to get closer to the exact solution.
+</p>
+
+
+<h4>Checking Accuracy:</h4>
+<p>
+We can check how good this approximation is by using **Euler's method** with a small step size and comparing the results to the exact solution and the Taylor polynomial.  
+Below is a graph showing:  
+<ul>
+  <li>Blue: Exact solution <span set:html={K("y = x - 1 + 2 e^{-x}")}></span></li>
+  <li>Green: Euler's method approximation</li>
+  <li>Orange: Taylor polynomial approximation</li>
+</ul>
+</p>
+
+<canvas id="myCanvas"></canvas>
+
+
+<p4> Pickard's method is very intresting the idea is that succesive functions converge on the function Let's see that in action for a harder diffrential equation</p4>
+<ul> 
+  <li> Let for example a harder diff eq such as <span set:html={K("y'' = 0.1*y' -y +sin(2t)")}> Normally, to solve you would Muck it finding the homogenous and the particular solutions and summing them.</span>
+    and since we know <span set:html={K("y(0) = 0")}> </span> and <span set:html={K("y'(0) = 1")}></span> then we do a simple substitution <span set:html= {K("v = y'")}> </span> and logically <span set:html= {K("v' = y''")}> </span> 
+    <ul> 
+      <li> 
+        Now we do a substitution <span set:html={K("v' = -0.1*v + y + sin(2t)")}> </span>
+        and we arrive at two equations:
+        <span set:html={K(`
+\\begin{cases}
+y'(t) = v(t) \\\\
+v'(t) = -0.1\\,v(t) - y(t) + \\sin(2t)
+\\end{cases}
+`)}></span>
+
+<span set:html={K(`
+y(0) = 0, \\quad v(0) = 1
+`)}></span>
+      </li>
+
+    </ul>
+    </li>
+  <li> Control which iteration of pickard is displayed
+    <div class="slidecontainer">
+  <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+</div></li> <div id="demo"> </div>
+</ul>
+
+<canvas id = "pickardCanvas"> </canvas>
+</WebsiteLayout>
+</main>
+
+<script type = "module"> 
+const canvas = document.getElementById("myCanvas");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth*0.5;
+canvas.height = window.innerHeight*1;
+ctx.fillStyle = "black";
+
+const width = canvas.width;
+const height = canvas.height;
+
+// Define your mathematical range
+const xMin = 0, xMax = 3;
+const yMin = -5, yMax = 5;
+const dx = 0.25, dy = 1;
+
+// Functions to convert math coordinates -> canvas pixels
+function xToCanvas(x) {
+  return ((x - xMin) / (xMax - xMin)) * width;
+}
+
+function yToCanvas(y) {
+  return height - ((y - yMin) / (yMax - yMin)) * height;
+}
+
+// Draw vertical lines
+for (let x = xMin; x <= xMax; x += dx) {
+  ctx.beginPath();
+  ctx.moveTo(xToCanvas(x), 0);
+  ctx.lineTo(xToCanvas(x), height);
+  ctx.strokeStyle = "#ccc";
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.fillText(`${x}`, xToCanvas(x),canvas.height/2-0.1);
+}
+
+// Draw horizontal lines
+for (let y = yMin; y <= yMax; y += dy) {
+  ctx.beginPath();
+  ctx.moveTo(0, yToCanvas(y));
+  ctx.lineTo(width, yToCanvas(y));
+  ctx.strokeStyle = "#ccc";
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.fillText(`${y}`, xToCanvas(0), yToCanvas(y));
+
+}
+
+for (let x_diffeq  = xMin; x_diffeq <= xMax; x_diffeq += dx/100){
+    ctx.beginPath();
+    ctx.fillStyle = "#1F77B4";
+    let y_diffeq = x_diffeq -1  + 2*Math.exp(-1* x_diffeq);
+    ctx.moveTo(0, xToCanvas(x_diffeq));
+    const canvasX = xToCanvas(x_diffeq); 
+    const canvasY = yToCanvas(y_diffeq); // if you have a y value
+    ctx.arc(canvasX, canvasY, 2, 0, 2 * Math.PI);
+
+    ctx.fill();
+}
+
+
+
+let y = 1 ;
+let oldX = 0;
+
+for (let x_euler  = 0; x_euler <= xMax; x_euler += dx){
+    
+    // x_n = x_n-1 + dx this is x_euler on each iteration but we need x_n-1 to find dy/dx as well and y_n-1 
+    // on first run x = 0, y = 0 
+    let y_n = y + dx* (oldX - y )
+    // y+n = y+n-1 + d* dy/dx
+    ctx.beginPath();
+    ctx.fillStyle = "#2CA02C";
+    ctx.moveTo(xToCanvas(oldX), yToCanvas(y));
+    ctx.lineTo(xToCanvas(x_euler), yToCanvas(y_n));
+    ctx.strokeStyle = "#2CA02C";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    oldX = x_euler; 
+    y = y_n;
+}
+
+
+// Taylor Polynomial
+
+for (let x_diffeq  = xMin; x_diffeq <= xMax; x_diffeq += dx/100){
+    ctx.beginPath();
+    ctx.fillStyle = "#FF7F0E";
+    let y_diffeq = 1+ (-1)*(x_diffeq-0)+1/2*(x_diffeq);
+    ctx.moveTo(0, xToCanvas(x_diffeq));
+    const canvasX = xToCanvas(x_diffeq); 
+    const canvasY = yToCanvas(y_diffeq); // if you have a y value
+    ctx.arc(canvasX, canvasY, 2, 0, 2 * Math.PI);
+
+    ctx.fill();
+}
+
+ctx.beginPath();
+ctx.strokeStyle = "#9467BD"; // purple
+ctx.lineWidth = 2;
+
+let y_picard = 1; // initial y0
+for (let x_p = 0; x_p <= xMax; x_p += dx) {
+    // first Picard iteration: y1 = y0 + ∫0^x (t - y0) dt = y0 + ∫0^x (t - 1) dt
+    y_picard = 1 + ((x_p*x_p)/2 - x_p); // integral of t - 1
+    ctx.lineTo(xToCanvas(x_p), yToCanvas(y_picard));
+}
+ctx.stroke();
+
+
+ctx.beginPath();
+ctx.strokeStyle = "#7242AC"; // purple
+ctx.lineWidth = 2;
+
+y_picard = 1; // initial y0
+for (let x_p = 0; x_p <= xMax; x_p += dx) {
+    // first Picard iteration: y1 = y0 + ∫0^x (t - y0) dt = y0 + ∫0^x (t - 1) dt
+    y_picard = 1 -x_p + x_p**2 - x_p**3/6; // integral of t - 1
+    ctx.lineTo(xToCanvas(x_p), yToCanvas(y_picard));
+}
+ctx.stroke();
+
+
+
+function drawLegend() {
+  const startX = 20; // top-left corner of legend
+  const startY = 20;
+  const boxSize = 15;
+  const spacing = 25;
+
+  const items = [
+    { color: "#1F77B4", label: "Solution curve" },
+    { color: "#2CA02C", label: "Euler's Method with step 0.25" },
+    { color: "#FF7F0E", label: "Taylor Polynomial of degree 2 with inital point x = 0" }, {color : "#9467BD", label : "Picard's first iterastion method with step 0.25"}, {color: "#7242AC", label : "Picard's second iteration method with step = 0.25" }
+    
+  ];
+
+  ctx.font = "14px Arial";
+  ctx.textBaseline = "middle";
+
+  items.forEach((item, i) => {
+    // draw color box
+    ctx.fillStyle = item.color;
+    ctx.fillRect(startX, startY + i * spacing, boxSize, boxSize);
+
+    // draw label
+    ctx.fillStyle = "black";
+    ctx.fillText(item.label, startX + boxSize + 8, startY + i * spacing + boxSize/2);
+  }); 
+};
+drawLegend();
+
+</script>
+
+<script type = "module">
+const picardCache = new Map();
+function getPicard(iter) {
+    var usedIter = iter;
+    if (!picardCache.has(usedIter)) {
+        picardCache.set(usedIter,
+            picardDampedOscillator(xMin, xMax, dx, usedIter)
+        );
+    }
+    return picardCache.get(usedIter);
+}
+ var slider = document.getElementById("myRange");
+var output = document.getElementById("demo");
+output.innerHTML = slider.value; // Display the default slider value
+
+// Update the current slider value (each time you drag the slider handle)
+slider.oninput = function() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  output.innerHTML = this.value;
+  var pickard_iterations = this.value;
+  for (let x = xMin; x <= xMax; x += 20*dx) {
+  ctx.beginPath();
+  ctx.moveTo(xToCanvas(x), 0);
+  ctx.lineTo(xToCanvas(x), height);
+  ctx.strokeStyle = "#ccc";
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.fillText(`${x}`, xToCanvas(x), yToCanvas(-5));
+}
+
+// Draw horizontal lines
+for (let y = yMin; y <= yMax; y += 2*dy) {
+  ctx.beginPath();
+  ctx.moveTo(0, yToCanvas(y));
+  ctx.lineTo(width, yToCanvas(y));
+  ctx.strokeStyle = "#ccc";
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.fillText(`${y}`, xToCanvas(0), yToCanvas(y));
+
+}
+
+for (let x_diffeq  = xMin; x_diffeq <= xMax; x_diffeq += dx/100){
+    ctx.beginPath();
+    ctx.fillStyle = "#1F77B4";
+    // Final solution parameters
+
+
+    // Function for y(t)
+    
+    let y_diffeq = y(x_diffeq);
+    ctx.moveTo(0, xToCanvas(x_diffeq));
+    const canvasX = xToCanvas(x_diffeq); 
+    const canvasY = yToCanvas(y_diffeq); // if you have a y value
+    ctx.arc(canvasX, canvasY, 2, 0, 2 * Math.PI);
+
+    ctx.fill();
+}
+
+///add pickard viosual
+
+
+
+drawLegend();
+  
+
+
+const { tValues, allIterations, finalIteration } = getPicard(pickard_iterations);
+
+
+
+const yFinal = finalIteration;
+
+ctx.beginPath();
+ctx.strokeStyle = "red";
+ctx.lineWidth = 1;
+
+for (let i = 0; i < tValues.length; i++) {
+    const canvasX = xToCanvas(tValues[i]);
+    const canvasY = yToCanvas(yFinal[i]);
+
+    if (i === 0) ctx.moveTo(canvasX, canvasY);
+    else ctx.lineTo(canvasX, canvasY);
+}
+
+ctx.stroke();
+} 
+
+
+function picardDampedOscillator(xMin, xMax, dx, iterations) {
+    const tValues = [];
+    for (let t = xMin; t <= xMax; t += dx) tValues.push(t);
+
+    // Initialize y and y' arrays
+    let yPrev = tValues.map(() => 0);  // y0 = 0
+    let yPrevDot = tValues.map(() => 1); // y'(0) = 1
+
+    const allIterations = [ [...yPrev] ];
+
+    for (let n = 0; n < iterations; n++) {
+        const yNext = [];
+        const yDotNext = [];
+        for (let i = 0; i < tValues.length; i++) {
+            const t = tValues[i];
+
+            // Approximate integral using sum over previous points
+            let sumY = 0;
+            let sumYDot = 0;
+            for (let j = 0; j < i; j++) {
+                const dt = dx;
+                const y2 = yPrevDot[j];
+                const y2Dot = -0.1 * yPrevDot[j] - yPrev[j] + Math.sin(2 * tValues[j]);
+                sumY += y2 * dt;
+                sumYDot += y2Dot * dt;
+            }
+
+            yNext.push(yPrev[0] + sumY); // y0 + integral
+            yDotNext.push(yPrevDot[0] + sumYDot); 
+        }
+        yPrev = [...yNext];
+        yPrevDot = [...yDotNext];
+        // because n starts at 0
+    allIterations.push([...yPrev]);
+        
+    }
+
+   return {
+  tValues,
+  allIterations,
+  finalIteration: allIterations[allIterations.length - 1]
+};
+}
+const canvas = document.getElementById("pickardCanvas");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth*0.5;
+canvas.height = window.innerHeight*1;
+ctx.fillStyle = "black";
+
+const width = canvas.width;
+const height = canvas.height;
+
+// Define your mathematical range
+const xMin = 0, xMax = 50;
+const yMin = -5, yMax = 5;
+const dx = 0.25, dy = 1;
+
+// Functions to convert math coordinates -> canvas pixels
+function xToCanvas(x) {
+  return ((x - xMin) / (xMax - xMin)) * width;
+}
+
+function yToCanvas(y) {
+  return height - ((y - yMin) / (yMax - yMin)) * height;
+}
+const C1 = 0.0221;
+const C2 = 1.6641;
+
+// Particular solution coefficients
+const A = -0.0221;
+const B = -0.3315;
+function y(t) {
+        // Homogeneous part
+        const y_h = Math.exp(-0.05 * t) * (C1 * Math.cos(t) + C2 * Math.sin(t));
+        // Particular part
+        const y_p = A * Math.cos(2 * t) + B * Math.sin(2 * t);
+        return y_h + y_p;
+    }
+
+
+function drawLegend() {
+  const startX = 20; // top-left corner of legend
+  const startY = 20;
+  const boxSize = 15;
+  const spacing = 25;
+
+  const items = [
+    { color: "#1F77B4", label: "Solution curve" },
+    
+    
+  ];
+
+  ctx.font = "14px Arial";
+  ctx.textBaseline = "middle";
+
+  items.forEach((item, i) => {
+    // draw color box
+    ctx.fillStyle = item.color;
+    ctx.fillRect(startX, startY + i * spacing, boxSize, boxSize);
+
+    // draw label
+    ctx.fillStyle = "black";
+    ctx.fillText(item.label, startX + boxSize + 8, startY + i * spacing + boxSize/2);
+  }); 
+};
+
+// Draw vertical lines
+
+
+
+</script>
