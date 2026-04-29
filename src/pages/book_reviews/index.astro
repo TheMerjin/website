@@ -7,6 +7,7 @@ function titleCase(s: string) {
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ");
 }
+
 function cleanSegment(seg: string) {
   try {
     return decodeURIComponent(seg);
@@ -14,144 +15,161 @@ function cleanSegment(seg: string) {
     return seg;
   }
 }
+
 function titleFromRoute(route: string) {
-  const parts = route.split("/").filter(Boolean).map(cleanSegment);
+  const parts = route
+    .split("/")
+    .filter(Boolean)
+    .map(cleanSegment);
+
   if (parts.length === 0) return "Math";
-  const last = parts[parts.length - 1];
-  return titleCase(last);
+
+  return titleCase(parts[parts.length - 1]);
 }
-// Discover all math pages (excluding this index).
+
+// Discover pages
 const modules = import.meta.glob("./**/*.astro", { eager: true });
+
 const routes = Object.keys(modules)
-  .map((p) => p.replace(/^\.\/+/, "")) // "differential equations/foo.astro"
-  .filter((p) => p.toLowerCase() !== "index.astro")
-  .map((p) => p.replace(/\.astro$/i, "")); // "differential equations/foo"
+  .map((p) => p.replace(/^\.\/+/, "").replace(/\.astro$/i, ""))
+  .filter((p) => p.toLowerCase() !== "index");
+
 const entries = routes
   .map((r) => ({
     route: `/book_reviews/${r.split("/").map(encodeURIComponent).join("/")}`,
     title: titleFromRoute(r),
-    section: r.includes("/") ? titleCase(cleanSegment(r.split("/")[0])) : "Notes",
+    section: r.includes("/")
+      ? titleCase(cleanSegment(r.split("/")[0]))
+      : "Notes",
+      rating : r.split("/")[0]
   }))
+  
   .sort((a, b) => a.route.localeCompare(b.route));
-  const indexString = "index";
-  const cleanedEntries = entries.map((x) => 
-  x.route.endsWith(indexString) 
-    ? { ...x, route: x.route.slice(0, -indexString.length) } 
+console.log(entries);
+const indexString = "index";
+
+const cleanedEntries = entries.map((x) =>
+  x.route.endsWith(indexString)
+    ? { ...x, route: x.route.slice(0, -indexString.length) }
     : x
 );
-console.log(cleanedEntries);
 
-const sections = Array.from(new Set(cleanedEntries.map((e) => e.section)));
+const sections = Array.from(
+  new Set(cleanedEntries.map((e) => e.section))
+);
+
+const reviews = cleanedEntries; // dynamically loaded book review entries
+
+
+
+
+
 ---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Book Reviews</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      margin: 0;
+      padding: 3rem 1.2rem;
+      max-width: 1000px;
+      margin-left: auto;
+      margin-right: auto;
+      font-family: Georgia, serif;
+      background: #fafafa;
+      color: #111;
+      line-height: 1.55;
+    }
 
+    a { color: #000; text-decoration: none; }
+    a:hover { text-decoration: underline; }
 
-<style>
-  /* Base page styling */
-  .math-index {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 2rem;
-    font-family: Georgia, serif; /* classic serif like Gwern */
-    color: #111;
-    line-height: 1.6;
-  }
+    h1 {
+      font-size: 2.6rem;
+      font-weight: 600;
+      margin: 0.5rem 0;
+      text-align: center;
+    }
+    .subtitle {
+      font-style: italic;
+      opacity: 0.7;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
 
-  .math-head h1 {
-    font-size: 3rem;
-    font-weight: normal;
-    margin-bottom: 0.25rem;
-  }
+    .review-page {
+      display: flex;
+      align-items: flex-start;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
 
-  .math-head .lead {
-    font-size: 1.25rem;
-    margin-bottom: 2rem;
-    color: #333;
-  }
+    .sidebar {
+      width: 250px;
+      padding: 1rem;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: #111;
+      background-color: #f0efef;
+      border: 1px solid #ddd;
+      position: sticky;
+      top: 2rem;
+      height: fit-content;
+    }
 
-  section.block {
-    margin-bottom: 3rem;
-  }
+    .sidebar h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; }
+    .sidebar ul { list-style: none; padding-left: 0; margin: 0; }
+    .sidebar li { margin-bottom: 0.5rem; }
+    .sidebar a { color: #111; }
+    .sidebar a:hover { text-decoration: underline; color: #000; }
 
-  section.block h3 {
-    font-size: 1.75rem;
-    font-weight: bold;
-    border-bottom: 1px solid #ddd; /* subtle separator */
-    padding-bottom: 0.25rem;
-    margin-bottom: 1rem;
-  }
+    .main-content { flex: 1; }
+    .review-item { margin-bottom: 3rem; }
+    .review-item h3 { font-size: 2rem; margin-bottom: 0.25rem; }
+    .review-meta { font-size: 0.85rem; color: #555; font-family: monospace; margin-bottom: 0.5rem; }
+    .review-summary { font-style: italic; opacity: 0.8; max-width: 70ch; }
+  </style>
+</head>
+<body>
 
-  ul.list {
-    list-style: none;
-    padding-left: 0;
-  }
+  <h1>Book Reviews</h1>
+  <div class="subtitle">
+    An incremental archive of essays, notes, and long-form fragments.
+  </div>
 
-  li.item {
-    margin-bottom: 1.5rem;
-  }
+  <div class="review-page">
 
-  .item-link {
-    text-decoration: none;
-    color: #111;
-  }
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <h2>Contents</h2>
+      <ul>
+        {reviews.map((r, i) => {
+          const id = r.title.toLowerCase().replace(/\s+/g, "-");
+          return <li><a href={`#${id}`}>{i+1}. {r.title}</a></li>;
+        })}
+      </ul>
+    </aside>
 
-  .item-link:hover h4 {
-    text-decoration: underline;
-  }
+    <!-- Main Content -->
+    <main class="main-content">
+      {reviews.map((r) => {
+        const id = r.title.toLowerCase().replace(/\s+/g, "-");
+        return (
+          <div class="review-item" id={id}>
+            <h3>{r.title}</h3>
+            <div class="review-meta">
+              {r.year ?? "Unknown"} · {r.rating ?? "—"} Stars · <a href={r.route}>Full Review →</a>
+            </div>
+            <div class="review-summary">{r.summary ?? "Summary not available."}</div>
+          </div>
+        );
+      })}
+    </main>
 
-  .item-title {
-    font-size: 1.25rem;
-    font-weight: bold;
-    margin-bottom: 0.25rem;
-  }
+  </div>
 
-  .item-meta {
-    font-size: 0.875rem;
-    color: #555;
-    font-family: monospace;
-  }
-
-  code.path {
-    background-color: #f5f5f5;
-    padding: 0.15rem 0.3rem;
-    border-radius: 3px;
-  }
-
-  .empty {
-    text-align: center;
-    font-style: italic;
-    color: #777;
-  }
-</style>
-
-<WebsiteLayout>
-  <main class="math-index">
-    <header class="math-head">
-      <h1>Book Reviews</h1>
-      <p class="lead">From stuff I have read</p>
-    </header>
-
-    {entries.length === 0 ? (
-      <p class="empty">No math pages yet.</p>
-    ) : (
-      sections.map((section) => (
-        <section class="block">
-          <h3>{section}</h3>
-          <ul class="list">
-            {cleanedEntries
-              .filter((e) => e.section === section)
-              .map((e) => (
-                <li class="item">
-                  <a class="item-link" href={e.route}>
-                    <h4 class="item-title">{e.title}</h4>
-                  </a>
-                  <small class="item-meta">
-                    <code class="path">{e.route}</code>
-                  </small>
-                </li>
-              ))}
-          </ul>
-        </section>
-      ))
-    )}
-  </main>
-</WebsiteLayout>
+</body>
+</html>
