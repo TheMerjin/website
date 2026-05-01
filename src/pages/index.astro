@@ -39,7 +39,7 @@ const { posts } = await res.json();
 			<h2>Recent Posts</h2>
 			<div class="section-description">Latest thoughts and discussions</div>
 		</div>
-		{posts.length === 0 ? (
+		{posts?.length === 0 ? (
 			<p class="empty-state">No posts yet!</p>
 		) : (
 			posts.map((post: any) => <Postcard post={post} key={post.id} />)
