@@ -1,0 +1,121 @@
+---
+// Hamilton High School Advocacy Archive: Equitable Assessment
+// Implementation: Astro (Static Site)
+// Style: Gwern.net (Minimalist, Semantic Zoom, Monochrome)
+---
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width" />
+
+<article class="gwern-page">
+  <header class="metadata">
+    <h1>Equitable Assessment: A Defense of Student Autonomy</h1>
+    <div class="info-block">
+      <span class="author">Sreek</span> · 
+      <span class="date">2026-05-1</span> · 
+      <span class="tags"> <a href="/">Index</a> / 
+      <a href="/archives">Archives</a> / 
+      <a href="/blog">Blog</a></span>
+    </div>
+  </header>
+
+  <p class="dropcap">
+    Dear Principal, I have been a student at this high school for two years, 
+    taking mostly AP classes. Recently, some teachers have begun assigning 
+    different finals based on criteria such as completing extra homework, 
+    attending additional “prep” sessions, or earning a certain grade. 
+    These policies create separate <strong>“easy”</strong> and 
+    <strong>“hard”</strong> finals within the same course.
+  </p>
+
+  <section class="collapsible">
+    <details open>
+      <summary><span class="smallcaps">I. The Standard of Measurement</span></summary>
+      <p>
+        These policies are fundamentally unfair. When students take finals of different difficulty, their performance cannot be compared on equal terms. A grade should reflect what a student knows, not which version of an exam they were given.
+      </p>
+    </details>
+  </section>
+
+  <section class="collapsible">
+    <details>
+      <summary><span class="smallcaps">II. Structural Inequity</span></summary>
+      <p>
+        Linking access to an easier final to extra work or attendance rewards students who have more time and flexibility, rather than those who understand the material. Students with jobs or family responsibilities may be unable to meet these additional requirements, even if they have mastered the content. 
+      </p>
+      <aside class="sidenote">
+        Equity is violated when secondary labor gates primary academic outcomes.
+      </aside>
+      <p>
+        As a result, the system creates differences in outcomes that are unrelated to academic ability. This is a violation of equitable assessment—the entire purpose of shared finals.
+      </p>
+    </details>
+  </section>
+
+  <section class="collapsible">
+    <details>
+      <summary><span class="smallcaps">III. Coercion and Autonomy</span></summary>
+      <p>
+        Moreover, this policy is coercive and places significant pressure on the student. Due to the “easy” final being significantly easier, this creates scenarios where a student prioritizes studying for a class they may not need to in order to receive an easier final, which results in deficits in all other classes. This means that despite “better” results on paper, the student has worse actual learning outcomes.
+      </p>
+      <p>
+        Placing this coercive pressure on the student undermines <strong>autonomy</strong>; the choice of what and when to study is no longer free when declining the “easy” final comes with significant penalties. As a result, the work is no longer truly optional but a condition that students must fulfill to be on an equal footing with their peers. This shifts control away from the student. Instead of deciding what helps them learn, they are pushed to follow prescribed steps to protect their grade.
+      </p>
+    </details>
+  </section>
+
+  <section class="conclusion">
+    <p>
+      A final exam should measure the same standard for every student in the class. When that standard changes, the meaning of the grade becomes unclear.
+    </p>
+    <p>
+      All schools in the district operate under the same shared tenets: 
+      <span class="smallcaps">Excellence, Integrity, Equity, Collaboration, and Efficiency.</span> 
+      This policy fails to support some of these tenets and actively opposes the others.
+    </p>
+    <p>
+      I ask that you review this practice and ensure that all students are assessed by the same criteria.
+    </p>
+    <p class="signature">Sincerely,<br/>Me</p>
+  </section>
+
+  <footer class="backlinks">
+    <hr/>
+    <p><strong>Backlinks:</strong> /ethics/power-process, /edu/ap-physics-notes</p>
+  </footer>
+</article>
+
+<style>
+  /* Gwern-inspired Monochrome CSS */
+  .gwern-page {
+    font-family: "Palatino", "Georgia", serif;
+    max-width: 42em;
+    margin: 2em auto;
+    padding: 0 1em;
+    line-height: 1.6;
+    color: #1a1a1a;
+    background-color: #fff;
+  }
+  .metadata h1 { font-weight: normal; font-size: 1.8em; margin-bottom: 0.2em; }
+  .info-block { color: #666; font-size: 0.85em; margin-bottom: 2em; border-bottom: 1px solid #eee; }
+  .smallcaps { font-variant: small-caps; letter-spacing: 0.05em; }
+  .dropcap::first-letter {
+    float: left;
+    font-size: 3.5em;
+    line-height: 0.7em;
+    padding: 0.1em 0.1em 0 0;
+  }
+  details { margin-bottom: 1em; border-left: 1px solid #ccc; padding-left: 1em; }
+  summary { cursor: pointer; list-style: none; color: #444; }
+  summary:hover { color: #000; text-decoration: underline; }
+  .sidenote {
+    float: right;
+    width: 180px;
+    margin: 0 -220px 1em 1em;
+    font-size: 0.8em;
+    color: #555;
+    border-left: 2px solid #eee;
+    padding-left: 0.8em;
+  }
+  .signature { margin-top: 2em; font-weight: bold; }
+  @media (max-width: 1000px) { .sidenote { float: none; width: auto; margin: 1em 0; } }
+</style>
