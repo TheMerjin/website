@@ -6,29 +6,25 @@ const reviews = [
   {
     title: "The Great Gatsby Overview",
     year: 1925,
-    summary: "A high-level overview of the novel and its main themes.",
-    rating: 5,
+    summary: "This book is intresting...my first impression was to regard it as boring but it has some merit on a philsophical level. The book takes pains to point out class diffrences eg. Tom Buchanan and George Wilson and even Gatbsy and the east-eggers. Gatsby uses material excess in order to",
+    rating: 2,
     route: "/reviews/the-great-gatsby-overview"
   },
   {
     title: "Chapter 1-3",
-    year: 1925,
-    summary: "The first three chapters of this book is like of this book is like reading the Trial by Franz Kafka without any of the air of paranoia or inrigue. Instead the book feels like a vague  ",
-    rating: 5,
+    summary: "The first three chapters of this book is like of this book is like reading the Trial by Franz Kafka without any of the air of paranoia or inrigue. We are introduced to Nick and he's a bondman with connections to East-Egg (the part that is old-money). He rents a cheap house with a rich man Jay Gatsby that throws large parties one of which Nick attends in the third chapter. ",
     route: "/reviews/the-great-gatsby-ch1-3"
   },
   {
     title: "Chapter 4-6",
-    year: 1925,
+
     summary: "Gatsby's past revealed, parties continue, and tensions rise.",
-    rating: 5,
     route: "/reviews/the-great-gatsby-ch4-6"
   },
   {
     title: "Chapter 7-9",
-    year: 1925,
+
     summary: "Climax and resolution, the downfall of Gatsby, and the American Dream critique.",
-    rating: 5,
     route: "/reviews/the-great-gatsby-ch7-9"
   }
 ];
@@ -135,7 +131,7 @@ const reviews = [
           <div class="review-item" id={id}>
             <h3>{r.title}</h3>
             <div class="review-meta">
-              {r.year} · {r.rating} Stars · <a href={r.route}>Full Review →</a>
+              {r.year && `·` }  {r.rating && `${r.rating} Stars ·`}  <a href={r.route}>Full Review →</a>
             </div>
             <div class="review-summary">{r.summary}</div>
           </div>

@@ -29,23 +29,31 @@ function titleFromRoute(route: string) {
 
 // Discover pages
 const modules = import.meta.glob("./**/*.astro", { eager: true });
+const rawModules = import.meta.glob("./**/*.astro", {
+  query: "?raw",
+  import: "default",
+  eager: true,
+}) as Record<string, string>;
 
 const routes = Object.keys(modules)
   .map((p) => p.replace(/^\.\/+/, "").replace(/\.astro$/i, ""))
   .filter((p) => p.toLowerCase() !== "index");
 
 const entries = routes
-  .map((r) => ({
-    route: `/book_reviews/${r.split("/").map(encodeURIComponent).join("/")}`,
-    title: titleFromRoute(r),
-    section: r.includes("/")
-      ? titleCase(cleanSegment(r.split("/")[0]))
-      : "Notes",
-      rating : r.split("/")[0]
-  }))
-  
+  .map((r) => {
+    const fileKey = `./${r}.astro`;
+    const hasReview = (rawModules[fileKey] ?? "").trim().length > 0;
+    return {
+      route: `/book_reviews/${r.split("/").map(encodeURIComponent).join("/")}`,
+      title: titleFromRoute(r),
+      section: r.includes("/")
+        ? titleCase(cleanSegment(r.split("/")[0]))
+        : "Notes",
+      rating: r.split("/")[0],
+      hasReview,
+    };
+  })
   .sort((a, b) => a.route.localeCompare(b.route));
-console.log(entries);
 const indexString = "index";
 
 const cleanedEntries = entries.map((x) =>
@@ -58,10 +66,11 @@ const sections = Array.from(
   new Set(cleanedEntries.map((e) => e.section))
 );
 
-const reviews = cleanedEntries; // dynamically loaded book review entries
+const reviews = cleanedEntries.reverse(); // dynamically loaded book review entries
 
-
-
+function reviewStatus(hasReview: boolean) {
+  return hasReview ? "Completed" : "Not completed";
+}
 
 
 ---
@@ -115,7 +124,7 @@ const reviews = cleanedEntries; // dynamically loaded book review entries
       color: #111;
       background-color: #f0efef;
       border: 1px solid #ddd;
-      position: sticky;
+      position: static;
       top: 2rem;
       height: fit-content;
     }
@@ -148,7 +157,13 @@ const reviews = cleanedEntries; // dynamically loaded book review entries
       <ul>
         {reviews.map((r, i) => {
           const id = r.title.toLowerCase().replace(/\s+/g, "-");
-          return <li><a href={`#${id}`}>{i+1}. {r.title}</a></li>;
+          return (
+            <li>
+              <a href={`#${id}`}>
+                {i + 1}. {r.title}
+              </a>
+            </li>
+          );
         })}
       </ul>
     </aside>
@@ -161,7 +176,7 @@ const reviews = cleanedEntries; // dynamically loaded book review entries
           <div class="review-item" id={id}>
             <h3>{r.title}</h3>
             <div class="review-meta">
-              {r.year ?? "Unknown"} · {r.rating ?? "—"} Stars · <a href={r.route}>Full Review →</a>
+              [{reviewStatus(r.hasReview)}] · {r.rating.split("_").join(" ") ?? "—"} · <a href={r.route}>Full Review →</a>
             </div>
             <div class="review-summary">{r.summary ?? "Summary not available."}</div>
           </div>
