@@ -1,0 +1,141 @@
+---
+import GuessWho from '../../components/guess-who/GuessWho.jsx';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Guess Who — offline deductive board</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="A minimal offline Guess Who board for two players in the same room." />
+    <link rel="icon" type="image/jpeg" href="/assets_task_01jyj60hf6fk59efxgcf6aerx2_1750809597_img_0.jpg" />
+    <style>
+      body {
+        margin: 0;
+        max-width: 52rem;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 2.75rem 1.35rem 4rem;
+        font-family: Georgia, 'Iowan Old Style', 'Palatino Linotype', Palatino, serif;
+        background: #f7f6f3;
+        color: #141414;
+        line-height: 1.55;
+      }
+
+      a {
+        color: #141414;
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      .gw-page-meta {
+        font-family: ui-monospace, Consolas, monospace;
+        font-size: 0.68rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        opacity: 0.55;
+        margin-bottom: 0.5rem;
+      }
+
+      h1 {
+        font-size: 2.15rem;
+        font-weight: normal;
+        margin: 0 0 0.35rem;
+        letter-spacing: -0.02em;
+      }
+
+      .gw-subtitle {
+        font-style: italic;
+        font-size: 1.05rem;
+        color: #5c5c5c;
+        margin: 0 0 2rem;
+        max-width: 36em;
+      }
+
+      .gw-abstract {
+        font-size: 0.95rem;
+        color: #5c5c5c;
+        max-width: 40em;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid #d4d2cb;
+      }
+
+      .gw-abstract ol {
+        margin: 0.75rem 0 0;
+        padding-left: 1.35rem;
+      }
+
+      .gw-abstract li {
+        margin-bottom: 0.45rem;
+      }
+
+      .gw-back {
+        display: inline-block;
+        font-family: ui-monospace, Consolas, monospace;
+        font-size: 0.72rem;
+        margin-bottom: 2rem;
+        opacity: 0.6;
+      }
+
+      .gw-back:hover {
+        opacity: 1;
+      }
+
+      footer {
+        margin-top: 3.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid #d4d2cb;
+        font-family: ui-monospace, Consolas, monospace;
+        font-size: 0.65rem;
+        opacity: 0.45;
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+
+      @media (max-width: 600px) {
+        body {
+          padding: 1.75rem 1rem 3rem;
+        }
+
+        h1 {
+          font-size: 1.75rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="gw-back" href="/">← agora</a>
+
+    <p class="gw-page-meta">Game · offline · two players</p>
+    <h1>Guess Who</h1>
+    <p class="gw-subtitle">
+      A paper-style deductive board for the same room—no accounts, no sync, only parallel notebooks.
+    </p>
+
+    <div class="gw-abstract">
+      <p style="margin: 0;">
+        Each player maintains a private copy of the suspect roster. Questions are spoken; eliminations are local.
+      </p>
+      <ol>
+        <li>Transcribe the same names on both devices (one per line).</li>
+        <li>Secretly select the identity you will defend.</li>
+        <li>Strike names as hypotheses fail; accuse when certain.</li>
+        <li>Your opponent pronounces the verdict aloud.</li>
+      </ol>
+    </div>
+
+    <GuessWho client:load />
+
+    <footer>
+      <span>local state only</span>
+      <span>{new Date().getFullYear()}</span>
+    </footer>
+  </body>
+</html>
