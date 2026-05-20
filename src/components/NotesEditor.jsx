@@ -4,6 +4,7 @@ import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import '../styles/SidebarElement.css';
 import ActPrepBubbling from './ActPrepBubbling.jsx';
+import ReadingList from './ReadingList.jsx';
 
 const DEFAULT_NOTE_HTML =
   '<h1>Welcome to Your Notes</h1><p>Start writing here... Try creating a note link with [{Note Name}]</p>';
@@ -687,18 +688,23 @@ export default function NotesEditor() {
     <div className="docs-container">
       {/* Mobile Header */}
       <div className="mobile-header-bar">
+        {mainView === 'notes' && (
         <button className="sidebar-toggle-btn" onClick={handleSidebarToggle} aria-label="Open notes sidebar">
           <span className="hamburger-icon">☰</span>
         </button>
+        )}
         <span className="mobile-title">
-          {mainView === 'notes' ? 'Notes' : 'ACT Prep Bubbling'}
+          {mainView === 'notes' ? 'Notes' : mainView === 'reading' ? 'Reading list' : 'ACT Prep Bubbling'}
         </span>
       </div>
       
       {/* Mobile Sidebar Overlay */}
+      {mainView === 'notes' && (
       <div className={`mobile-sidebar-overlay${sidebarOpen ? ' open' : ''}`} onClick={handleSidebarClose} />
+      )}
       
       {/* Sidebar */}
+      {mainView === 'notes' && (
       <div className={`docs-sidebar${sidebarOpen ? ' open' : ''}`}>
         <div className="sidebar-header">
           <h2>Notes</h2>
@@ -754,9 +760,10 @@ export default function NotesEditor() {
           )}
         </div>
       </div>
+      )}
 
       {/* Main Editor Area */}
-      <div className="docs-main">
+      <div className={`docs-main${mainView !== 'notes' ? ' docs-main-full' : ''}`}>
         <div className="notes-view-tabs" role="tablist" aria-label="Notes page mode">
           <button
             type="button"
@@ -766,6 +773,15 @@ export default function NotesEditor() {
             onClick={() => setMainView('notes')}
           >
             Notes
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mainView === 'reading'}
+            className={`notes-view-tab${mainView === 'reading' ? ' active' : ''}`}
+            onClick={() => setMainView('reading')}
+          >
+            Reading list
           </button>
           <button
             type="button"
@@ -781,6 +797,10 @@ export default function NotesEditor() {
         {mainView === 'act' ? (
           <div className="docs-main-act-fill">
             <ActPrepBubbling />
+          </div>
+        ) : mainView === 'reading' ? (
+          <div className="docs-main-act-fill">
+            <ReadingList />
           </div>
         ) : (
           <>
@@ -1151,6 +1171,10 @@ export default function NotesEditor() {
           display: flex;
           flex-direction: column;
           overflow: hidden;
+        }
+
+        .docs-main-full {
+          margin-left: 0 !important;
         }
 
         /* Toolbar */
