@@ -291,7 +291,7 @@ function reviewStatus(hasReview: boolean) {
             <div class="review-meta">
               [{reviewStatus(r.hasReview)}]
               {" · "}
-              {r.rating ?? "—"}
+              {r.rating.split("_").join(" ") ?? "—"}
             </div>
 
             {r.hasSummary ? (
