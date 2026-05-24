@@ -291,7 +291,14 @@ function reviewStatus(hasReview: boolean) {
             <div class="review-meta">
               [{reviewStatus(r.hasReview)}]
               {" · "}
-              {r.rating.split("_") ?? "—"}
+              {
+  r.rating
+    ? (() => {
+        const score = Number(r.rating.split("_")[0]);
+        return "★".repeat(score) + "☆".repeat(5 - score);
+      })()
+    : "—"
+}
             </div>
 
             {r.hasSummary ? (
