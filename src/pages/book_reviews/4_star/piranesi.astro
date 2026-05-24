@@ -1,8 +1,19 @@
 ---
-const title = "Piranesi";
-const author = "Susanna Clarke";
-const year = 2020;
-const rating = "★★★★☆";
+export const metadata = {
+  title: "Piranesi",
+  author: "Susanna Clarke",
+  year: 2020,
+  rating: "★★★★☆",
+
+  summary:
+    "A philosophical fantasy about memory, identity, and consciousness set within an infinite House of statues, tides, and collapsing perception.",
+};
+
+const title = metadata.title;
+const author = metadata.author;
+const year = metadata.year;
+const rating = metadata.rating;
+
 ---
 
 <!doctype html>
