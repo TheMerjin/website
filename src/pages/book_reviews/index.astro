@@ -263,20 +263,37 @@ function reviewStatus(hasReview: boolean) {
     <!-- Sidebar -->
     <aside class="sidebar">
       <h2>Contents</h2>
+      <base>
+  {
+    reviews.map((r, i) => {
+      const id = r.title.toLowerCase().replace(/\s+/g, "-");
+      
+      // Look at the previous item in the array to see if the rating changed
+      const prevReview = reviews[i - 1];
+      const isNewSection = !prevReview || r.rating !== prevReview.rating;
 
-      <ul>
-        {reviews.map((r, i) => {
-          const id = r.title.toLowerCase().replace(/\s+/g, "-");
-
-          return (
-            <li>
-              <a href={`#${id}`}>
-                {i + 1}. {r.title}
-              </a>
+      return (
+        <>
+          {/* 1. Render a section header only when the rating changes */}
+          {isNewSection && (
+            <li class="sidebar-section-header">
+              <strong>{r.section}</strong>
             </li>
-          );
-        })}
-      </ul>
+          )}
+
+          {/* 2. Render the actual link */}
+          <li key={id}>
+            <a href={`#${id}`}>
+              {i + 1}. {r.title}
+            </a>
+          </li>
+        </>
+      );
+    })
+  }
+</ul>
+
+      
     </aside>
 
     <!-- Main -->
