@@ -92,6 +92,7 @@ const reviews = cleanedEntries.reverse();
 function reviewStatus(hasReview: boolean) {
   return hasReview ? "Completed" : "Review Not Completed";
 }
+let prevNumber = 0;
 ---
 
 <!doctype html>
@@ -132,6 +133,9 @@ function reviewStatus(hasReview: boolean) {
       font-weight: 600;
       margin: 0.5rem 0;
       text-align: center;
+    }
+    li {
+      list-style-type: none;
     }
 
     .subtitle {
@@ -264,13 +268,25 @@ function reviewStatus(hasReview: boolean) {
     <aside class="sidebar">
       <h2>Contents</h2>
       <base>
+      
+     
   {
+     
+    
     reviews.map((r, i) => {
       const id = r.title.toLowerCase().replace(/\s+/g, "-");
       
       // Look at the previous item in the array to see if the rating changed
       const prevReview = reviews[i - 1];
       const isNewSection = !prevReview || r.rating !== prevReview.rating;
+
+
+      if (isNewSection) {
+        prevNumber = 1;
+      } else {
+        prevNumber++;
+      }
+
 
       return (
         <>
@@ -282,11 +298,11 @@ function reviewStatus(hasReview: boolean) {
           )}
 
           {/* 2. Render the actual link */}
-          
+            <li>
             <a href={`#${id}`}>
-              {i + 1}. {r.title}
+              {6 - reviews[i].rating[0]}.{prevNumber}. {r.title}
             </a>
-          
+          </li>
         </>
       );
     })
