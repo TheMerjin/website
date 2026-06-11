@@ -251,6 +251,17 @@ let prevNumber = 0;
         position: static;
       }
     }
+    .section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.section-number,
+.toc-number {
+  color: #777;
+}
   </style>
 </head>
 
@@ -292,16 +303,22 @@ let prevNumber = 0;
         <>
           {/* 1. Render a section header only when the rating changes */}
           {isNewSection && (
- 
-              <strong>{r.section}</strong>
- 
-          )}
+          <div class ="section-header">
+            <span class ="section-number">
+              {6 - reviews[i]?.rating[0]}
+            </span>
+            <strong>{r.section}</strong>
+          </div>
+        )}
 
-          {/* 2. Render the actual link */}
-            <li>
-            <a href={`#${id}`}>
-              {6 - reviews[i].rating[0]}.{prevNumber}. {r.title}
-            </a>
+                  {/* 2. Render the actual link */}
+                    <li>
+                    <a href={`#${id}`}>
+          <span class ="toc-number">
+            {6 - reviews[i]?.rating[0]}.{prevNumber}.
+          </span>{" "}
+          {r.title}
+        </a>
           </li>
         </>
       );

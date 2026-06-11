@@ -1,0 +1,38 @@
+Constituent_Number,Name,Amplitude_FT,Phase_DEG,Speed_DEG_HR,Description
+1,M2,1.78271,0.428,0.984104,Principal lunar semidiurnal constituent
+2,S2,0.7426,0.43,0.0,Principal solar semidiurnal constituent
+3,N2,0.41255,0.528,0.43973,Larger lunar elliptic semidiurnal constituent
+4,K1,1.1188,0.015,0.041069,Lunar diurnal constituent
+5,M4,0.01151,0.857,0.96821,Shallow water overtides of principal lunar constituent
+6,O1,0.781,0.113,0.943035,Lunar diurnal constituent
+7,M6,0.0186,0.686,0.95232,Shallow water overtides of principal lunar constituent
+8,MK3,0.01223,0.344,0.025173,Shallow water terdiurnal
+9,S4,0.011,0.26,0.0,Shallow water overtides of principal solar constituent
+10,MN4,0.01113,0.757,0.423832,Shallow water quarter diurnal constituent
+11,NU2,0.08261,0.628,0.512583,Larger lunar evectional constituent
+12,S6,0.068,0.19,0.0,Shallow water overtides of principal solar constituent
+13,MU2,0.05228,0.327,0.968208,Variational constituent
+14,2N2,0.05232,0.227,0.895355,Lunar elliptical semidiurnal second-order constituent
+15,OO1,0.04112,0.816,0.139101,Lunar diurnal
+16,LAM2,0.01258,0.329,0.455626,Smaller lunar evectional constituent
+17,S1,0.02209,0.015,0.0,Solar diurnal constituent
+18,M1,0.04109,0.114,0.496694,Smaller lunar elliptic diurnal constituent
+19,J1,0.0696,0.215,0.5854435,Smaller lunar elliptic diurnal constituent
+20,MM,0.0,0.0,0.5443747,Lunar monthly constituent
+21,SSA,0.0,0.0,0.0821373,Solar semiannual constituent
+22,SA,0.2518,0.2,0.0410686,Solar annual constituent
+23,MSF,0.0,0.01,0.0158958,Lunisolar synodic fortnightly constituent
+24,MF,0.0,0.01,0.0980331,Lunisolar fortnightly constituent
+25,RHO,0.0377,0.113,0.471515,Larger lunar evectional diurnal constituent
+26,Q1,0.1378,0.313,0.398661,Larger lunar elliptic diurnal constituent
+27,T2,0.05248,0.529,0.958933,Larger solar elliptic constituent
+28,R2,0.01275,0.33,0.041067,Smaller solar elliptic constituent
+29,2Q1,0.0283,0.312,0.854286,Larger elliptic diurnal
+30,P1,0.3586,0.214,0.958931,Solar diurnal constituent
+31,2SM2,0.0164,0.131,0.015896,Shallow water semidiurnal constituent
+32,M3,0.018,0.743,0.47616,Lunar terdiurnal constituent
+33,L2,0.04248,0.329,0.528479,Smaller lunar elliptic semidiurnal constituent
+34,2MK3,0.01209,0.442,0.92714,Shallow water terdiurnal constituent
+35,K2,0.22253,0.83,0.082138,Lunisolar semidiurnal constituent
+36,M8,0.0,0.0115,0.93642,Shallow water eighth diurnal constituent
+37,MS4,0.0191,0.358,0.984104,Shallow water quarter diurnal constituent
