@@ -51,7 +51,15 @@ const profile_posts = posts.filter((post: any) => post.author_id === user.id).sl
         <h2 class="profile-section-title-lw">Posts</h2>
         <div style="display: flex; align-items: center; gap: 0.3rem;">
           <button id="new-post-button-and-text" type="button" class="lw-new-post-btn">+ New Post</button>
-          <button class="lw-plus-btn" aria-label="Quick Add Post">+</button>
+          <button class="lw-edit-btn" aria-label="Edit Post">
+            <a href = "/edit_posts"> 
+  <svg class="edit-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+  </svg>
+  <span>Edit Post</span>
+</button>
+</a>
         </div>
       </div>
       {posts.length === 0 ? (

@@ -32,9 +32,9 @@ load_dotenv(dotenv_path=".env")
 
 SUPABASE_URL = os.getenv("PUBLIC_SUPABASE_URL")
 SUPABASE_KEY = os.getenv("PRIVATE_SUPABASE_ROLE_KEY")
-
-# Create Supabase client
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+print(SUPABASE_URL, SUPABASE_KEY)
+print(repr(SUPABASE_KEY))
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 
 import csv

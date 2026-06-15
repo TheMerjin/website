@@ -21,6 +21,10 @@ They say repeat great words, repeat them stubbornly. Well give me some of your m
 >”Ever tried. Ever failed. No matter. Try again. Fail again. Fail better”
 > Samuel Beckett
 
+>"Truth doesn't hedge"
+>Sreekar Charan
+
+
 >”Live to the point of tears.”
 >.Albert Camus
 
