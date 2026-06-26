@@ -1,16 +1,22 @@
 ---
 export const metadata = {
-  title: "Exhalation Stories",
+  title: "Exhalation: Stories",
   author: "Ted Chiang",
   year: 2019,
   rating: "★★★★☆",
-
-  summary: `This is Ted Chiang's second collection of short works. Exhalation contains nine stories exploring humanity's place in the universe, free will, time travel, artificial intelligence, and the limits of knowledge.`,
+  completed: false,
+  summary:
+    "Ted Chiang's second collection of short works exploring free will, time travel, artificial intelligence, and the limits of knowledge.",
 };
 
-const { title, author, year, rating, summary } = metadata;
+const title = metadata.title;
+const author = metadata.author;
+const year = metadata.year;
+const rating = metadata.rating;
+const yearDisplay = year ?? '—';
 ---
 
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -27,56 +33,48 @@ const { title, author, year, rating, summary } = metadata;
       --max-width: 72ch;
     }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       margin: 0;
-      padding: 3rem 1.5rem 6rem;
-
       background: var(--bg);
       color: var(--text);
 
       font-family: Georgia, serif;
       font-size: 19px;
       line-height: 1.72;
+
+      padding: 3rem 1.5rem 6rem;
     }
 
     .container {
       max-width: var(--max-width);
       margin: 0 auto;
+      position: relative;
     }
 
     h1 {
       font-size: 3rem;
       font-weight: 600;
       letter-spacing: -0.03em;
-      margin-bottom: 0.25rem;
+
+      margin-bottom: 0.2rem;
+    }
+
+    h2, h3 {
+      font-size: 1.35rem;
+      font-weight: 600;
+      margin: 2rem 0 1rem;
     }
 
     .meta {
       color: var(--muted);
       font-size: 0.95rem;
       font-family: monospace;
-      margin-bottom: 2rem;
-    }
 
-    .summary-box {
-      background: #efefef;
-      border-left: 3px solid #cfcfcf;
-
-      padding: 1rem 1.2rem;
-      margin: 2rem 0;
-
-      font-size: 0.95rem;
-      line-height: 1.65;
-    }
-
-    .summary-title {
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #666;
-
-      font-family: monospace;
-      margin-bottom: 0.7rem;
+      margin-bottom: 3rem;
     }
 
     p {
@@ -84,62 +82,91 @@ const { title, author, year, rating, summary } = metadata;
       text-align: justify;
     }
 
+    .review-incomplete {
+      font-style: italic;
+      color: var(--muted);
+    }
+
+    blockquote {
+      margin: 2.5rem 0;
+      padding-left: 1.2rem;
+
+      border-left: 2px solid var(--border);
+
+      color: #333;
+      font-style: italic;
+    }
+
+    .section-break {
+      text-align: center;
+      color: var(--muted);
+      margin: 3rem 0;
+      letter-spacing: 0.15em;
+    }
+
+    .sidenote {
+      float: right;
+      clear: right;
+
+      width: 15rem;
+
+      margin-right: -18rem;
+      margin-top: 0.3rem;
+
+      padding-left: 0.9rem;
+      border-left: 1px solid var(--border);
+
+      color: var(--muted);
+
+      font-size: 0.78rem;
+      line-height: 1.5;
+    }
+
+    .sidenote code {
+      font-size: 0.75rem;
+      background: #efefea;
+      padding: 0.05rem 0.2rem;
+    }
+
+    @media (max-width: 1200px) {
+      .sidenote {
+        display: none;
+      }
+    }
+
+    a {
+      color: inherit;
+    }
+
     hr {
       border: none;
       border-top: 1px solid var(--border);
-      margin: 3rem 0;
+      margin: 4rem 0;
     }
   </style>
 </head>
 
 <body>
   <main class="container">
+
     <h1>{title}</h1>
 
     <div class="meta">
-      {author} · {year} · {rating} [WIP Review]
+      {author} · {yearDisplay} · {rating} · Review not completed
     </div>
 
-    <div class="summary-box">
-      <div class="summary-title">Summary</div>
-      {summary}
-    </div>
-
-    <div class="summary-box">
-      <div class="summary-title">Stories</div>
-
-      Exhalation · The Merchant and the Alchemist's Gate ·
-      The Lifecycle of Software Objects ·
-      The Truth of Fact, the Truth of Feeling ·
-      Omphalos ·
-      Anxiety Is the Dizziness of Freedom
-    </div>
-    <h3> 
-        The Merchant and the Alchemist's Gate
-    </h3>
+    <h3>The Merchant and the Alchemist's Gate</h3>
     <p>
-      The first story is excellent. It concerns a method for consistent time travel and unlike other stories it doesn't concern itself with modifying the past but simply observing the past. The 
-      arab tradition of telling stories similar styles make the stories feel natural in their enviornement.
-
-      Though fate constrains the past andd future, the story attempts to prove that the most important is understanding and acceptance of one's fate. Fuwaad ibn abbas the protagonist goes into the past but arrives too late to make any amends but learns that 
-      his wife forgave and loved him. The same priciple could be applied to the present. The Buddha in the Sallatha Sutra asserts a similar premise. 
-      They are, he says, struck as if “with an arrow and, right afterward… with another one, so that he would feel the pains of two arrows.” 
-      First comes the pain itself. Then comes everything they add to it: sorrow, lament, resistance, the inner shout of this should not be happening.
-      If one could understand and accept their fate in the present and their past, suffering could radically decrease. 
+      The first story is excellent. It concerns a method for consistent time travel and, unlike other stories, does not concern itself with modifying the past but simply observing it. The Arabian tradition of nested storytelling makes the structure feel natural.
+    </p>
+    <p>
+      Though fate constrains the past and future, the story argues that understanding and acceptance of one's fate matter most. Fuwaad ibn Abbas travels into the past but arrives too late to make amends, yet learns that his wife forgave and loved him—a principle applicable to the present as well.
     </p>
 
-    <p>
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent
-      commodo, lorem et volutpat ullamcorper, lectus magna aliquam tortor,
-      nec posuere nisl lorem id nunc.
+    <p class="review-incomplete">
+      Review not completed. Remaining stories in the collection are not yet written up.
     </p>
 
-
-    <p>
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec
-      scelerisque, sem non egestas feugiat, lectus ipsum vulputate eros,
-      vitae malesuada magna nisi vel risus.
-    </p>
   </main>
 </body>
 </html>

@@ -4,16 +4,16 @@ export const metadata = {
   author: "Yukio Mishima",
   year: 1954,
   rating: "★★★☆☆",
-
+  completed: true,
   summary:
-    "Uta-Jima is an idyllic town unaffected by the changes of modernization. Shinji the protagnist has a blossoming love story with the female protagonist Hatsue. The simplicity of the characters fits them into traditional japanese stereo-types and allows a simple, feel good story. The whole book was simple, and steady like the tide. ",
+    "Uta-Jima is an idyllic town unaffected by the changes of modernization. Shinji the protagonist has a blossoming love story with Hatsue. The simplicity of the characters fits them into traditional Japanese stereotypes and allows a simple, feel-good story. The whole book was simple, and steady like the tide.",
 };
 
 const title = metadata.title;
 const author = metadata.author;
 const year = metadata.year;
 const rating = metadata.rating;
-
+const yearDisplay = year ?? '—';
 ---
 
 <!doctype html>
@@ -63,6 +63,12 @@ const rating = metadata.rating;
       margin-bottom: 0.2rem;
     }
 
+    h2, h3 {
+      font-size: 1.35rem;
+      font-weight: 600;
+      margin: 2rem 0 1rem;
+    }
+
     .meta {
       color: var(--muted);
       font-size: 0.95rem;
@@ -74,6 +80,11 @@ const rating = metadata.rating;
     p {
       margin-bottom: 1.7rem;
       text-align: justify;
+    }
+
+    .review-incomplete {
+      font-style: italic;
+      color: var(--muted);
     }
 
     blockquote {
@@ -139,14 +150,13 @@ const rating = metadata.rating;
   <main class="container">
 
     <h1>{title}</h1>
+
     <div class="meta">
-      Yukio Mishima · 1954 · {rating} [WIP Review]
+      {author} · {yearDisplay} · {rating}
     </div>
 
     <p> 
-      <span> 
-        Uta-Jima is an idyllic island unaffected by the changes in modern Japan. The island fishermen live by labor, reputation, and custom. Shinji, a poor fisherman, falls in love with Hatsue, the daughter of a wealthy shipowner. Their romance is simple and direct, beginning with Shinji’s unknowing love-at-first-sight. Even the main conflict of the story, the refusal of Hatsue’s father to permit their marriage is resolved justly through hard work.
-      </span>
+      Uta-Jima is an idyllic island unaffected by the changes in modern Japan. The island fishermen live by labor, reputation, and custom. Shinji, a poor fisherman, falls in love with Hatsue, the daughter of a wealthy shipowner. Their romance is simple and direct, beginning with Shinji’s unknowing love-at-first-sight. Even the main conflict of the story, the refusal of Hatsue’s father to permit their marriage is resolved justly through hard work.
     </p>
 
     <p> 
@@ -169,3 +179,4 @@ const rating = metadata.rating;
 
   </main>
 </body>
+</html>

@@ -4,7 +4,7 @@ export const metadata = {
   author: "Susanna Clarke",
   year: 2020,
   rating: "★★★☆☆",
-
+  completed: true,
   summary:
     "A philosophical fantasy about memory, identity, and consciousness set within an infinite House of statues, tides, and collapsing perception.",
 };
@@ -13,7 +13,7 @@ const title = metadata.title;
 const author = metadata.author;
 const year = metadata.year;
 const rating = metadata.rating;
-
+const yearDisplay = year ?? '—';
 ---
 
 <!doctype html>
@@ -63,6 +63,12 @@ const rating = metadata.rating;
       margin-bottom: 0.2rem;
     }
 
+    h2, h3 {
+      font-size: 1.35rem;
+      font-weight: 600;
+      margin: 2rem 0 1rem;
+    }
+
     .meta {
       color: var(--muted);
       font-size: 0.95rem;
@@ -74,6 +80,11 @@ const rating = metadata.rating;
     p {
       margin-bottom: 1.7rem;
       text-align: justify;
+    }
+
+    .review-incomplete {
+      font-style: italic;
+      color: var(--muted);
     }
 
     blockquote {
@@ -141,7 +152,7 @@ const rating = metadata.rating;
     <h1>{title}</h1>
 
     <div class="meta">
-      Susanna Clarke · 2020 · {rating}
+      {author} · {yearDisplay} · {rating}
     </div>
 
     <p>

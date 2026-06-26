@@ -1,0 +1,164 @@
+---
+export const metadata = {
+  title: "Ready Player One",
+  author: "Ernest Cline",
+  year: 2011,
+  rating: "★★★☆☆",
+  completed: false,
+  summary:
+    "A VR treasure hunt through eighties pop culture for control of a vast digital empire.",
+};
+
+const title = metadata.title;
+const author = metadata.author;
+const year = metadata.year;
+const rating = metadata.rating;
+const yearDisplay = year ?? '—';
+---
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>{title} Review</title>
+
+  <style>
+    :root {
+      --bg: #f8f8f5;
+      --text: #111;
+      --muted: #666;
+      --border: #d8d8d8;
+      --max-width: 72ch;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+
+      font-family: Georgia, serif;
+      font-size: 19px;
+      line-height: 1.72;
+
+      padding: 3rem 1.5rem 6rem;
+    }
+
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      position: relative;
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+
+      margin-bottom: 0.2rem;
+    }
+
+    h2, h3 {
+      font-size: 1.35rem;
+      font-weight: 600;
+      margin: 2rem 0 1rem;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 0.95rem;
+      font-family: monospace;
+
+      margin-bottom: 3rem;
+    }
+
+    p {
+      margin-bottom: 1.7rem;
+      text-align: justify;
+    }
+
+    .review-incomplete {
+      font-style: italic;
+      color: var(--muted);
+    }
+
+    blockquote {
+      margin: 2.5rem 0;
+      padding-left: 1.2rem;
+
+      border-left: 2px solid var(--border);
+
+      color: #333;
+      font-style: italic;
+    }
+
+    .section-break {
+      text-align: center;
+      color: var(--muted);
+      margin: 3rem 0;
+      letter-spacing: 0.15em;
+    }
+
+    .sidenote {
+      float: right;
+      clear: right;
+
+      width: 15rem;
+
+      margin-right: -18rem;
+      margin-top: 0.3rem;
+
+      padding-left: 0.9rem;
+      border-left: 1px solid var(--border);
+
+      color: var(--muted);
+
+      font-size: 0.78rem;
+      line-height: 1.5;
+    }
+
+    .sidenote code {
+      font-size: 0.75rem;
+      background: #efefea;
+      padding: 0.05rem 0.2rem;
+    }
+
+    @media (max-width: 1200px) {
+      .sidenote {
+        display: none;
+      }
+    }
+
+    a {
+      color: inherit;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 4rem 0;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+
+    <h1>{title}</h1>
+
+    <div class="meta">
+      {author} · {yearDisplay} · {rating} · Review not completed
+    </div>
+
+    <p class="review-incomplete">
+      Review not completed.
+    </p>
+
+  </main>
+</body>
+</html>
