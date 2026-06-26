@@ -1,0 +1,178 @@
+---
+export const metadata = {
+  title: "High School Confidential",
+  author: "J.K. Rowling",
+  year: 1997,
+  rating: "★★☆☆☆",
+  completed: false,
+  summary:
+    "A 24 year-old returns to high school undercover and gives an account of the experience",
+};
+
+const title = metadata.title;
+const author = metadata.author;
+const year = metadata.year;
+const rating = metadata.rating;
+const yearDisplay = year ?? '—';
+---
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>{title} Review</title>
+
+  <style>
+    :root {
+      --bg: #f8f8f5;
+      --text: #111;
+      --muted: #666;
+      --border: #d8d8d8;
+      --max-width: 72ch;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+
+      font-family: Georgia, serif;
+      font-size: 19px;
+      line-height: 1.72;
+
+      padding: 3rem 1.5rem 6rem;
+    }
+
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      position: relative;
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+
+      margin-bottom: 0.2rem;
+    }
+
+    h2, h3 {
+      font-size: 1.35rem;
+      font-weight: 600;
+      margin: 2rem 0 1rem;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 0.95rem;
+      font-family: monospace;
+
+      margin-bottom: 3rem;
+    }
+
+    p {
+      margin-bottom: 1.7rem;
+      text-align: justify;
+    }
+
+    .review-incomplete {
+      font-style: italic;
+      color: var(--muted);
+    }
+
+    blockquote {
+      margin: 2.5rem 0;
+      padding-left: 1.2rem;
+
+      border-left: 2px solid var(--border);
+
+      color: #333;
+      font-style: italic;
+    }
+
+    .section-break {
+      text-align: center;
+      color: var(--muted);
+      margin: 3rem 0;
+      letter-spacing: 0.15em;
+    }
+
+    .sidenote {
+      float: right;
+      clear: right;
+
+      width: 15rem;
+
+      margin-right: -18rem;
+      margin-top: 0.3rem;
+
+      padding-left: 0.9rem;
+      border-left: 1px solid var(--border);
+
+      color: var(--muted);
+
+      font-size: 0.78rem;
+      line-height: 1.5;
+    }
+
+    .sidenote code {
+      font-size: 0.75rem;
+      background: #efefea;
+      padding: 0.05rem 0.2rem;
+    }
+
+    @media (max-width: 1200px) {
+      .sidenote {
+        display: none;
+      }
+    }
+
+    a {
+      color: inherit;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 4rem 0;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+
+    <h1>{title}</h1>
+
+    <div class="meta">
+      {author} · {yearDisplay} · {rating} · Review not completed
+    </div>
+
+    <p class="review-incomplete">
+      This book fails in that it misunderstands what the reader wishes to learn about. The experience of going back to high school for a 24 yr old how did he acquaint himself 
+      how did he learn to communicate and get involved in the culture? These are all questions which the book covers with the briefest glances despite their greater intrest.
+      He instead gave us a rough account of various debaucheries and dramas which were frankly unintresting. If the reader wished to find teenage gossip from the perspective of teenagers he can 
+      find it elsewhere making this portion of the book superflous. 
+      </p>
+      <p>
+      Regardless, Iversen manages to stumble into some basic insights.  
+      Iversen also feels the need to footnote "tight" for cool despite it not being uncommon usage and chooses to have  
+      footnotes dedicated to topics like Yu-Gi-Yoh which are unneccesary and a waste of time due to their proliferation in American culture --- you wouldn't expect a footnote on 
+      coke or even hula-hoops. Some of the foornotes have intresting statstics and perhaps if the book were to have been focused more on Iversen and not a
+       disembodied camera the story would be amelriorated. 
+
+       The story merits two stars in total but the reader 
+       is to be warned of the marshy swamp that is the middle portion of the book which may cause him to lose sight of dry land and throw aside the novel with great force. For 
+       those who march through, they will emerge from the middle with boots full of mud and little to show for the effort --- the ending is sappy and frankly unintresting.
+    </p>
+
+  </main>
+</body>
+</html>
