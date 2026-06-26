@@ -48,7 +48,7 @@ const entries = routes
     const completed = metadata.completed === true;
 
     return {
-      route: `/book_reviews/${r
+      route: `/books/book_reviews/${r
         .split("/")
         .map(encodeURIComponent)
         .join("/")}`,
