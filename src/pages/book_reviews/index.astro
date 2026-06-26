@@ -31,13 +31,6 @@ function titleFromRoute(route: string) {
 // Load astro pages
 const modules = import.meta.glob("./**/*.astro", { eager: true });
 
-// Load raw files
-const rawModules = import.meta.glob("./**/*.astro", {
-  query: "?raw",
-  import: "default",
-  eager: true,
-}) as Record<string, string>;
-
 const routes = Object.keys(modules)
   .map((p) => p.replace(/^\.\/+/, "").replace(/\.astro$/i, ""))
   .filter((p) => p.toLowerCase() !== "index");
@@ -49,13 +42,10 @@ const entries = routes
     const fileKey = `./${r}.astro`;
 
     const mod = modules[fileKey] as any;
-    const raw = rawModules[fileKey] ?? "";
 
     const metadata = mod?.metadata ?? {};
     const summary = metadata.summary ?? null;
-    console.log(r.split("/")[0]);
-
-    const hasReview = raw.trim().length > 0;
+    const completed = metadata.completed === true;
 
     return {
       route: `/book_reviews/${r
@@ -64,6 +54,7 @@ const entries = routes
         .join("/")}`,
 
       title: metadata.title ?? titleFromRoute(r),
+      author: metadata.author ?? null,
 
       section: r.includes("/")
         ? titleCase(cleanSegment(r.split("/")[0]))
@@ -74,7 +65,7 @@ const entries = routes
       summary,
 
       hasSummary: !!summary,
-      hasReview,
+      completed,
     };
   })
   .sort((a, b) => a.route.localeCompare(b.route));
@@ -89,8 +80,8 @@ const cleanedEntries = entries.map((x) =>
 
 const reviews = cleanedEntries.reverse();
 
-function reviewStatus(hasReview: boolean) {
-  return hasReview ? "Completed" : "Review Not Completed";
+function reviewStatus(completed: boolean) {
+  return completed ? "Completed" : "Review Not Completed";
 }
 let prevNumber = 0;
 ---
@@ -341,7 +332,8 @@ let prevNumber = 0;
             <h3>{r.title}</h3>
 
             <div class="review-meta">
-              [{reviewStatus(r.hasReview)}]
+              [{reviewStatus(r.completed)}]
+              {r.author && ` · ${r.author}`}
               {" · "}
               {
   r.rating
