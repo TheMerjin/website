@@ -1,0 +1,197 @@
+---
+export const metadata = {
+  title: "The Golden State Killer",
+  author: "William Thorpe",
+  year: 1998,
+  rating: "★★★☆☆",
+  completed: true,
+  summary:
+    "A recap of the murders, investigation, and capture of the Golden State Killer a serial rapist and murderer who went by many monikers. ",
+};
+
+const title = metadata.title;
+const author = metadata.author;
+const year = metadata.year;
+const rating = metadata.rating;
+const yearDisplay = year ?? '—';
+---
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>{title} Review</title>
+
+  <style>
+    :root {
+      --bg: #f8f8f5;
+      --text: #111;
+      --muted: #666;
+      --border: #d8d8d8;
+      --max-width: 72ch;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+
+      font-family: Georgia, serif;
+      font-size: 19px;
+      line-height: 1.72;
+
+      padding: 3rem 1.5rem 6rem;
+    }
+
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      position: relative;
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+
+      margin-bottom: 0.2rem;
+    }
+
+    h2, h3 {
+      font-size: 1.35rem;
+      font-weight: 600;
+      margin: 2rem 0 1rem;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 0.95rem;
+      font-family: monospace;
+
+      margin-bottom: 3rem;
+    }
+
+    p {
+      margin-bottom: 1.7rem;
+      text-align: justify;
+    }
+
+    .review-incomplete {
+      font-style: italic;
+      color: var(--muted);
+    }
+
+    blockquote {
+      margin: 2.5rem 0;
+      padding-left: 1.2rem;
+
+      border-left: 2px solid var(--border);
+
+      color: #333;
+      font-style: italic;
+    }
+
+    .section-break {
+      text-align: center;
+      color: var(--muted);
+      margin: 3rem 0;
+      letter-spacing: 0.15em;
+    }
+
+    .sidenote {
+      float: right;
+      clear: right;
+
+      width: 15rem;
+
+      margin-right: -18rem;
+      margin-top: 0.3rem;
+
+      padding-left: 0.9rem;
+      border-left: 1px solid var(--border);
+
+      color: var(--muted);
+
+      font-size: 0.78rem;
+      line-height: 1.5;
+    }
+
+    .sidenote code {
+      font-size: 0.75rem;
+      background: #efefea;
+      padding: 0.05rem 0.2rem;
+    }
+
+    @media (max-width: 1200px) {
+      .sidenote {
+        display: none;
+      }
+    }
+
+    a {
+      color: inherit;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 4rem 0;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+
+    <h1>{title}</h1>
+
+    <div class="meta">
+      {author} · {yearDisplay} · {rating}
+    </div>
+
+    <p>
+        The book has three portions a description of the Golden State Killer's crimes, a description of the failed investigation efforts, and finally a final reckoning of the DNA evidence used to convict Joseph DeAngelo. 
+
+    </p>
+    <p>
+        The book covers his method in rather sparse detail describing his "familiarity" with law-enforcement procedure and his ability to escape through pre-planned escape routes. 
+        While this is probably meant to discourage information regarding methods to commit crime, 
+        it makes the reader question what DeAngelo's X factor was that enabled him to commit crime for so long. For example, DeAngelo's ability to break in to locked homes without any signs of forced 
+        entry is stated but not examined in detail: Was he able to dissamble locks? Was he able to unscrew windows?.
+        
+        DeAngelo's method as described in the book is the following: Case the house to determine times when 1 victim is alone, find nearby watersheds for disposal, 
+        and plan an escape route about 1-2 weeks before hand. 
+        Then, look for commonly opened windows or weak locks and enter through the back-yard or climb to the top of the house then break in stealing into the victims room 
+        before threatening them to be silent often with a bright flashlight shining into their face to disorient and then tie them up with ligatures steal a few trinkets <span class = "sidenote">A few victims descrobe DeAngelo cooking himself dinner in their homes after incapacitating them</span> 
+        then assault the women and leave through a pre-planned route. 
+
+        The book presents a few hypotheses on why DeAngelo was able to commit crimes for so long. The California Police Departments were unwilling to communicate beetween districts which 
+        meant distant crimes could not be connected. 
+        Secondly, DeAngelo was effecient often with pre-tied ligatures and used his millitary and police background to estimate response times and protocols. 
+
+        DeAngelo's crimes became progressively more malicious over time <span class = "sidenote">One of the investigators describes DeAngelo having visiited his house and scaring his four-year old. The police department sent men to stand guard at all the investigators homes.
+        </span>
+
+        The fear and desperation that surrounded Sacramento at the time is described excellently though sometimes Thrope meanders overmuch such as when he dedicates two paragraphs to 
+        describing the position of female law enforcement at the time. Overall, a great short book to read in one sitting and its fascinating the techniques DeAngelo used to stay free until DNA evidence caught up to him. 
+
+
+
+        
+        
+
+
+      
+      
+    <div class="section-break">⁂</div>
+    </p>
+
+  </main>
+</body>
+</html>
