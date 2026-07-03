@@ -15,6 +15,8 @@ updated_at: "2025-07-22T05:06:04.502506+00:00"
 
 > “In the seen, there is simply the seen. This is, in fact, the end of suffering.” — [Bāhiya Sutta](https://en.wikipedia.org/wiki/Bahiya_Sutta)
 
+>"I prefer seeing with my eyes rather than my ears"--An anonymous person I once heard talking in a busy street in Tucson Arizona
+
 > “Ever tried. Ever failed. No matter. Try again. Fail again. Fail better.” — [Samuel Beckett](https://en.wikipedia.org/wiki/Samuel_Beckett)
 
 > “Truth doesn't hedge.” — Sreekar Charan
