@@ -17,15 +17,15 @@ try {
   error = "Archive subsystem failure (database unreachable).";
 }
 
-const postsByPrimaryTag = {};
+// Map posts to ALL their tags for the Topic View
+const postsByAllTags = {};
 for (const post of posts) {
-  const primaryTag = post.tags?.[0];
-  if (!primaryTag) continue;
-  if (!postsByPrimaryTag[primaryTag]) postsByPrimaryTag[primaryTag] = [];
-  postsByPrimaryTag[primaryTag].push(post);
+  for (const tag of post.tags ?? []) {
+    if (!postsByAllTags[tag]) postsByAllTags[tag] = [];
+    postsByAllTags[tag].push(post);
+  }
 }
-
-const sortedPrimaryTags = Object.entries(postsByPrimaryTag).sort((a, b) => a[0].localeCompare(b[0]));
+const sortedAllTags = Object.entries(postsByAllTags).sort((a, b) => a[0].localeCompare(b[0]));
 ---
 
 <!doctype html>
@@ -49,9 +49,9 @@ const sortedPrimaryTags = Object.entries(postsByPrimaryTag).sort((a, b) => a[0].
       .topic-group li { margin-bottom: 0.4rem; }
       article { padding: 2rem 0; border-bottom: 1px solid #e5e5e5; }
       .post-meta { font-family: monospace; font-size: 11px; opacity: 0.5; margin-bottom: 0.5rem; display: flex; gap: 0.8rem; }
+      .tag-badge { opacity: 0.6; margin-left: 5px; font-size: 10px; }
       h2 { font-size: 1.4rem; margin: 0.3rem 0 0.7rem; }
       .excerpt { font-style: italic; opacity: 0.75; max-width: 65ch; }
-      .expand { font-family: monospace; font-size: 11px; margin-top: 0.8rem; }
       aside { margin-top: 4rem; padding-left: 1rem; border-left: 2px solid #ddd; font-style: italic; opacity: 0.8; }
       footer { margin-top: 4rem; font-family: monospace; font-size: 10px; opacity: 0.5; display: flex; justify-content: space-between; border-top: 1px solid #ddd; padding-top: 1rem; }
       @media (max-width: 800px) { .grid-container { grid-template-columns: 1fr; } }
@@ -64,22 +64,24 @@ const sortedPrimaryTags = Object.entries(postsByPrimaryTag).sort((a, b) => a[0].
     
     <nav>
       <a href="/">index</a> /
-      <button id="toggleView" style="background:none; border:none; cursor:pointer; font:inherit; text-decoration:underline;">toggle view</button> /
-
-
-<a href="/about">about</a> /
-
-<a href = "/books/book_reviews">book reviews</a> /
-
-<a href="/archives">archives</a>
-
-
+      <button id="toggleView" style="background:none; border:none; cursor:pointer; font:inherit; text-decoration:underline;">toggle view (time/topic)</button> /
+      <a href="/about">about</a> /
+      <a href="/books/book_reviews">book reviews</a> / 
+      <a href="/archives">archives</a>
     </nav>
 
     <main id="chronologicalView">
       {posts.map((post, i) => (
         <article>
-          <div class="post-meta"><span>{new Date(post.created_at).toLocaleDateString()}</span> <span>§{i + 1}</span></div>
+          <div class="post-meta">
+            <span>{new Date(post.created_at).toLocaleDateString()}</span>
+            <span>§{i + 1}</span>
+            <span>
+              {post.tags?.map((tag, idx) => (
+                <span class={idx === 0 ? "" : "tag-badge"}>{idx === 0 ? tag : `• ${tag}`}</span>
+              ))}
+            </span>
+          </div>
           <h2><a href={`/posts/${post.slug || post.id}`}>{post.title}</a></h2>
           {post.excerpt && <div class="excerpt">{post.excerpt}</div>}
         </article>
@@ -88,7 +90,7 @@ const sortedPrimaryTags = Object.entries(postsByPrimaryTag).sort((a, b) => a[0].
 
     <main id="topicView" class="hidden">
       <div class="grid-container">
-        {sortedPrimaryTags.map(([tag, posts]) => (
+        {sortedAllTags.map(([tag, posts]) => (
           <div class="topic-group">
             <h3>{tag.toUpperCase()}</h3>
             <ul>
