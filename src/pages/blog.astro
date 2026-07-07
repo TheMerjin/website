@@ -53,22 +53,6 @@ const sortedTags = Object.entries(postsByTag).sort((a, b) =>
 // Log the number of posts per tag
 
 
-const primaryGroups = {};
-
-for (const post of posts) {
-  const primary = post.tags?.[0] ?? "other";
-
-  if (!primaryGroups[primary]) primaryGroups[primary] = [];
-
-  primaryGroups[primary].push(post);
-}
-
-console.log(
-  primaryGroups.map(([tag, posts]) => ({
-    tag,
-    count: posts.length,
-  }))
-);
 ---
 
 <!doctype html>
