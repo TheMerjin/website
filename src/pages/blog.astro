@@ -20,7 +20,7 @@ try {
 // Map posts to ALL their tags for the Topic View
 const postsByAllTags = {};
 for (const post of posts) {
-  for (const tag of post.tags ?? []) {
+  for (const tag of post.tags.slice(0,2) ?? []) {
     if (!postsByAllTags[tag]) postsByAllTags[tag] = [];
     postsByAllTags[tag].push(post);
   }
