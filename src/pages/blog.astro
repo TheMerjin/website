@@ -35,6 +35,21 @@ try {
 } catch {
   error = "Archive subsystem failure (database unreachable).";
 }
+const view = Astro.url.searchParams.get("view") ?? "time";
+
+const postsByTag = {};
+
+for (const post of posts) {
+  for (const tag of post.tags ?? []) {
+    if (!postsByTag[tag]) postsByTag[tag] = [];
+    postsByTag[tag].push(post);
+  }
+}
+
+const sortedTags = Object.entries(postsByTag).sort((a, b) =>
+  a[0].localeCompare(b[0])
+);
+console.log(postsByTag);
 ---
 
 <!doctype html>
