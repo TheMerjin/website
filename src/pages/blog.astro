@@ -51,6 +51,24 @@ const sortedTags = Object.entries(postsByTag).sort((a, b) =>
   a[0].localeCompare(b[0])
 );
 // Log the number of posts per tag
+// Primary tag groups (first tag only)
+const postsByPrimaryTag = {};
+
+for (const post of posts) {
+  const primaryTag = post.tags?.[0];
+
+  if (!primaryTag) continue;
+
+  if (!postsByPrimaryTag[primaryTag]) {
+    postsByPrimaryTag[primaryTag] = [];
+  }
+
+  postsByPrimaryTag[primaryTag].push(post);
+}
+
+const sortedPrimaryTags = Object.entries(postsByPrimaryTag).sort((a, b) =>
+  a[0].localeCompare(b[0])
+);
 
 
 ---
@@ -254,7 +272,11 @@ const sortedTags = Object.entries(postsByTag).sort((a, b) =>
           </article>
         ))
       )}
-      
+      {sortedPrimaryTags.map(([tag, posts]) => (
+  <div>
+    {tag}: {posts.length}
+  </div>
+))}
 
     </main>
 
