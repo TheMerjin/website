@@ -1,76 +1,31 @@
 ---
-/**
- * Gwern-style blog index (standalone document)
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import { supabase } from "../lib/supabase.js";
-
 export const prerender = false;
 
-// -----------------------------
-// Data layer (hidden machinery)
-// -----------------------------
 let posts = [];
-
 let error = null;
 
 try {
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("id")
-    .eq("username", "Sreek")
-    .single();
-
+  const { data: profile } = await supabase.from("profiles").select("id").eq("username", "Sreek").single();
   if (!profile) {
     error = "User ‘Sreek’ not found in archive index.";
   } else {
-    const { data } = await supabase
-      .from("posts")
-      .select("*")
-      .eq("author_id", profile.id)
-      .order("created_at", { ascending: false });
-
+    const { data } = await supabase.from("posts").select("*").eq("author_id", profile.id).order("created_at", { ascending: false });
     posts = data ?? [];
   }
 } catch {
   error = "Archive subsystem failure (database unreachable).";
 }
-const view = Astro.url.searchParams.get("view") ?? "time";
 
-const postsByTag = {};
-
-for (const post of posts) {
-  for (const tag of post.tags ?? []) {
-    if (!postsByTag[tag]) postsByTag[tag] = [];
-    postsByTag[tag].push(post);
-  }
-}
-
-const sortedTags = Object.entries(postsByTag).sort((a, b) =>
-  a[0].localeCompare(b[0])
-);
-// Log the number of posts per tag
-// Primary tag groups (first tag only)
 const postsByPrimaryTag = {};
-
 for (const post of posts) {
   const primaryTag = post.tags?.[0];
-
   if (!primaryTag) continue;
-
-  if (!postsByPrimaryTag[primaryTag]) {
-    postsByPrimaryTag[primaryTag] = [];
-  }
-
+  if (!postsByPrimaryTag[primaryTag]) postsByPrimaryTag[primaryTag] = [];
   postsByPrimaryTag[primaryTag].push(post);
 }
 
-const sortedPrimaryTags = Object.entries(postsByPrimaryTag).sort((a, b) =>
-  a[0].localeCompare(b[0])
-);
-
-
+const sortedPrimaryTags = Object.entries(postsByPrimaryTag).sort((a, b) => a[0].localeCompare(b[0]));
 ---
 
 <!doctype html>
@@ -79,221 +34,78 @@ const sortedPrimaryTags = Object.entries(postsByPrimaryTag).sort((a, b) =>
     <meta charset="utf-8" />
     <title>Sreek’s Blog</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
     <style>
-      /* -----------------------------
-         Gwern-style minimal system
-      ------------------------------ */
-
-      body {
-        margin: 0;
-        padding: 3rem 1.2rem;
-        max-width: 820px;
-        margin-left: auto;
-        margin-right: auto;
-        font-family: serif;
-        background: #fafafa;
-        color: #111;
-        line-height: 1.55;
-      }
-
-      a {
-        color: #000;
-        text-decoration: none;
-      }
-
-      a:hover {
-        text-decoration: underline;
-      }
-
-      /* header */
-      .meta {
-        font-family: monospace;
-        font-size: 11px;
-        opacity: 0.6;
-        letter-spacing: 0.05em;
-        margin-bottom: 1rem;
-      }
-
-      h1 {
-        font-size: 2.6rem;
-        font-weight: 600;
-        margin: 0.5rem 0;
-      }
-
-      .subtitle {
-        font-style: italic;
-        opacity: 0.7;
-        margin-bottom: 2rem;
-      }
-
-      /* nav */
-      nav {
-        font-family: monospace;
-        font-size: 12px;
-        margin-bottom: 2rem;
-      }
-
-      nav span {
-        opacity: 0.5;
-      }
-
-      /* post block */
-      article {
-        padding: 2rem 0;
-        border-bottom: 1px solid #e5e5e5;
-      }
-
-      .post-meta {
-        font-family: monospace;
-        font-size: 11px;
-        opacity: 0.5;
-        margin-bottom: 0.5rem;
-        display: flex;
-        gap: 0.8rem;
-      }
-
-      h2 {
-        font-size: 1.4rem;
-        margin: 0.3rem 0 0.7rem;
-      }
-
-      .excerpt {
-        font-style: italic;
-        opacity: 0.75;
-        max-width: 65ch;
-      }
-
-      .expand {
-        font-family: monospace;
-        font-size: 11px;
-        margin-top: 0.8rem;
-      }
-
-      /* side note */
-      aside {
-        margin-top: 4rem;
-        padding-left: 1rem;
-        border-left: 2px solid #ddd;
-        font-style: italic;
-        opacity: 0.8;
-      }
-
-      footer {
-        margin-top: 4rem;
-        font-family: monospace;
-        font-size: 10px;
-        opacity: 0.5;
-        display: flex;
-        justify-content: space-between;
-        border-top: 1px solid #ddd;
-        padding-top: 1rem;
-      }
-
-      @media (max-width: 600px) {
-        h1 {
-          font-size: 2rem;
-        }
-
-        footer {
-          flex-direction: column;
-          gap: 0.5rem;
-        }
-      }
+      body { margin: 0; padding: 3rem 1.2rem; max-width: 820px; margin-left: auto; margin-right: auto; font-family: serif; background: #fafafa; color: #111; line-height: 1.55; }
+      a { color: #000; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .meta { font-family: monospace; font-size: 11px; opacity: 0.6; letter-spacing: 0.05em; margin-bottom: 1rem; }
+      h1 { font-size: 2.6rem; font-weight: 600; margin: 0.5rem 0; }
+      .subtitle { font-style: italic; opacity: 0.7; margin-bottom: 2rem; }
+      nav { font-family: monospace; font-size: 12px; margin-bottom: 2rem; }
+      .hidden { display: none; }
+      .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 2rem; }
+      .topic-group h3 { font-family: monospace; font-size: 13px; border-bottom: 1px dotted #ccc; padding-bottom: 0.3rem; margin-bottom: 0.8rem; }
+      .topic-group ul { list-style: none; padding: 0; font-size: 14px; }
+      .topic-group li { margin-bottom: 0.4rem; }
+      article { padding: 2rem 0; border-bottom: 1px solid #e5e5e5; }
+      .post-meta { font-family: monospace; font-size: 11px; opacity: 0.5; margin-bottom: 0.5rem; display: flex; gap: 0.8rem; }
+      h2 { font-size: 1.4rem; margin: 0.3rem 0 0.7rem; }
+      .excerpt { font-style: italic; opacity: 0.75; max-width: 65ch; }
+      .expand { font-family: monospace; font-size: 11px; margin-top: 0.8rem; }
+      aside { margin-top: 4rem; padding-left: 1rem; border-left: 2px solid #ddd; font-style: italic; opacity: 0.8; }
+      footer { margin-top: 4rem; font-family: monospace; font-size: 10px; opacity: 0.5; display: flex; justify-content: space-between; border-top: 1px solid #ddd; padding-top: 1rem; }
+      @media (max-width: 800px) { .grid-container { grid-template-columns: 1fr; } }
     </style>
   </head>
-
   <body>
-
-    <!-- Title / metadata block -->
-    <div class="meta">
-      C:\archive\sreek\blog\index.astro •
-      {posts.length} entries •
-      status: live index
-    </div>
-
+    <div class="meta">C:\archive\sreek\blog\index.astro • {posts.length} entries</div>
     <h1>Sreek’s Blog</h1>
-
-    <div class="subtitle">
-      An incremental archive of essays, notes, and long-form fragments.
-    </div>
-
-    <!-- Navigation -->
+    <div class="subtitle">An incremental archive of essays, notes, and long-form fragments.</div>
+    
     <nav>
-      <a href="/blogsmall link fix">index</a> /
-      <a href="/about">about</a> /
-      <a href = "/books/book_reviews">book reviews</a> / 
-      <a href="/archives">archives</a>
+      <a href="/">index</a> /
+      <button id="toggleView" style="background:none; border:none; cursor:pointer; font:inherit; text-decoration:underline;">toggle view</button> /
+      <a href="/about">about</a>
     </nav>
 
-    <!-- Body -->
-    <main>
-
-      {error ? (
-        <section>
-          <h2>Archive inaccessible</h2>
-          <p style="font-style: italic; opacity: 0.7;">
-            {error}
-          </p>
-        </section>
-      ) : posts.length === 0 ? (
-        <section>
-          <h2>Empty archive</h2>
-          <p style="font-style: italic; opacity: 0.7;">
-            No entries have yet been committed to this index.
-          </p>
-        </section>
-      ) : (
-        posts.map((post, i) => (
-          <article>
-            <div class="post-meta">
-              <span>{new Date(post.created_at).toLocaleDateString()}</span>
-              <span>§{i + 1}</span>
-              <span>Sreek</span>
-            </div>
-
-            <h2>
-              <a href={`/posts/${post.slug || post.id}`}>
-                {post.title}
-              </a>
-            </h2>
-
-            {post.excerpt && (
-              <div class="excerpt">
-                {post.excerpt}
-              </div>
-            )}
-
-            <div class="expand">
-              <a href={`/posts/${post.slug || post.id}`}>
-                expand →
-              </a>
-            </div>
-          </article>
-        ))
-      )}
-      {sortedPrimaryTags.map(([tag, posts]) => (
-  <div>
-    {tag}: {posts.length}
-  </div>
-))}
-
+    <main id="chronologicalView">
+      {posts.map((post, i) => (
+        <article>
+          <div class="post-meta"><span>{new Date(post.created_at).toLocaleDateString()}</span> <span>§{i + 1}</span></div>
+          <h2><a href={`/posts/${post.slug || post.id}`}>{post.title}</a></h2>
+          {post.excerpt && <div class="excerpt">{post.excerpt}</div>}
+        </article>
+      ))}
     </main>
 
-    <!-- Marginal note (Gwern-style annotation) -->
-    <aside>
-      “A blog is not a product but an accumulation function over time.”
-      <div style="font-size: 10px; opacity: 0.6; margin-top: 0.5rem;">
-        reader may ignore this section safely
+    <main id="topicView" class="hidden">
+      <div class="grid-container">
+        {sortedPrimaryTags.map(([tag, posts]) => (
+          <div class="topic-group">
+            <h3>{tag.toUpperCase()}</h3>
+            <ul>
+              {posts.map(post => <li><a href={`/posts/${post.slug || post.id}`}>{post.title}</a></li>)}
+            </ul>
+          </div>
+        ))}
       </div>
-    </aside>
+    </main>
 
-    <!-- Footer -->
+    <aside>“A blog is not a product but an accumulation function over time.”</aside>
+    
     <footer>
       <span>archive integrity: nominal</span>
-      <span>linkrot protection: partial</span>
       <span>render: SSR hybrid</span>
     </footer>
 
+    <script>
+      const btn = document.getElementById('toggleView');
+      const chrono = document.getElementById('chronologicalView');
+      const topic = document.getElementById('topicView');
+      btn.addEventListener('click', () => {
+        chrono.classList.toggle('hidden');
+        topic.classList.toggle('hidden');
+      });
+    </script>
   </body>
 </html>
