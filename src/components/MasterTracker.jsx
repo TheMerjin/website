@@ -69,7 +69,7 @@ function MasterTracker() {
     form.reset();
     setShowForm(false);
 
-    await fetch("/api/auth/calendar_events/create", {
+    const resultOn = await fetch("/api/auth/calendar_events/create", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -87,6 +87,7 @@ function MasterTracker() {
         color: "grey",
       }),
     });
+    console.log(resultOn);
   }
 
   function handleDeleteTask(id) {
