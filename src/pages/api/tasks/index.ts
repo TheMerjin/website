@@ -2,6 +2,50 @@ import type { APIRoute } from "astro";
 import { supabase } from "../../../lib/supabase.js";
 
 export const prerender = false;
+
+export const GET: APIRoute = async ({ request }) => {
+  try {
+    const { data, error } = await supabase
+      .from("tasks")
+      .select("*")
+      .order("due_date", { ascending: true });
+
+    if (error) {
+      console.error("Error fetching tasks:", {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code,
+        error,
+      });
+      return new Response(JSON.stringify({ error: error.message, tasks: [] }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    return new Response(JSON.stringify({ tasks: data || [] }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    console.error("Server error fetching tasks:", {
+      message: errorMessage,
+      stack: errorStack,
+      error,
+    });
+    return new Response(
+      JSON.stringify({ error: "Internal Server Error", tasks: [] }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+  }
+};
 export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
