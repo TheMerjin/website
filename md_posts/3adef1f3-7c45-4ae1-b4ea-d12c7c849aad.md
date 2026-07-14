@@ -9,11 +9,19 @@ updated_at: "2025-07-22T05:06:04.502506+00:00"
 
 # Quotes of Interest
 
+>"Nothing good ever comes from worrying or sitting there feeling sorry for yourself... Keep positive and keep pushing on and things will turn good."--Connor McGregor
+
+>"I am cocky in prediction, I am confident in preparation but I am always humble in victory or defeat." [Connor McGregor](https://en.wikiquote.org/wiki/Conor_McGregor)
+
 > “The problem is not the problem. The problem is your attitude about the problem.” — [Captain Jack Sparrow](https://en.wikipedia.org/wiki/Jack_Sparrow)
+
+>“I am not afraid of saying something and going and pursuing it. That’s it. I see it in my mind. I say it out loud, I go and do it.”-- [Connor McGregor]()
 
 > “Humility is not thinking less of yourself; it is thinking of yourself less.” — [C. S. Lewis](https://en.wikipedia.org/wiki/C._S._Lewis)
 
 > “In the seen, there is simply the seen. This is, in fact, the end of suffering.” — [Bāhiya Sutta](https://en.wikipedia.org/wiki/Bahiya_Sutta)
+
+>"If you have a clear picture in your head of something that's going to happen... then nothing can stop it." --Conor McGregor
 
 >"I prefer seeing with my eyes rather than my ears"--An anonymous person I once heard talking in a busy street in Tucson Arizona
 
@@ -22,6 +30,8 @@ updated_at: "2025-07-22T05:06:04.502506+00:00"
 > “Truth doesn't hedge.” — Sreekar Charan
 
 > “Live to the point of tears.” — [Albert Camus](https://en.wikipedia.org/wiki/Albert_Camus)
+
+>"Doubt is only removed by action. If you're not working then that's where doubt comes in."-- Conor McGregor
 
 > “Don’t let your sense of morals prevent you from doing what’s right.” — [Salvor Hardin](https://en.wikipedia.org/wiki/Foundation_%28book_series%29#Characters), from *[Foundation](https://en.wikipedia.org/wiki/Foundation_%28Asimov_novel%29)* by [Isaac Asimov](https://en.wikipedia.org/wiki/Isaac_Asimov)
 
