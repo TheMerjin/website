@@ -217,7 +217,7 @@ function getDaysFromNow(dueDate: string): string {
           {tasks.length === 0 && (
             <tr><td colspan="5" style="text-align:center;color:#888;font-style:italic;">No tasks found.</td></tr>
           )}
-          {tasks.map((task: any) => (
+          {incompleteTasks.map((task: any) => (
             <tr>
               <td>{task.class}</td>
               <td><a href={`/tasks/${task.id}`} class="lw-task-link">{task.item}</a></td>
