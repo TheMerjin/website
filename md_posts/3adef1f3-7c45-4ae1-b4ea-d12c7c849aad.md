@@ -11,7 +11,17 @@ updated_at: "2025-07-22T05:06:04.502506+00:00"
 
 >"Nothing good ever comes from worrying or sitting there feeling sorry for yourself... Keep positive and keep pushing on and things will turn good."--Connor McGregor
 
+>” Much that was called religion has carried an unconscious attitude of hostility toward life. True religion must teach that life is filled with joys pleasing to the eye of God, that knowledge without action is empty. All men must see that the teaching of religion by rules and rote is largely a hoax. The proper teaching is recognized with ease. You can know it without fail because it awakens within you that sensation which tells you this is something you've always known.”—The Orange Catholic Bible [Dune]
+
 >"I am cocky in prediction, I am confident in preparation but I am always humble in victory or defeat." [Connor McGregor](https://en.wikiquote.org/wiki/Conor_McGregor)
+
+>    "I must not fear.
+    Fear is the mind-killer.
+    Fear is the little-death that brings total obliteration.
+    I will face my fear.
+    I will permit it to pass over me and through me.
+    And when it has gone past, I will turn the inner eye to see its path.
+    Where the fear has gone there will be nothing. Only I will remain."-- Paul Atreidies from Dune
 
 > “The problem is not the problem. The problem is your attitude about the problem.” — [Captain Jack Sparrow](https://en.wikipedia.org/wiki/Jack_Sparrow)
 
@@ -30,6 +40,7 @@ updated_at: "2025-07-22T05:06:04.502506+00:00"
 > “Truth doesn't hedge.” — Sreekar Charan
 
 > “Live to the point of tears.” — [Albert Camus](https://en.wikipedia.org/wiki/Albert_Camus)
+
 
 >"Doubt is only removed by action. If you're not working then that's where doubt comes in."-- Conor McGregor
 
@@ -89,10 +100,7 @@ before her menfolks a heaping pile of hay. And when they indignantly demanded
 whether she had gone crazy, she replied: “Why, how did I know you’d notice? I’ve
 been cooking for you men for the last twenty years and in all that time I ain’t heard
 no word to let me know you wasn’t just eating hay.”
-
+---
+>A sister once observed to her brother that people had begun to regard her as more pleasant, owing perhaps to the improvement in her appearance after having her teeth straightened. Her brother replied, with that mixture of wit and cruelty peculiar to family affection, that such judgments were premature. “They are merely admiring the architecture,” he remarked; “wait until you opens your mouth, and they will abandon all such foolish notions.”
 
 [^1]: Famous for his book how to win friends and influence people. 
-
-
-
-
