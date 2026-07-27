@@ -9,9 +9,11 @@ updated_at: "2025-07-22T05:06:04.502506+00:00"
 
 # Quotes of Interest
 
+>” Much that was called religion has carried an unconscious attitude of hostility toward life. True religion must teach that life is filled with joys pleasing to the eye of God, that knowledge without action is empty. All men must see that the teaching of religion by rules and rote is largely a hoax. The proper teaching is recognized with ease. You can know it without fail because it awakens within you that sensation which tells you this is something you've always known.”—The Orange Catholic Bible [Dune]
+
 >"Nothing good ever comes from worrying or sitting there feeling sorry for yourself... Keep positive and keep pushing on and things will turn good."--Connor McGregor
 
->” Much that was called religion has carried an unconscious attitude of hostility toward life. True religion must teach that life is filled with joys pleasing to the eye of God, that knowledge without action is empty. All men must see that the teaching of religion by rules and rote is largely a hoax. The proper teaching is recognized with ease. You can know it without fail because it awakens within you that sensation which tells you this is something you've always known.”—The Orange Catholic Bible [Dune]
+>"The meek shall inherit the earth only in their fantasies. The strong and the righteous shall reap according to their merit"--- The texts of the Virath
 
 >"I am cocky in prediction, I am confident in preparation but I am always humble in victory or defeat." [Connor McGregor](https://en.wikiquote.org/wiki/Conor_McGregor)
 

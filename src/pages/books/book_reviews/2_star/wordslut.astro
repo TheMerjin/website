@@ -1,0 +1,243 @@
+---
+export const metadata = {
+  title: "Wordslut",
+  author: "Amanda Montell",
+  year: 2019,
+  rating: "★★★☆☆",
+  completed: true,
+  summary:
+    "A critique of Amanda Montell's argument that language reinforces patriarchy, examining the evidence, linguistic claims, and limits of language reform.",
+};
+
+const title = metadata.title;
+const author = metadata.author;
+const year = metadata.year;
+const rating = metadata.rating;
+const yearDisplay = year ?? '—';
+---
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>{title} Review</title>
+
+  <style>
+    :root {
+      --bg: #f8f8f5;
+      --text: #111;
+      --muted: #666;
+      --border: #d8d8d8;
+      --max-width: 72ch;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+
+      font-family: Georgia, serif;
+      font-size: 19px;
+      line-height: 1.72;
+
+      padding: 3rem 1.5rem 6rem;
+    }
+
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      position: relative;
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+
+      margin-bottom: 0.2rem;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 0.95rem;
+      font-family: monospace;
+
+      margin-bottom: 3rem;
+    }
+
+    p {
+      margin-bottom: 1.7rem;
+      text-align: justify;
+    }
+
+    blockquote {
+      margin: 2.5rem 0;
+      padding-left: 1.2rem;
+
+      border-left: 2px solid var(--border);
+
+      color: #333;
+      font-style: italic;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    @media (max-width: 1200px) {
+      .sidenote {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+
+    <h1>{title}</h1>
+
+    <div class="meta">
+      {author} · {yearDisplay} · {rating} · Review completed
+    </div>
+
+    <p>
+      <i>Wordslut</i> is evidently meant to invite controversy both through its
+      subject and its discussion and use of the profane. What claims to be a
+      map to feminist and intersectional language instead resembles a tourist
+      brochure: colorful, selective, and of limited use once the journey begins.
+    </p>
+
+    <p>
+      Montell’s main argument is that almost all human societies have been
+      organized as patriarchies due to language. Because the language one
+      speaks influences thought, the “patriarchy” is reinforced by the language
+      we use. She writes, “One of our culture’s biggest obstacles is the idea
+      that language doesn’t matter the way that other more tangible forms of
+      freedom and oppression do.”
+    </p>
+
+    <p>
+      Montell’s evidence is highly suspect, relying heavily on anecdotes from
+      feminist professors from the 1970s and 1990s, polls of her followers and
+      friends who are likely to share her views, occasional isolated studies,
+      and a lack of bibliography. Montell presents many examples of sexist
+      language and sexist societies, but examples alone do not establish that
+      language causes or substantially reinforces sexism.
+    </p>
+
+    <p>
+      Even if language influences thought, Montell never demonstrates that
+      linguistic reform should be prioritized over more tangible reforms such as
+      changes in law, education, or economic opportunity. Indeed, she
+      acknowledges that language itself is shaped by the culture that speaks
+      it. If culture and language influence one another, then reforming
+      institutions and social norms should naturally produce linguistic change
+      as well. The book never establishes that changing language is the more
+      effective starting point.
+    </p>
+
+    <p>
+      Montell may have more convincingly demonstrated a scientific interest in
+      her thesis had she compared linguistic practices across cultures with
+      measures of gender equality. Such an analysis would have required
+      grappling with difficult empirical questions, including the Nordic
+      paradox: why some of the world's most gender-egalitarian societies
+      continue to exhibit persistent sex differences in occupations and
+      preferences despite progressive social norms. At minimum, this suggests
+      that language alone cannot bear the explanatory weight Montell places
+      upon it. Norwegian, for example, contains grammatical gender despite
+      Norway being among the world's most gender-equal societies.
+    </p>
+
+    <p>
+      Specifically, she argues:
+    </p>
+
+    <blockquote>
+      “In French, for instance, most prestigious job titles are masculine. The
+      French words for police officer, doctor, professor, engineer, politician,
+      lawyer, surgeon, and dozens of others all have masculine gender.”
+    </blockquote>
+
+    <p>
+      This is an oversimplification. Modern French contains feminine forms of
+      many professions: <i>un avocat</i> and <i>une avocate</i> (lawyer),
+      <i>un chirurgien</i> and <i>une chirurgienne</i> (surgeon), and
+      <i>un infirmier</i> and <i>une infirmière</i> (nurse). While linguistic
+      conventions may reflect historical social structures, they do not by
+      themselves prove that grammar maintains those structures.
+    </p>
+
+    <p>
+      Montell also attacks social perceptions of occupations, describing the
+      harmful “pervasive assumption that many esteemed professions, surgeons,
+      scientists, lawyers, writers, actors are male while models, nurses, and
+      prostitutes are female.” She links these perceptions to implicit biases
+      that maintain occupational segregation and unequal treatment.
+    </p>
+
+    <p>
+      However, occupational segregation is not necessarily evidence of unequal
+      treatment. Countries such as Norway consistently rank among the world's
+      most gender-equal societies while continuing to exhibit substantial
+      occupational segregation. Furthermore, many of these perceptions
+      correspond to current workplace demographics. Registered nurses remain
+      overwhelmingly female, while surgeons and lawyers remain
+      disproportionately male. The existence of statistically accurate
+      expectations does not establish that language created these patterns, nor
+      does it demonstrate that changing language will substantially alter them.
+    </p>
+
+    <p>
+      Montell introduces several interesting etymologies, such as those of
+      <i>dude</i> and <i>guy</i>, both of which originated as words referring
+      specifically to men but are now frequently used in gender-neutral ways.
+      She nevertheless advocates replacing such terms with alternatives like
+      <i>folks</i>, arguing that their continued use reinforces male
+      normativity.
+    </p>
+
+    <p>
+      This argument places too much weight on etymology and too little on
+      contemporary usage. Words routinely diverge from their historical
+      origins. Few English speakers associate <i>villain</i> with its original
+      meaning of peasant or serf, <i>nice</i> with its original meaning of
+      foolish, or <i>decimate</i> with its original meaning of reducing by
+      one-tenth. Likewise, for many speakers, <i>guys</i> and <i>dudes</i>
+      function simply as informal collective terms rather than direct
+      references to men.
+    </p>
+
+    <p>
+      It was genuinely surprising, however, how many words for women have
+      pejorated over time. I did not know the origins or historical usage of
+      terms such as “hussy” and had not noticed the broader pattern. However,
+      the argument for language reform remains weak. Montell largely assumes
+      that the derogation of female terms demonstrates language's causal role
+      in maintaining sexism. Another plausible explanation is that these words
+      became derogatory because of existing societal attitudes, and short-term
+      reforms may eventually succumb to the euphemism treadmill. If the latter
+      explanation is correct, changing vocabulary alone is unlikely to
+      eliminate the underlying prejudice.
+    </p>
+
+    <p>
+      The existence of gender differences does not by itself demonstrate
+      discrimination. A complete explanation must separate the effects of
+      social pressure, historical conditions, economic incentives, biological
+      differences, and individual preferences. If a theory explains every
+      gender difference primarily through patriarchy, it risks becoming
+      unfalsifiable because any outcome can be interpreted as evidence of the
+      same cause.
+    </p>
+
+  </main>
+</body>
+</html>
