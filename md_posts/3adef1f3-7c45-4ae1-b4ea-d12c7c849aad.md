@@ -11,6 +11,9 @@ updated_at: "2025-07-22T05:06:04.502506+00:00"
 
 >” Much that was called religion has carried an unconscious attitude of hostility toward life. True religion must teach that life is filled with joys pleasing to the eye of God, that knowledge without action is empty. All men must see that the teaching of religion by rules and rote is largely a hoax. The proper teaching is recognized with ease. You can know it without fail because it awakens within you that sensation which tells you this is something you've always known.”—The Orange Catholic Bible [Dune]
 
+>"When you have eliminated the impossible, whatever
+remains, however improbable, must be the truth."--Sherlock Holmes
+
 >"Nothing good ever comes from worrying or sitting there feeling sorry for yourself... Keep positive and keep pushing on and things will turn good."--Connor McGregor
 
 >"The meek shall inherit the earth only in their fantasies. The strong and the righteous shall reap according to their merit"--- The texts of the Virath
@@ -73,6 +76,7 @@ But it takes character and self-control to be understanding and forgiving" -- [D
 ## Anecdotes
 
 
+
 Diogenes was approached by Alexander the Great, who offered to grant him any wish. Diogenes replied:
 
 > “Stand out of my sunlight.”
@@ -104,5 +108,12 @@ been cooking for you men for the last twenty years and in all that time I ain’
 no word to let me know you wasn’t just eating hay.”
 ---
 >A sister once observed to her brother that people had begun to regard her as more pleasant, owing perhaps to the improvement in her appearance after having her teeth straightened. Her brother replied, with that mixture of wit and cruelty peculiar to family affection, that such judgments were premature. “They are merely admiring the architecture,” he remarked; “wait until you opens your mouth, and they will abandon all such foolish notions.”
+
+---
+>"In an exchange remembered by one student, a teacher inquired about the student's first-period class and learned it was Physics C. "Isn't that a difficult class?" she asked. The student answered simply, "I don't plan to struggle or to do poorly."
+
+>"The teacher smiled and replied, "I don't think the people who did poorly planned that either."
+
+>"Without hesitation, the student responded, "They weren't planning at all."
 
 [^1]: Famous for his book how to win friends and influence people. 
