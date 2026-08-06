@@ -1,0 +1,387 @@
+---
+export const metadata = {
+  title: "American Predator",
+  author: "Maureen Callahan",
+  year: 2019,
+  rating: "★★★★☆",
+  completed: true,
+  summary:
+    "The terrifying true story of Israel Keyes, one of the most meticulous and chilling serial killers in American history.",
+};
+
+const title = metadata.title;
+const author = metadata.author;
+const year = metadata.year;
+const rating = metadata.rating;
+const yearDisplay = year ?? '—';
+---
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>{title} Review</title>
+
+  <style>
+    :root {
+      --bg: #f8f8f5;
+      --text: #111;
+      --muted: #666;
+      --border: #d8d8d8;
+      --max-width: 72ch;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+
+      font-family: Georgia, serif;
+      font-size: 19px;
+      line-height: 1.72;
+
+      padding: 3rem 1.5rem 6rem;
+    }
+
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      position: relative;
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+
+      margin-bottom: 0.2rem;
+    }
+
+    h2, h3 {
+      font-size: 1.35rem;
+      font-weight: 600;
+      margin: 2rem 0 1rem;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 0.95rem;
+      font-family: monospace;
+
+      margin-bottom: 3rem;
+    }
+
+    p {
+      margin-bottom: 1.7rem;
+      text-align: justify;
+    }
+
+    .review-incomplete {
+      font-style: italic;
+      color: var(--muted);
+    }
+
+    blockquote {
+      margin: 2.5rem 0;
+      padding-left: 1.2rem;
+
+      border-left: 2px solid var(--border);
+
+      color: #333;
+      font-style: italic;
+    }
+
+    .section-break {
+      text-align: center;
+      color: var(--muted);
+      margin: 3rem 0;
+      letter-spacing: 0.15em;
+    }
+
+    .sidenote {
+      float: right;
+      clear: right;
+
+      width: 15rem;
+
+      margin-right: -18rem;
+      margin-top: 0.3rem;
+
+      padding-left: 0.9rem;
+      border-left: 1px solid var(--border);
+
+      color: var(--muted);
+
+      font-size: 0.78rem;
+      line-height: 1.5;
+    }
+
+    .sidenote code {
+      font-size: 0.75rem;
+      background: #efefea;
+      padding: 0.05rem 0.2rem;
+    }
+
+    @media (max-width: 1200px) {
+      .sidenote {
+        display: none;
+      }
+    }
+
+    a {
+      color: inherit;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 4rem 0;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+
+    <h1>{title}</h1>
+
+    <div class="meta">
+      {author} · {yearDisplay} · {rating} · Review not completed
+    </div>
+
+    <p class="review-complete">
+  Serial killers occupy a peculiar place in the public imagination. Unlike
+  crimes of passion or desperation, serial murder often involves patience,
+  preparation, and the repeated pursuit of victims for motives that are
+  frequently sadistic or sexual. The combination of careful planning and
+  seemingly irrational motives has made serial killers a source of enduring
+  fascination.
+</p>
+
+<p class="review-complete">
+  Few cases illustrate this puzzle better than that of
+  <a href="https://en.wikipedia.org/wiki/Israel_Keyes">Israel Keyes</a>. For
+  more than a decade, he committed murders across the United States while
+  largely avoiding suspicion, ultimately being apprehended not through a
+  sophisticated investigation but because investigators traced a stolen credit
+  card he used after one of his crimes.
+  <span class="sidenote">
+    Keyes was arrested in March 2012 after using
+    <a href="https://en.wikipedia.org/wiki/Samantha_Koenig">Samantha Koenig's</a>
+    debit card following her murder. Investigators tracked ATM withdrawals and
+    purchases across several states before locating him in Texas.
+  </span>
+  How could a killer remain undetected for so long, and did his success stem
+  from extraordinary skill, institutional weaknesses, or simple luck?
+  <i>American Predator</i> attempts to answer that question through a detailed
+  reconstruction of Keyes' crimes and the investigation that finally ended
+  them.
+</p>
+
+<p class="review-complete">
+  Keyes MO did not rely on a fixed victim type, or location for disposal and
+  murder, with limits preventing investigators from linking cases through
+  <a href="https://en.wikipedia.org/wiki/Victimology">victimology</a>.
+  <span class="sidenote">
+    <b>Victimology</b> studies the characteristics and lifestyles of victims.
+    Many serial murder investigations begin by noticing similarities among
+    victims. Keyes intentionally selected victims with little connection to one
+    another, making linkage far more difficult.
+  </span>
+  This reduced the potential contact between victims, witnesses, and Keyes.
+</p>
+
+<p class="review-complete">
+  He also left thousands of miles between him and his victims obscuring his
+  travel patterns: flying to distant cities before renting cars and driving
+  thousands of miles which made it difficult to connect him to his murders.
+  <span class="sidenote">
+    The FBI eventually reconstructed many of these trips using airline records,
+    rental-car agreements, bank withdrawals, and surveillance footage after his
+    arrest.
+  </span>
+</p>
+
+<p class="review-complete">
+  Carefully planning his murders, he avoided bringing his cell-phone or removed
+  the battery and used only paper maps to leave virtually no electronic
+  paper-trails.
+  <span class="sidenote">
+    Most of Keyes' murders occurred before smartphones became ubiquitous.
+    Removing a battery from many phones of the 2000s effectively prevented
+    cellular location tracking. Today, this technique would generally not work
+    because most smartphones have sealed batteries and numerous background
+    location services.
+  </span>
+</p>
+
+<p class="review-complete">
+  He buried caches (murder-kits) long ahead of time throughout the United
+  States allowing him to have a clean purchase history and not possess his
+  tools at any time.
+  <span class="sidenote">
+    The FBI recovered several buried "kill kits" after Keyes' arrest. They
+    commonly contained firearms, ammunition, restraints, cash, and tools.
+    Several had reportedly remained underground for years before being used.
+  </span>
+</p>
+
+<p class="review-complete">
+  The last paragraph contains elements you could find from any summary. But
+  what else did Keyes do to avoid
+  <a href="https://en.wikipedia.org/wiki/DNA_profiling">DNA evidence</a>,
+  <a href="https://en.wikipedia.org/wiki/Closed-circuit_television">CCTV</a>,
+  or body discovery?
+</p>
+
+<p class="review-complete">
+  Keyes wore thick leather gloves in order to avoid leaving fingerprints or any
+  DNA.
+  <span class="sidenote">
+    Gloves reduce direct fingerprint deposition but can themselves transfer
+    oils or biological material between surfaces. According to the book, Keyes
+    wiped his weapons and gloves using bleach and Lysol after crimes in an
+    attempt to minimize transferable evidence.
+  </span>
+  He had minimal body hair—
+  <a href="https://en.wikipedia.org/wiki/Maureen_Callahan_(journalist)"
+    >McCallahan</a
+  >
+  goes as far as to hint that he got laser hair removal though this is probably
+  one of the more speculative claims in the book.
+  <span class="sidenote">
+    There is no public confirmation that Keyes underwent laser hair removal.
+    McCallahan infers the possibility because investigators recovered
+    remarkably little hair evidence.
+  </span>
+  He wore layers and had minimal contact with the victim to avoid skin cell
+  transfer.
+  <span class="sidenote">
+    Modern forensic investigations increasingly rely on
+    <a href="https://en.wikipedia.org/wiki/Trace_evidence">trace evidence</a>:
+    microscopic hairs, fibers, skin cells, pollen, soil, and other tiny
+    materials that can link a suspect to a victim or crime scene.
+  </span>
+</p>
+<p class="review-complete">
+  Keyes was nowhere near perfect; however, many of his murders relied on an
+  element of luck. In his final murder of
+  <a href="https://en.wikipedia.org/wiki/Samantha_Koenig">Samantha Koenig</a>,
+  she almost escaped and nearby passerby did not realize or help her before he
+  caught her and forced her into his car at gunpoint and later claimed he
+  didn’t know credit cards could be tracked.
+  <span class="sidenote">
+    Ironically, this mistake—not DNA, eyewitnesses, or criminal profiling—was
+    ultimately what led investigators to Keyes. After Koenig's murder he used
+    her debit card repeatedly, allowing investigators to follow a trail of ATM
+    withdrawals across several states.
+  </span>
+</p>
+
+<p class="review-complete">
+  In the
+  <a href="https://en.wikipedia.org/wiki/Bill_and_Lorraine_Currier">
+    Currier murders
+  </a>,
+  Lorraine almost runs away before he chases her and tackles her down.
+  <span class="sidenote">
+    Bill and Lorraine Currier disappeared from their Vermont home in 2011.
+    Their bodies have never been recovered despite extensive searches after
+    Keyes confessed to the murders.
+  </span>
+</p>
+
+<p class="review-complete">
+  The book however often presents an over-idealized version of Keyes
+  emphasizing his meticulous planning over his shortcomings.
+  <span class="sidenote">
+    Throughout the investigation there are numerous examples of Keyes making
+    mistakes: being observed by witnesses, abandoning plans, changing targets,
+    and relying upon circumstances outside his control. Many crimes succeeded
+    partly because no one connected isolated disappearances occurring hundreds
+    or thousands of miles apart.
+  </span>
+</p>
+
+<p class="review-complete">
+  His background also played a part in Keyes’s untraceability. Born to
+  ex-Mormons who were distrustful of the government, he was not on virtually
+  any government database.
+  <span class="sidenote">
+    Keyes' family eventually became associated with the
+    <a href="https://en.wikipedia.org/wiki/Christian_Identity">
+      Christian Identity
+    </a>
+    movement, an extremist religious ideology emphasizing racial separatism.
+    McCallahan argues that his isolated upbringing also meant relatively few
+    official records existed from his childhood.
+  </span>
+  He wasn’t even in the
+  <a href="https://en.wikipedia.org/wiki/Social_Security_(United_States)">
+    Social Security
+  </a>
+  database until he enlisted in the army.
+  <span class="sidenote">
+    A Social Security record is not itself a criminal database. Rather, it
+    serves as one of many government records investigators can later use to
+    reconstruct a person's history.
+  </span>
+</p>
+
+<p class="review-complete">
+  McCallahan's prose is sparse and without ornamentation or frills which is
+  perfect for a book about a methodical killer. The book begins how Keyes would
+  tell stories with the end of his murderous career before interspersing
+  interviews, flashbacks, and reconstructions of his murders.
+  <span class="sidenote">
+    The structure mirrors many of the FBI interviews with Keyes, who often
+    preferred discussing crimes indirectly or out of chronological order rather
+    than providing investigators with a complete confession.
+  </span>
+</p>
+
+<p class="review-complete">
+  The problem is that much relies on Keyes’s account as his MO was difficult to
+  back up or check--- even his murder count is debated but McCallahan does her
+  best to introduce evidence where possible: such as Keyes’ correct
+  recollection of the floorplan and layout during the Currier murders.
+  <span class="sidenote">
+    Keyes frequently refused to identify victims unless certain conditions were
+    met, and committed suicide in prison before investigators could verify many
+    of his claims.
+  </span>
+  <span class="sidenote">
+    His accurate recollection of the Currier home—including its interior
+    layout—was one reason investigators considered at least portions of his
+    confession credible despite the lack of physical evidence.
+  </span>
+  <span class="sidenote">
+    The exact number of murders remains unknown. Keyes admitted to fewer than a
+    dozen killings, while the FBI believes there were likely additional victims
+    that may never be identified.
+  </span>
+</p>
+
+<p class="review-complete">
+  True crime is often sensationalized but McCallahan’s account reads serious
+  and descriptive of all the right facts.
+  <span class="sidenote">
+    Unlike many popular true-crime books, <i>American Predator</i> spends
+    relatively little time speculating about Keyes' psychology and instead
+    emphasizes investigative records, FBI interviews, and documented evidence.
+  </span>
+</p>
+
+<p class="review-incomplete">
+  [WIP]
+</p>
+
+  </main>
+</body>
+</html>
