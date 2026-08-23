@@ -11,6 +11,8 @@ updated_at: "2025-07-22T05:06:04.502506+00:00"
 
 >” Much that was called religion has carried an unconscious attitude of hostility toward life. True religion must teach that life is filled with joys pleasing to the eye of God, that knowledge without action is empty. All men must see that the teaching of religion by rules and rote is largely a hoax. The proper teaching is recognized with ease. You can know it without fail because it awakens within you that sensation which tells you this is something you've always known.”—The Orange Catholic Bible [Dune]
 
+>“I would rather reason with a man whose principles I despise than with a man who has none.”---Sreekar Charan
+
 >"When you have eliminated the impossible, whatever
 remains, however improbable, must be the truth."--Sherlock Holmes
 
