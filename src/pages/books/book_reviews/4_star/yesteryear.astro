@@ -1,0 +1,269 @@
+---
+export const metadata = {
+  title: "Yesteryear",
+  author: "Caro Claire Burke",
+  year: 2025,
+  rating: "Not rated",
+  completed: false,
+  summary:
+    "A reflection on nostalgia, idealized identities, tradwifery, and the search for belonging through Natalie and Caleb.",
+};
+
+const title = metadata.title;
+const author = metadata.author;
+const year = metadata.year;
+const rating = metadata.rating;
+const yearDisplay = year ?? "—";
+const status = metadata.completed ? "Completed review" : "Half-baked review";
+---
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>{title} Review</title>
+
+  <style>
+    :root {
+      --bg: #f8f8f5;
+      --text: #111;
+      --muted: #666;
+      --border: #d8d8d8;
+      --max-width: 72ch;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Georgia, serif;
+      font-size: 19px;
+      line-height: 1.72;
+      padding: 3rem 1.5rem 6rem;
+    }
+
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      position: relative;
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.2rem;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 0.95rem;
+      font-family: monospace;
+      margin-bottom: 3rem;
+    }
+
+    .review-status {
+      display: inline-block;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 0.2rem 0.55rem;
+      font-size: 0.75rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 2rem;
+    }
+
+    p {
+      margin-bottom: 1.7rem;
+      text-align: justify;
+    }
+
+    .review-incomplete {
+      font-style: italic;
+      color: var(--muted);
+    }
+
+    a {
+      color: inherit;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 4rem 0;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        font-size: 17px;
+        padding: 2rem 1.2rem 4rem;
+      }
+
+      h1 {
+        font-size: 2.4rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+
+    <h1>{title}</h1>
+
+    <div class="meta">
+      {author} · {yearDisplay} · {rating}
+    </div>
+
+    <div class="review-status">
+      {status}
+    </div>
+
+    <p class="review-incomplete">
+      This is a half-baked review. Thoughts are unfinished, arguments
+      remain underdeveloped, and further revisions are pending.
+    </p>
+
+    <p>
+      <em>Yesteryear</em> follows the life of Natalie Heller Mills, a
+      tradwife who wakes up to the breakdown of her carefully crafted
+      life. Her existence becomes so consumed by feigning that she
+      eventually attempts to escape reality and become the very mask
+      she wears.
+    </p>
+
+    <p>
+      When reading the prologue, I initially wanted to put down the
+      book and slap another “DNF” (did not finish) on my reading list.
+      I didn't wish to read another book criticizing tradwifery. I had
+      read more than enough op-eds on the subject and watched enough
+      TikTok warriors decrying it as oppressive. I wanted to dismiss
+      the book just as I had dismissed them: let a woman make her own
+      choices, even if those choices include manually making butter
+      or milking cows. And even if it's mostly fake, who cares? It
+      inspires people to pursue their own bovine-related dreams.
+      Upon reflection, however, I realized that my own mental
+      reactions eerily paralleled the mental defenses the main
+      character puts up.
+    </p>
+
+    <p>
+      Before putting the book down, I read the dust jacket and
+      decided to at least give it a chance, if only to discover the
+      main character's reactions to being teleported back in time.
+      I will admit that I discovered something about myself: I am
+      exceedingly charitable toward alternative lifestyles. It's
+      easy to construct an idealized past or alternative way of life
+      that airbrushes away the problems of modernity. I could very
+      well have been someone who, although not a loyal follower of
+      the tradwife movement, would nevertheless support the decision
+      if I heard of someone embracing it.
+    </p>
+
+    <p>
+      The book is especially relevant given that nostalgia often
+      stems from present uncertainty. It feels as though we are
+      living through the most rapid period of development in history:
+      new technologies emerging on a global scale, economies booming
+      and busting within days. Everything familiar is unfamiliar;
+      everything known is unprecedented. Who among us doesn't do the
+      same with our childhood? A simpler time without struggle and
+      worry—it's easy to apply this lens backward. Imagining away
+      the struggle and pain into clean order is especially easy
+      because the harsh mundanities of life are forgotten. Natalie
+      is forced to use hours to make the butter she discarded in an
+      instant. Natalie forgets the hours women spent burning their
+      fingers in lye to launder clothes. <em>Yesteryear</em> forces
+      the reader to confront his own idealizations.
+    </p>
+
+    <p>
+      Natalie's desire to become a tradwife stems from her need to
+      control and "masculate" her husband, as well as her longing
+      for a simpler, purer past in which moral decay had not yet
+      swept across America. Her husband is a particularly
+      interesting character, although his evolution is not a
+      central focus of the novel. Through the few glimpses we get
+      of him, we see his own misfortune and victimization. He begins
+      as an innocent, unassuming man with little ambition, but his
+      wife identifies this as a condemnable character flaw. He is
+      constantly pressured to become more "manly." The book
+      identifies the false dichotomy imposed on men: they are either
+      weak or manly and ruthless. Men are told to be strong, stoic,
+      and focused, but forcing them all into this character type is
+      a grave mistake. As always, the middle ground seems to be just
+      right: strong but compassionate.
+    </p>
+
+    <p>
+      Feeling so rejected by society, Caleb turns to the manosphere,
+      where he finds a much-needed sense of belonging. The book does
+      an admirable job of condemning traditional social expectations
+      of masculinity, but I wonder whether it sufficiently explores
+      what an alternative might look like.
+    </p>
+
+    <p>
+      Caleb, for instance, eventually discovers what he wants to do:
+      become a kindergarten teacher. Natalie dismisses this aspiration
+      as insufficiently masculine and instead attempts to manufacture
+      a more conventionally masculine identity for him through
+      farming. Yet I find myself wondering whether the novel gives
+      Caleb enough agency of his own. Although his desire to teach
+      is perfectly legitimate, having a purpose and actively pursuing
+      it are two different things. Caleb's predicament is therefore
+      more complicated than simply being denied the freedom to pursue
+      his ambitions: he has not learned to take responsibility for
+      pursuing them.
+    </p>
+
+    <p>
+      Caleb's lack of agency stems from his need for self-confidence,
+      which he obtains through the manosphere. It offers him a
+      twisted ideal of masculinity, but without it, he would need an
+      alternative source of validation. A more nuanced interpretation
+      suggests that perhaps Caleb does need certain masculine social
+      norms but has not been exposed to positive examples of them.
+      Perhaps not all traditional forms of masculinity are inherently
+      harmful.
+    </p>
+
+    <p>
+      Where do boys initially develop confidence? Through healthy
+      interactions with other boys, participation in sports, clubs,
+      and other social activities—which I can avouch—emphasize these
+      norms. Perhaps traditional social norms aren't all bad; rather,
+      the problem lies in their overemphasis and rigid enforcement.
+      There is a difference between rejecting the expectation that
+      men must be strong, stoic, and domineering and rejecting the
+      value of strength, resilience, and camaraderie altogether.
+      This distinction is one I wish the novel had explored more
+      deeply, although it's quite understandable given the novel's
+      focus on female identity.
+    </p>
+
+    <p>
+      The book's main thesis, in my view, analyzes how we often
+      romanticize idealized identities and lifestyles as a means
+      of finding certainty and belonging, but in doing so, we risk
+      overlooking the realities and contradictions underlying those
+      ideals. Natalie's attempt at farm life ends up with her being
+      a business owner and the dominant partner despite her ideal
+      of a submissive wife.
+    </p>
+
+    <hr />
+
+    <p class="review-incomplete">
+      Half-baked review — to be continued.
+    </p>
+
+  </main>
+</body>
+</html>

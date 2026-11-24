@@ -9,7 +9,11 @@ updated_at: "2025-07-22T05:06:04.502506+00:00"
 
 # Quotes of Interest
 
+>"There are those that wish to live only one life: to strive and attain enlightenment. I wish to live a thousand ---no hundred---prosperous lives enjoying the juice of life itself..." ---Sreekar Charan
+
 >” Much that was called religion has carried an unconscious attitude of hostility toward life. True religion must teach that life is filled with joys pleasing to the eye of God, that knowledge without action is empty. All men must see that the teaching of religion by rules and rote is largely a hoax. The proper teaching is recognized with ease. You can know it without fail because it awakens within you that sensation which tells you this is something you've always known.”—The Orange Catholic Bible [Dune]
+
+>"When I get sad, I stop being sad, and be AWESOME instead. True story"--[Barney Stinson](https://www.quotes.net/mquote/764404)
 
 >“I would rather reason with a man whose principles I despise than with a man who has none.”---Sreekar Charan
 
@@ -17,6 +21,10 @@ updated_at: "2025-07-22T05:06:04.502506+00:00"
 remains, however improbable, must be the truth."--Sherlock Holmes
 
 >"Nothing good ever comes from worrying or sitting there feeling sorry for yourself... Keep positive and keep pushing on and things will turn good."--Connor McGregor
+
+>"I've always thought that I deserved it all"---Anonymous
+
+>"Stop quoting the laws to we who carry swords"---Pompey the Great
 
 >"The meek shall inherit the earth only in their fantasies. The strong and the righteous shall reap according to their merit"--- The texts of the Virath
 
@@ -48,6 +56,7 @@ remains, however improbable, must be the truth."--Sherlock Holmes
 
 > “Live to the point of tears.” — [Albert Camus](https://en.wikipedia.org/wiki/Albert_Camus)
 
+>"It's gonna be Legen...Wait for it...DARY!"---Barney Stinson
 
 >"Doubt is only removed by action. If you're not working then that's where doubt comes in."-- Conor McGregor
 
